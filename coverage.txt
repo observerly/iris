@@ -1,0 +1,2 @@
+mode: atomic
+github.com/observerly/iris/pkg/fits/fits.go:17.33,28.2 1 0
