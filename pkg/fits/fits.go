@@ -50,3 +50,30 @@ func NewFITSImage() *FITSImage {
 		Bscale: 1,
 	}
 }
+
+// Creates a new instance of FITS image from given naxisn:
+// (Data is not copied, allocated if nil. naxisn is deep copied)
+func NewFITSImageFromNaxisn(naxisn []int32, data []float32) *FITSImage {
+	numPixels := int32(1)
+
+	for _, naxis := range naxisn {
+		numPixels *= naxis
+	}
+
+	if data == nil {
+		data = make([]float32, numPixels)
+	}
+
+	return &FITSImage{
+		ID:       0,
+		Filename: "",
+		Header:   NewFITSHeader(),
+		Bitpix:   -32,
+		Bzero:    0,
+		Bscale:   1,
+		Naxisn:   append([]int32(nil), naxisn...), // clone slice
+		Pixels:   numPixels,
+		Data:     data,
+		Exposure: 0,
+	}
+}
