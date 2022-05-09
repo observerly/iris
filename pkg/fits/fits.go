@@ -77,3 +77,22 @@ func NewFITSImageFromNaxisn(naxisn []int32, data []float32) *FITSImage {
 		Exposure: 0,
 	}
 }
+
+// Creates a new instance of FITS image from given image:
+// (New data array will be allocated)
+func NewFITSImageFromImage(img *FITSImage) *FITSImage {
+	data := make([]float32, img.Pixels)
+
+	return &FITSImage{
+		ID:       img.ID,
+		Filename: img.Filename,
+		Header:   img.Header,
+		Bitpix:   img.Bitpix,
+		Bzero:    img.Bzero,
+		Bscale:   img.Bscale,
+		Naxisn:   append([]int32(nil), img.Naxisn...), // clone slice
+		Pixels:   img.Pixels,
+		Data:     data,
+		Exposure: img.Exposure,
+	}
+}

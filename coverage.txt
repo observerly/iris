@@ -6,3 +6,4 @@ github.com/observerly/iris/pkg/fits/fits.go:63.2,63.17 1 1
 github.com/observerly/iris/pkg/fits/fits.go:67.2,78.3 1 1
 github.com/observerly/iris/pkg/fits/fits.go:59.31,61.3 1 2
 github.com/observerly/iris/pkg/fits/fits.go:63.17,65.3 1 1
+github.com/observerly/iris/pkg/fits/fits.go:83.55,98.2 2 1
