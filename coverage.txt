@@ -1,5 +1,4 @@
 mode: atomic
-github.com/observerly/iris/pkg/iris/monochrome.go:16.84,28.2 3 2
 github.com/observerly/iris/pkg/fits/fits.go:17.33,28.2 1 2
 github.com/observerly/iris/pkg/fits/fits.go:47.32,52.2 1 1
 github.com/observerly/iris/pkg/fits/fits.go:56.72,59.31 2 1
@@ -8,3 +7,11 @@ github.com/observerly/iris/pkg/fits/fits.go:67.2,78.3 1 1
 github.com/observerly/iris/pkg/fits/fits.go:59.31,61.3 1 2
 github.com/observerly/iris/pkg/fits/fits.go:63.17,65.3 1 1
 github.com/observerly/iris/pkg/fits/fits.go:83.55,98.2 2 1
+github.com/observerly/iris/pkg/iris/monochrome.go:19.84,31.2 3 4
+github.com/observerly/iris/pkg/iris/monochrome.go:33.65,38.31 3 2
+github.com/observerly/iris/pkg/iris/monochrome.go:47.2,53.16 4 2
+github.com/observerly/iris/pkg/iris/monochrome.go:57.2,57.18 1 2
+github.com/observerly/iris/pkg/iris/monochrome.go:38.31,39.33 1 20
+github.com/observerly/iris/pkg/iris/monochrome.go:39.33,40.22 1 272
+github.com/observerly/iris/pkg/iris/monochrome.go:40.22,43.5 2 272
+github.com/observerly/iris/pkg/iris/monochrome.go:53.16,55.3 1 0

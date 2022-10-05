@@ -3,6 +3,9 @@ package iris
 import (
 	"bytes"
 	"image"
+	"image/color"
+	"image/jpeg"
+	"sync"
 )
 
 type MonochromeExposure struct {
@@ -25,4 +28,31 @@ func NewMonochromeExposure(exposure [][]uint32, xs int, ys int) MonochromeExposu
 	}
 
 	return mono
+}
+
+func (m *MonochromeExposure) Preprocess() (bytes.Buffer, error) {
+	var wg sync.WaitGroup
+
+	wg.Add(m.Width * m.Height)
+
+	for i := 0; i < m.Width; i++ {
+		for j := 0; j < m.Height; j++ {
+			go func(i, j int) {
+				m.Image.SetGray(i, j, color.Gray{uint8(m.Raw[i][j])})
+				wg.Done()
+			}(i, j)
+		}
+	}
+
+	wg.Wait()
+
+	var buff bytes.Buffer
+
+	err := jpeg.Encode(&buff, m.Image, &jpeg.Options{Quality: 100})
+
+	if err != nil {
+		return buff, err
+	}
+
+	return buff, nil
 }
