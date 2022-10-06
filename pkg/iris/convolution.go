@@ -78,3 +78,35 @@ func BiLinearConvolveGreenChannel(i, j uint32, raw []uint32, green []float32, w,
 
 	return green
 }
+
+func BiLinearConvolveBlueChannel(i, j uint32, raw []uint32, blue []float32, w, h, xOffset, yOffset, x, y uint32) []float32 {
+	// Source Offset:
+	so := (i+yOffset)*x + (j + xOffset)
+
+	// Destination Offset:
+	do := (i)*x + (j)
+
+	b1 := float32(raw[so+1+x])
+
+	b2, b3, b4 := b1, b1, b1
+
+	if j+xOffset > 0 {
+		b2 = float32(raw[so-1+x])
+	}
+
+	if i+yOffset > 0 {
+		b3 = float32(raw[so+1-x])
+	}
+
+	if j+xOffset > 0 && i+yOffset > 0 {
+		b3 = float32(raw[so+1-x])
+		b4 = float32(raw[so-1-x])
+	}
+
+	blue[do] = 0.25 * (b1 + b2 + b3 + b4)
+	blue[do+1] = 0.5 * (b1 + b3)
+	blue[do+x] = 0.5 * (b1 + b2)
+	blue[do+1+x] = b1
+
+	return blue
+}
