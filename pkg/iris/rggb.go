@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"image"
 	"image/color"
+	"image/jpeg"
 	"strings"
 )
 
@@ -104,4 +105,27 @@ func (b *RGGBExposure) DebayerBilinearInterpolation(xOffset int, yOffset int) er
 	}
 
 	return nil
+}
+
+func (b *RGGBExposure) Preprocess() (bytes.Buffer, error) {
+	xOffset, yOffset, err := b.GetBayerMatrixOffset()
+
+	if err != nil {
+		return b.Buffer, err
+	}
+
+	err = b.DebayerBilinearInterpolation(xOffset, yOffset)
+
+	if err != nil {
+		return b.Buffer, err
+	}
+
+	// Encode the image as a JPEG:
+	err = jpeg.Encode(&b.Buffer, b.Image, &jpeg.Options{Quality: 100})
+
+	if err != nil {
+		return b.Buffer, err
+	}
+
+	return b.Buffer, nil
 }
