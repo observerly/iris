@@ -16,7 +16,7 @@ type StarsExtractor struct {
 	Radius    float32
 	Raw       []uint32
 	Stars     []Star
-	HRF       float32
+	HFR       float32
 }
 
 func NewStarsExtractor(exposure [][]uint32, xs int, ys int, radius float32) *StarsExtractor {
