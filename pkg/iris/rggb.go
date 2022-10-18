@@ -16,6 +16,7 @@ type RGGBExposure struct {
 	Raw               [][]uint32
 	Buffer            bytes.Buffer
 	Image             *image.RGBA
+	Pixels            int
 }
 
 func NewRGGBExposure(exposure [][]uint32, xs int, ys int, cfa string) *RGGBExposure {
@@ -28,6 +29,7 @@ func NewRGGBExposure(exposure [][]uint32, xs int, ys int, cfa string) *RGGBExpos
 		Raw:               exposure,
 		Buffer:            bytes.Buffer{},
 		Image:             img,
+		Pixels:            xs * ys,
 	}
 }
 
