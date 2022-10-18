@@ -14,6 +14,7 @@ type MonochromeExposure struct {
 	Raw    [][]uint32
 	Buffer bytes.Buffer
 	Image  *image.Gray
+	Pixels int
 }
 
 func NewMonochromeExposure(exposure [][]uint32, xs int, ys int) MonochromeExposure {
@@ -25,6 +26,7 @@ func NewMonochromeExposure(exposure [][]uint32, xs int, ys int) MonochromeExposu
 		Raw:    exposure,
 		Buffer: bytes.Buffer{},
 		Image:  img,
+		Pixels: xs * ys,
 	}
 
 	return mono

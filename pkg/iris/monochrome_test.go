@@ -32,6 +32,18 @@ func TestNewMonochromeExposureHeight(t *testing.T) {
 	}
 }
 
+func TestNewMonochromeExposurePixels(t *testing.T) {
+	mono := NewMonochromeExposure(ex, 800, 600)
+
+	var got int = mono.Pixels
+
+	var want int = 480000
+
+	if got != want {
+		t.Errorf("got %q, wanted %q", got, want)
+	}
+}
+
 func TestNewMonochromeExposurePreprocess4x4(t *testing.T) {
 	var ex = [][]uint32{
 		{6, 6, 6, 6},
