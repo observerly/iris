@@ -29,6 +29,18 @@ func TestNewRGGBExposureHeight(t *testing.T) {
 	}
 }
 
+func TestNewRGGBExpsourePixels(t *testing.T) {
+	rggb := NewRGGBExposure(ex, 800, 600, "RGGB")
+
+	var got int = rggb.Pixels
+
+	var want int = 480000
+
+	if got != want {
+		t.Errorf("got %q, wanted %q", got, want)
+	}
+}
+
 func TestNewRGGBGetBayerMatrixOffset(t *testing.T) {
 	rggb := NewRGGBExposure(ex, 800, 600, "RGGB")
 
