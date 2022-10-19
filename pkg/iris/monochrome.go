@@ -5,7 +5,6 @@ import (
 	"image"
 	"image/color"
 	"image/jpeg"
-	"sync"
 )
 
 type MonochromeExposure struct {
@@ -33,20 +32,11 @@ func NewMonochromeExposure(exposure [][]uint32, xs int, ys int) MonochromeExposu
 }
 
 func (m *MonochromeExposure) Preprocess() (bytes.Buffer, error) {
-	var wg sync.WaitGroup
-
-	wg.Add(m.Width * m.Height)
-
-	for i := 0; i < m.Width; i++ {
-		for j := 0; j < m.Height; j++ {
-			go func(i, j int) {
-				m.Image.SetGray(i, j, color.Gray{uint8(m.Raw[i][j])})
-				wg.Done()
-			}(i, j)
+	for j := 0; j < m.Height; j++ {
+		for i := 0; i < m.Width; i++ {
+			m.Image.SetGray(i, j, color.Gray{uint8(m.Raw[j][i])})
 		}
 	}
-
-	wg.Wait()
 
 	var buff bytes.Buffer
 
