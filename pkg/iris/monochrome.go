@@ -47,11 +47,21 @@ func (m *MonochromeExposure) GetBuffer(img *image.Gray) (bytes.Buffer, error) {
 }
 
 func (m *MonochromeExposure) Preprocess() (bytes.Buffer, error) {
-	for j := 0; j < m.Height; j++ {
-		for i := 0; i < m.Width; i++ {
-			m.Image.SetGray(i, j, color.Gray{uint8(m.Raw[j][i])})
-		}
+	bounds := m.Image.Bounds()
+
+	size := bounds.Size()
+
+	gray := image.NewGray(bounds)
+
+	setPixel := func(gray *image.Gray, x int, y int) {
+		gray.SetGray(x, y, color.Gray{uint8(m.Raw[y][x])})
 	}
+
+	utils.DeferForEachPixel(size, func(x, y int) {
+		setPixel(gray, x, y)
+	})
+
+	m.Image = gray
 
 	return m.GetBuffer(m.Image)
 }
