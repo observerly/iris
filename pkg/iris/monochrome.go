@@ -31,10 +31,10 @@ func NewMonochromeExposure(exposure [][]uint32, xs int, ys int) MonochromeExposu
 	return mono
 }
 
-func (m *MonochromeExposure) GetBuffer() (bytes.Buffer, error) {
+func (m *MonochromeExposure) GetBuffer(img *image.Gray) (bytes.Buffer, error) {
 	var buff bytes.Buffer
 
-	err := jpeg.Encode(&buff, m.Image, &jpeg.Options{Quality: 100})
+	err := jpeg.Encode(&buff, img, &jpeg.Options{Quality: 100})
 
 	if err != nil {
 		return buff, err
@@ -50,5 +50,5 @@ func (m *MonochromeExposure) Preprocess() (bytes.Buffer, error) {
 		}
 	}
 
-	return m.GetBuffer()
+	return m.GetBuffer(m.Image)
 }
