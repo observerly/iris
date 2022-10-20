@@ -1,4 +1,12 @@
 mode: atomic
+github.com/observerly/iris/pkg/fits/fits.go:17.33,28.2 1 2
+github.com/observerly/iris/pkg/fits/fits.go:47.32,52.2 1 1
+github.com/observerly/iris/pkg/fits/fits.go:56.72,59.31 2 1
+github.com/observerly/iris/pkg/fits/fits.go:63.2,63.17 1 1
+github.com/observerly/iris/pkg/fits/fits.go:67.2,78.3 1 1
+github.com/observerly/iris/pkg/fits/fits.go:59.31,61.3 1 2
+github.com/observerly/iris/pkg/fits/fits.go:63.17,65.3 1 1
+github.com/observerly/iris/pkg/fits/fits.go:83.55,98.2 2 1
 github.com/observerly/iris/pkg/photometry/stars.go:22.93,27.29 2 2
 github.com/observerly/iris/pkg/photometry/stars.go:31.2,40.3 2 2
 github.com/observerly/iris/pkg/photometry/stars.go:27.29,29.3 1 32
@@ -9,14 +17,6 @@ github.com/observerly/iris/pkg/photometry/stars.go:48.35,52.22 2 24
 github.com/observerly/iris/pkg/photometry/stars.go:62.4,62.29 1 24
 github.com/observerly/iris/pkg/photometry/stars.go:52.22,56.85 2 23
 github.com/observerly/iris/pkg/photometry/stars.go:56.85,58.6 1 5
-github.com/observerly/iris/pkg/fits/fits.go:17.33,28.2 1 2
-github.com/observerly/iris/pkg/fits/fits.go:47.32,52.2 1 1
-github.com/observerly/iris/pkg/fits/fits.go:56.72,59.31 2 1
-github.com/observerly/iris/pkg/fits/fits.go:63.2,63.17 1 1
-github.com/observerly/iris/pkg/fits/fits.go:67.2,78.3 1 1
-github.com/observerly/iris/pkg/fits/fits.go:59.31,61.3 1 2
-github.com/observerly/iris/pkg/fits/fits.go:63.17,65.3 1 1
-github.com/observerly/iris/pkg/fits/fits.go:83.55,98.2 2 1
 github.com/observerly/iris/pkg/iris/convolution.go:5.122,16.40 5 128
 github.com/observerly/iris/pkg/iris/convolution.go:21.2,21.21 1 128
 github.com/observerly/iris/pkg/iris/convolution.go:25.2,25.21 1 128
@@ -79,3 +79,6 @@ github.com/observerly/iris/pkg/iris/rggb.go:132.2,132.22 1 1
 github.com/observerly/iris/pkg/iris/rggb.go:115.16,117.3 1 0
 github.com/observerly/iris/pkg/iris/rggb.go:121.16,123.3 1 0
 github.com/observerly/iris/pkg/iris/rggb.go:128.16,130.3 1 0
+github.com/observerly/iris/pkg/histogram/histogram.go:18.51,25.47 4 1
+github.com/observerly/iris/pkg/histogram/histogram.go:30.2,30.12 1 1
+github.com/observerly/iris/pkg/histogram/histogram.go:25.47,28.3 2 256
