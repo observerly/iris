@@ -31,13 +31,7 @@ func NewMonochromeExposure(exposure [][]uint32, xs int, ys int) MonochromeExposu
 	return mono
 }
 
-func (m *MonochromeExposure) Preprocess() (bytes.Buffer, error) {
-	for j := 0; j < m.Height; j++ {
-		for i := 0; i < m.Width; i++ {
-			m.Image.SetGray(i, j, color.Gray{uint8(m.Raw[j][i])})
-		}
-	}
-
+func (m *MonochromeExposure) GetBuffer() (bytes.Buffer, error) {
 	var buff bytes.Buffer
 
 	err := jpeg.Encode(&buff, m.Image, &jpeg.Options{Quality: 100})
@@ -47,4 +41,14 @@ func (m *MonochromeExposure) Preprocess() (bytes.Buffer, error) {
 	}
 
 	return buff, nil
+}
+
+func (m *MonochromeExposure) Preprocess() (bytes.Buffer, error) {
+	for j := 0; j < m.Height; j++ {
+		for i := 0; i < m.Width; i++ {
+			m.Image.SetGray(i, j, color.Gray{uint8(m.Raw[j][i])})
+		}
+	}
+
+	return m.GetBuffer()
 }
