@@ -5,6 +5,8 @@ import (
 	"image"
 	"image/color"
 	"image/jpeg"
+
+	"github.com/observerly/iris/pkg/utils"
 )
 
 type MonochromeExposure struct {
@@ -13,6 +15,7 @@ type MonochromeExposure struct {
 	Raw    [][]uint32
 	Buffer bytes.Buffer
 	Image  *image.Gray
+	Otsu   *image.Gray
 	Pixels int
 }
 
@@ -51,4 +54,30 @@ func (m *MonochromeExposure) Preprocess() (bytes.Buffer, error) {
 	}
 
 	return m.GetBuffer(m.Image)
+}
+
+func (m *MonochromeExposure) ApplyOtsuThreshold(threshold uint8) (bytes.Buffer, error) {
+	bounds := m.Image.Bounds()
+
+	size := bounds.Size()
+
+	gray := image.NewGray(bounds)
+
+	setPixel := func(gray *image.Gray, x int, y int) {
+		pixel := m.Image.GrayAt(x, y).Y
+
+		if pixel < threshold {
+			gray.SetGray(x, y, color.Gray{Y: 0})
+		} else {
+			gray.SetGray(x, y, color.Gray{Y: pixel})
+		}
+	}
+
+	utils.DeferForEachPixel(size, func(x, y int) {
+		setPixel(gray, x, y)
+	})
+
+	m.Otsu = gray
+
+	return m.GetBuffer(m.Otsu)
 }
