@@ -97,7 +97,7 @@ func (m *MonochromeExposure) Preprocess() (bytes.Buffer, error) {
 	gray := image.NewGray(bounds)
 
 	setPixel := func(gray *image.Gray, x int, y int) {
-		gray.SetGray(x, y, color.Gray{uint8(m.Raw[y][x])})
+		gray.SetGray(x, y, color.Gray{uint8(m.Raw[x][y])})
 	}
 
 	utils.DeferForEachPixel(size, func(x, y int) {
