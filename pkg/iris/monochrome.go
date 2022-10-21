@@ -6,17 +6,19 @@ import (
 	"image/color"
 	"image/jpeg"
 
+	"github.com/observerly/iris/pkg/histogram"
 	"github.com/observerly/iris/pkg/utils"
 )
 
 type MonochromeExposure struct {
-	Width  int
-	Height int
-	Raw    [][]uint32
-	Buffer bytes.Buffer
-	Image  *image.Gray
-	Otsu   *image.Gray
-	Pixels int
+	Width     int
+	Height    int
+	Raw       [][]uint32
+	Buffer    bytes.Buffer
+	Image     *image.Gray
+	Otsu      *image.Gray
+	Threshold uint8
+	Pixels    int
 }
 
 func NewMonochromeExposure(exposure [][]uint32, xs int, ys int) MonochromeExposure {
@@ -46,6 +48,47 @@ func (m *MonochromeExposure) GetBuffer(img *image.Gray) (bytes.Buffer, error) {
 	return buff, nil
 }
 
+func (m *MonochromeExposure) GetOtsuThresholdValue(img *image.Gray, size image.Point, histogram [256]uint64) uint8 {
+	var threshold uint8
+
+	var sumHistogram float64
+	var sumBackground float64
+	var weightBackground int
+	var weightForeground int
+
+	pixels := size.X * size.Y
+
+	maxVariance := 0.0
+
+	for i, bin := range histogram {
+		weightBackground += int(bin)
+
+		if weightBackground == 0 {
+			continue
+		}
+
+		weightForeground = pixels - weightBackground
+
+		if weightForeground == 0 {
+			break
+		}
+
+		sumBackground += float64(uint64(i) * bin)
+
+		meanBackground := float64(sumBackground) / float64(weightBackground)
+		meanForeground := (sumHistogram - sumBackground) / float64(weightForeground)
+
+		variance := float64(weightBackground) * float64(weightForeground) * (meanBackground - meanForeground) * (meanBackground - meanForeground)
+
+		if variance > maxVariance {
+			maxVariance = variance
+			threshold = uint8(i)
+		}
+	}
+
+	return threshold
+}
+
 func (m *MonochromeExposure) Preprocess() (bytes.Buffer, error) {
 	bounds := m.Image.Bounds()
 
@@ -66,17 +109,20 @@ func (m *MonochromeExposure) Preprocess() (bytes.Buffer, error) {
 	return m.GetBuffer(m.Image)
 }
 
-func (m *MonochromeExposure) ApplyOtsuThreshold(threshold uint8) (bytes.Buffer, error) {
+func (m *MonochromeExposure) ApplyOtsuThreshold() (bytes.Buffer, error) {
 	bounds := m.Image.Bounds()
 
 	size := bounds.Size()
+
+	// Get the Otsu Method's threshold value for our image:
+	m.Threshold = m.GetOtsuThresholdValue(m.Image, size, histogram.HistogramGray(m.Image))
 
 	gray := image.NewGray(bounds)
 
 	setPixel := func(gray *image.Gray, x int, y int) {
 		pixel := m.Image.GrayAt(x, y).Y
 
-		if pixel < threshold {
+		if pixel < m.Threshold {
 			gray.SetGray(x, y, color.Gray{Y: 0})
 		} else {
 			gray.SetGray(x, y, color.Gray{Y: pixel})

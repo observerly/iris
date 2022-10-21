@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"testing"
+
+	"github.com/observerly/iris/pkg/histogram"
 )
 
 var ex = [][]uint32{}
@@ -202,7 +204,7 @@ func TestNewMonochromeExposureOtsuThreshold(t *testing.T) {
 
 	mono.Preprocess()
 
-	buff, err := mono.ApplyOtsuThreshold(40)
+	buff, err := mono.ApplyOtsuThreshold()
 
 	if err != nil {
 		t.Errorf("Expected the buffer to be created successfully, but got %q", err)
@@ -231,5 +233,52 @@ func TestNewMonochromeExposureOtsuThreshold(t *testing.T) {
 
 	if n >= 1086 {
 		t.Errorf("Expected the number of bytes to be approximately less than 1086, but got %q", n)
+	}
+}
+
+func TestNewMonochromeExposureHistogramGray(t *testing.T) {
+	var ex = [][]uint32{
+		{1, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6},
+		{6, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 7, 6},
+		{7, 8, 9, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 9, 8, 7},
+		{6, 7, 8, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 8, 7, 6},
+		{6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6},
+		{6, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 7, 6},
+		{7, 8, 9, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 9, 8, 7},
+		{6, 7, 8, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 8, 7, 6},
+		{6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6},
+		{6, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 7, 6},
+		{7, 8, 9, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 9, 8, 7},
+		{6, 7, 8, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 8, 7, 6},
+		{6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6},
+		{6, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 7, 6},
+		{7, 8, 9, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 9, 8, 7},
+		{6, 7, 8, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 8, 7, 6},
+	}
+
+	mono := NewMonochromeExposure(ex, 16, 16)
+
+	mono.Preprocess()
+
+	res := histogram.HistogramGray(mono.Image)
+
+	if res[1] != 1 {
+		t.Errorf("got %q, wanted %q", res[1], 1)
+	}
+
+	if res[6] != 119 {
+		t.Errorf("got %q, wanted %q", res[6], 119)
+	}
+
+	if res[7] != 64 {
+		t.Errorf("got %q, wanted %q", res[7], 64)
+	}
+
+	if res[8] != 64 {
+		t.Errorf("got %q, wanted %q", res[8], 64)
+	}
+
+	if res[9] != 8 {
+		t.Errorf("got %q, wanted %q", res[9], 16)
 	}
 }
