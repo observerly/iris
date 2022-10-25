@@ -236,6 +236,82 @@ func TestNewMonochromeExposureOtsuThreshold(t *testing.T) {
 	}
 }
 
+func TestNewMonochromeExposureNoiseReduction16x16(t *testing.T) {
+	var ex = [][]uint32{
+		{6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6},
+		{6, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 7, 6},
+		{7, 8, 9, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 9, 8, 7},
+		{6, 7, 8, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 8, 7, 6},
+		{6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6},
+		{6, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 7, 6},
+		{7, 8, 9, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 9, 8, 7},
+		{6, 7, 8, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 8, 7, 6},
+		{6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6},
+		{6, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 7, 6},
+		{7, 8, 9, 7, 7, 7, 7, 7, 200, 200, 7, 7, 7, 9, 8, 7},
+		{6, 7, 8, 6, 6, 6, 6, 6, 200, 200, 6, 6, 6, 8, 7, 6},
+		{6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6},
+		{6, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 7, 6},
+		{7, 8, 9, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 9, 8, 7},
+		{6, 7, 8, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 8, 7, 6},
+	}
+
+	mono := NewMonochromeExposure(ex, 16, 16)
+
+	var x int = mono.Width
+
+	var y int = mono.Height
+
+	if x != 16 {
+		t.Errorf("got %q, wanted %q", x, 16)
+	}
+
+	if y != 16 {
+		t.Errorf("got %q, wanted %q", y, 16)
+	}
+
+	mono.Preprocess()
+
+	buff, err := mono.ApplyNoiseReduction()
+
+	if err != nil {
+		t.Errorf("Expected the buffer to be created successfully, but got %q", err)
+	}
+
+	f, err := os.Create("16x16image.jpg")
+
+	if err != nil {
+		panic(err)
+	}
+
+	defer func() {
+		if err := f.Close(); err != nil {
+			t.Errorf("Expected the image buffer to be saved successfully, but got %q", err)
+		}
+
+		// Clean up the file after we have finished with the test:
+		os.Remove("16x16image.jpg")
+	}()
+
+	n, err := f.Write(buff.Bytes())
+
+	if err != nil {
+		t.Errorf("Expected the image buffer to be saved successfully, but got %q", err)
+	}
+
+	if n >= 1086 {
+		t.Errorf("Expected the number of bytes to be approximately less than 1086, but got %q", n)
+	}
+
+	if mono.Noise <= 0.0 {
+		t.Errorf("Noise is %f, expected > 0.0", mono.Noise)
+	}
+
+	if mono.Noise > 255 {
+		t.Errorf("Noise is %f, expected <= 255", mono.Noise)
+	}
+}
+
 func TestNewMonochromeExposureHistogramGray(t *testing.T) {
 	var ex = [][]uint32{
 		{1, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6},
