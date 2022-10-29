@@ -2,6 +2,7 @@ package iris
 
 import (
 	"fmt"
+	"image/jpeg"
 	"os"
 	"testing"
 
@@ -356,5 +357,141 @@ func TestNewMonochromeExposureHistogramGray(t *testing.T) {
 
 	if res[9] != 8 {
 		t.Errorf("got %q, wanted %q", res[9], 16)
+	}
+}
+
+func TestNewNoiseExtractorGaussianNoisePngImage(t *testing.T) {
+	f, err := os.Open("../../images/noise.jpeg")
+
+	if err != nil {
+		t.Errorf("Error opening image: %s", err)
+	}
+
+	defer f.Close()
+
+	img, err := jpeg.Decode(f)
+
+	if err != nil {
+		t.Errorf("Error decoding image: %s", err)
+	}
+
+	bounds := img.Bounds()
+
+	ex := make([][]uint32, bounds.Dy())
+
+	for y := 0; y < bounds.Dy(); y++ {
+		row := make([]uint32, bounds.Dx())
+		ex[y] = row
+	}
+
+	mono := NewMonochromeExposure(ex, bounds.Dx(), bounds.Dy())
+
+	for j := 0; j < bounds.Dy(); j++ {
+		for i := 0; i < bounds.Dx(); i++ {
+			r, g, b, _ := img.At(i, j).RGBA()
+			lum := 0.299*float64(r) + 0.587*float64(g) + 0.114*float64(b)
+			mono.Raw[j][i] = uint32(lum / 256)
+		}
+	}
+
+	mono.Preprocess()
+
+	// Extract the noise from the image:
+	bytes, err := mono.ApplyNoiseReduction()
+
+	if err != nil {
+		t.Errorf("Error extracting noise from image: %s", err)
+	}
+
+	// Save the image to the root folder:
+	f, err = os.Create("noise.jpg")
+
+	if err != nil {
+		t.Errorf("Error creating image: %s", err)
+	}
+
+	defer f.Close()
+
+	defer func() {
+		if err := f.Close(); err != nil {
+			t.Errorf("Expected the image buffer to be saved successfully, but got %q", err)
+		}
+
+		// Clean up the file after we have finished with the test:
+		os.Remove("noise.jpg")
+	}()
+
+	_, err = f.Write(bytes.Bytes())
+
+	if err != nil {
+		t.Errorf("Error writing image: %s", err)
+	}
+}
+
+func TestNewNoiseExtractorGaussianNoise16PngImage(t *testing.T) {
+	f, err := os.Open("../../images/noise16.jpeg")
+
+	if err != nil {
+		t.Errorf("Error opening image: %s", err)
+	}
+
+	defer f.Close()
+
+	img, err := jpeg.Decode(f)
+
+	if err != nil {
+		t.Errorf("Error decoding image: %s", err)
+	}
+
+	bounds := img.Bounds()
+
+	ex := make([][]uint32, bounds.Dy())
+
+	for y := 0; y < bounds.Dy(); y++ {
+		row := make([]uint32, bounds.Dx())
+		ex[y] = row
+	}
+
+	mono := NewMonochromeExposure(ex, bounds.Dx(), bounds.Dy())
+
+	for j := 0; j < bounds.Dy(); j++ {
+		for i := 0; i < bounds.Dx(); i++ {
+			r, g, b, _ := img.At(i, j).RGBA()
+			lum := 0.299*float64(r) + 0.587*float64(g) + 0.114*float64(b)
+			mono.Raw[j][i] = uint32(lum / 256)
+		}
+	}
+
+	mono.Preprocess()
+
+	// Extract the noise from the image:
+	bytes, err := mono.ApplyNoiseReduction()
+
+	if err != nil {
+		t.Errorf("Error extracting noise from image: %s", err)
+	}
+
+	// Save the image to the root folder:
+	f, err = os.Create("noise16.jpg")
+
+	if err != nil {
+		t.Errorf("Error creating image: %s", err)
+	}
+
+	defer f.Close()
+
+	defer func() {
+		if err := f.Close(); err != nil {
+			t.Errorf("Expected the image buffer to be saved successfully, but got %q", err)
+		}
+
+		// Clean up the file after we have finished with the test:
+		os.Remove("noise16.jpg")
+	}()
+
+	_, err = f.Write(bytes.Bytes())
+
+	if err != nil {
+		t.Errorf("Error writing image: %s", err)
 	}
 }
