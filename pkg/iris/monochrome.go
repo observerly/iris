@@ -99,7 +99,7 @@ func (m *MonochromeExposure) Preprocess() (bytes.Buffer, error) {
 	gray := image.NewGray(bounds)
 
 	setPixel := func(gray *image.Gray, x int, y int) {
-		gray.SetGray(x, y, color.Gray{uint8(m.Raw[x][y])})
+		gray.SetGray(x, y, color.Gray{uint8(m.Raw[y][x])})
 	}
 
 	utils.DeferForEachPixel(size, func(x, y int) {
@@ -123,7 +123,7 @@ func (m *MonochromeExposure) ApplyNoiseReduction() (bytes.Buffer, error) {
 	m.Noise = noise.GetGaussianNoise()
 
 	setPixel := func(gray *image.Gray, x int, y int) {
-		pixel := m.Raw[x][y]
+		pixel := m.Raw[y][x]
 
 		if pixel < uint32(m.Noise) {
 			gray.SetGray(x, y, color.Gray{Y: 0})
