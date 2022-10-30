@@ -377,11 +377,11 @@ func TestNewNoiseExtractorGaussianNoisePngImage(t *testing.T) {
 
 	bounds := img.Bounds()
 
-	ex := make([][]uint32, bounds.Dy())
+	ex := make([][]uint32, bounds.Dx())
 
-	for y := 0; y < bounds.Dy(); y++ {
-		row := make([]uint32, bounds.Dx())
-		ex[y] = row
+	for x := 0; x < bounds.Dx(); x++ {
+		col := make([]uint32, bounds.Dy())
+		ex[x] = col
 	}
 
 	mono := NewMonochromeExposure(ex, bounds.Dx(), bounds.Dy())
@@ -390,7 +390,7 @@ func TestNewNoiseExtractorGaussianNoisePngImage(t *testing.T) {
 		for i := 0; i < bounds.Dx(); i++ {
 			r, g, b, _ := img.At(i, j).RGBA()
 			lum := 0.299*float64(r) + 0.587*float64(g) + 0.114*float64(b)
-			mono.Raw[j][i] = uint32(lum / 256)
+			mono.Raw[i][j] = uint32(lum / 256)
 		}
 	}
 
@@ -445,11 +445,11 @@ func TestNewNoiseExtractorGaussianNoise16PngImage(t *testing.T) {
 
 	bounds := img.Bounds()
 
-	ex := make([][]uint32, bounds.Dy())
+	ex := make([][]uint32, bounds.Dx())
 
-	for y := 0; y < bounds.Dy(); y++ {
-		row := make([]uint32, bounds.Dx())
-		ex[y] = row
+	for x := 0; x < bounds.Dx(); x++ {
+		col := make([]uint32, bounds.Dy())
+		ex[x] = col
 	}
 
 	mono := NewMonochromeExposure(ex, bounds.Dx(), bounds.Dy())
@@ -458,7 +458,7 @@ func TestNewNoiseExtractorGaussianNoise16PngImage(t *testing.T) {
 		for i := 0; i < bounds.Dx(); i++ {
 			r, g, b, _ := img.At(i, j).RGBA()
 			lum := 0.299*float64(r) + 0.587*float64(g) + 0.114*float64(b)
-			mono.Raw[j][i] = uint32(lum / 256)
+			mono.Raw[i][j] = uint32(lum / 256)
 		}
 	}
 
