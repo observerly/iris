@@ -1,6 +1,7 @@
 package iris
 
 import (
+	"fmt"
 	"io"
 )
 
@@ -35,4 +36,29 @@ func NewFITSHeader() FITSHeader {
   Writes a FITS header according to the FITS standard
   @see https://fits.gsfc.nasa.gov/standard40/fits_standard40aa-le.pdf
 */
-func (h *FITSHeader) Write(w io.Writer) {}
+func (h *FITSHeader) Write(w io.Writer) {
+	for k, v := range h.Bools {
+		writeBool(w, k, v, "")
+	}
+}
+
+// Writes a FITS header boolean T/F value
+func writeBool(w io.Writer, key string, value bool, comment string) {
+	if len(key) > 8 {
+		key = key[0:8]
+	}
+
+	if len(comment) > 47 {
+		comment = comment[0:47]
+	}
+
+	// Default false values are set to "F"
+	v := "F"
+
+	// If boolean value true, set to "T"
+	if value {
+		v = "T"
+	}
+
+	fmt.Fprintf(w, "%-8s= %20s / %-47s", key, v, comment)
+}
