@@ -1,5 +1,9 @@
 package iris
 
+import (
+	"io"
+)
+
 // FITS Header struct:
 type FITSHeader struct {
 	Bools    map[string]bool
@@ -26,3 +30,9 @@ func NewFITSHeader() FITSHeader {
 		End:      false,
 	}
 }
+
+/*
+  Writes a FITS header according to the FITS standard
+  @see https://fits.gsfc.nasa.gov/standard40/fits_standard40aa-le.pdf
+*/
+func (h *FITSHeader) Write(w io.Writer) {}
