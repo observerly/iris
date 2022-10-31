@@ -3,6 +3,7 @@ package iris
 import (
 	"fmt"
 	"io"
+	"strings"
 )
 
 // FITS Header struct:
@@ -40,6 +41,10 @@ func (h *FITSHeader) Write(w io.Writer) {
 	for k, v := range h.Bools {
 		writeBool(w, k, v, "")
 	}
+
+	for k, v := range h.Strings {
+		writeString(w, k, v, "")
+	}
 }
 
 // Writes a FITS header boolean T/F value
@@ -61,4 +66,32 @@ func writeBool(w io.Writer, key string, value bool, comment string) {
 	}
 
 	fmt.Fprintf(w, "%-8s= %20s / %-47s", key, v, comment)
+}
+
+// Writes a FITS header string value, with escaping and continuations if necessary.
+func writeString(w io.Writer, key, value, comment string) {
+	if len(key) > 8 {
+		key = key[0:8]
+	}
+	if len(comment) > 47 {
+		comment = comment[0:47]
+	}
+
+	// escape ' characters
+	value = strings.Join(strings.Split(value, "'"), "''")
+
+	if len(value) <= 18 {
+		fmt.Fprintf(w, "%-8s= '%s'%s / %-47s", key, value, strings.Repeat(" ", 18-len(value)), comment)
+	} else {
+		fmt.Fprintf(w, "%-8s= '%s&' / %-47s", key, value[0:17], comment)
+
+		value = value[17:]
+
+		for len(value) > 66 {
+			fmt.Fprintf(w, "CONTINUE  '%s&' ", value[0:66])
+			value = value[66:]
+		}
+
+		fmt.Fprintf(w, "CONTINUE  '%s'%s", value, strings.Repeat(" ", 50+(18-len(value))))
+	}
 }
