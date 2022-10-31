@@ -99,3 +99,23 @@ func TestNewDefaultFITSHeaderWriteInt(t *testing.T) {
 		t.Errorf("NewFITSHeader() Header.Write() exopected length of 80 characters: got %v, want %v", len(got), want)
 	}
 }
+
+func TestNewDefaultFITSHeaderWriteFloat(t *testing.T) {
+	var header = NewFITSHeader()
+
+	sb := strings.Builder{}
+
+	header.Floats = map[string]float32{
+		"TEST": 1.0,
+	}
+
+	header.Write(&sb)
+
+	got := sb.String()
+
+	want := 80
+
+	if len(got) != want {
+		t.Errorf("NewFITSHeader() Header.Write() exopected length of 80 characters: got %v, want %v", len(got), want)
+	}
+}
