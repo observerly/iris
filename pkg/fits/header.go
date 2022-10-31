@@ -49,6 +49,10 @@ func (h *FITSHeader) Write(w io.Writer) {
 	for k, v := range h.Ints {
 		writeInt(w, k, v, "")
 	}
+
+	for k, v := range h.Floats {
+		writeFloat(w, k, v, "")
+	}
 }
 
 // Writes a FITS header boolean T/F value
@@ -111,4 +115,17 @@ func writeInt(w io.Writer, key string, value int32, comment string) {
 	}
 
 	fmt.Fprintf(w, "%-8s= %20d / %-47s", key, value, comment)
+}
+
+// Writes a FITS header float value
+func writeFloat(w io.Writer, key string, value float32, comment string) {
+	if len(key) > 8 {
+		key = key[0:8]
+	}
+
+	if len(comment) > 47 {
+		comment = comment[0:47]
+	}
+
+	fmt.Fprintf(w, "%-8s= %20g / %-47s", key, value, comment)
 }
