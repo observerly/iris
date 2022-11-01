@@ -12,7 +12,7 @@ import (
 var ex = [][]uint32{}
 
 func TestNewMonochromeExposureWidth(t *testing.T) {
-	mono := NewMonochromeExposure(ex, 800, 600)
+	mono := NewMonochromeExposure(ex, 1, 800, 600)
 
 	var got int = mono.Width
 
@@ -24,7 +24,7 @@ func TestNewMonochromeExposureWidth(t *testing.T) {
 }
 
 func TestNewMonochromeExposureHeight(t *testing.T) {
-	mono := NewMonochromeExposure(ex, 800, 600)
+	mono := NewMonochromeExposure(ex, 1, 800, 600)
 
 	var got int = mono.Height
 
@@ -36,7 +36,7 @@ func TestNewMonochromeExposureHeight(t *testing.T) {
 }
 
 func TestNewMonochromeExposurePixels(t *testing.T) {
-	mono := NewMonochromeExposure(ex, 800, 600)
+	mono := NewMonochromeExposure(ex, 1, 800, 600)
 
 	var got int = mono.Pixels
 
@@ -55,7 +55,7 @@ func TestNewMonochromeExposurePreprocess4x4(t *testing.T) {
 		{6, 7, 8, 6},
 	}
 
-	mono := NewMonochromeExposure(ex, 4, 4)
+	mono := NewMonochromeExposure(ex, 1, 4, 4)
 
 	var x int = mono.Width
 
@@ -123,7 +123,7 @@ func TestNewMonochromeExposurePreprocess16x16(t *testing.T) {
 		{6, 7, 8, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 8, 7, 6},
 	}
 
-	mono := NewMonochromeExposure(ex, 16, 16)
+	mono := NewMonochromeExposure(ex, 1, 16, 16)
 
 	var x int = mono.Width
 
@@ -189,7 +189,7 @@ func TestNewMonochromeExposureOtsuThreshold(t *testing.T) {
 		{6, 7, 8, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 8, 7, 6},
 	}
 
-	mono := NewMonochromeExposure(ex, 16, 16)
+	mono := NewMonochromeExposure(ex, 1, 16, 16)
 
 	var x int = mono.Width
 
@@ -257,7 +257,7 @@ func TestNewMonochromeExposureNoiseReduction16x16(t *testing.T) {
 		{6, 7, 8, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 8, 7, 6},
 	}
 
-	mono := NewMonochromeExposure(ex, 16, 16)
+	mono := NewMonochromeExposure(ex, 1, 16, 16)
 
 	var x int = mono.Width
 
@@ -333,7 +333,7 @@ func TestNewMonochromeExposureHistogramGray(t *testing.T) {
 		{6, 7, 8, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 8, 7, 6},
 	}
 
-	mono := NewMonochromeExposure(ex, 16, 16)
+	mono := NewMonochromeExposure(ex, 1, 16, 16)
 
 	mono.Preprocess()
 
@@ -384,7 +384,7 @@ func TestNewNoiseExtractorGaussianNoisePngImage(t *testing.T) {
 		ex[x] = col
 	}
 
-	mono := NewMonochromeExposure(ex, bounds.Dx(), bounds.Dy())
+	mono := NewMonochromeExposure(ex, 1, bounds.Dx(), bounds.Dy())
 
 	for j := 0; j < bounds.Dy(); j++ {
 		for i := 0; i < bounds.Dx(); i++ {
@@ -452,7 +452,7 @@ func TestNewNoiseExtractorGaussianNoise16PngImage(t *testing.T) {
 		ex[x] = col
 	}
 
-	mono := NewMonochromeExposure(ex, bounds.Dx(), bounds.Dy())
+	mono := NewMonochromeExposure(ex, 1, bounds.Dx(), bounds.Dy())
 
 	for j := 0; j < bounds.Dy(); j++ {
 		for i := 0; i < bounds.Dx(); i++ {
