@@ -1,5 +1,7 @@
 package iris
 
+const FITS_STANDARD = "FITS Standard 4.0"
+
 // FITS Image struct:
 // @see https://fits.gsfc.nasa.gov/fits_primer.html
 // @see https://fits.gsfc.nasa.gov/standard40/fits_standard40aa-le.pdf

@@ -23,9 +23,10 @@ func TestNewDefaultFITSHeaderWriteBoolean(t *testing.T) {
 
 	sb := strings.Builder{}
 
-	header.Bools = map[string]bool{
-		"TEST": true,
-	}
+	header.Bools["SIMPLE"] = struct {
+		Value   bool
+		Comment string
+	}{Value: true, Comment: FITS_STANDARD}
 
 	header.Write(&sb)
 
