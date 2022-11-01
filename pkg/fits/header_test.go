@@ -44,9 +44,10 @@ func TestNewDefaultFITSHeaderWriteString(t *testing.T) {
 
 	sb := strings.Builder{}
 
-	header.Strings = map[string]string{
-		"TEST": "TEST",
-	}
+	header.Strings["SIMPLE"] = struct {
+		Value   string
+		Comment string
+	}{Value: "T", Comment: FITS_STANDARD}
 
 	header.Write(&sb)
 
@@ -64,9 +65,10 @@ func TestNewDefaultFITSHeaderWriteStringContinue(t *testing.T) {
 
 	sb := strings.Builder{}
 
-	header.Strings = map[string]string{
-		"TEST": "LONGER TEST STRING THAT SHOULD BE TRUNCATED ON A NEW LINE",
-	}
+	header.Strings["PROGRAM"] = struct {
+		Value   string
+		Comment string
+	}{Value: "observerly Online FITS Exposure Generator", Comment: FITS_STANDARD}
 
 	header.Write(&sb)
 
@@ -126,9 +128,10 @@ func TestNewDefaultFITSHeaderWriteEnd(t *testing.T) {
 
 	sb := strings.Builder{}
 
-	header.Strings = map[string]string{
-		"TEST": "TEST",
-	}
+	header.Strings["PROGRAM"] = struct {
+		Value   string
+		Comment string
+	}{Value: "observerly Ltd", Comment: FITS_STANDARD}
 
 	header.Write(&sb)
 
