@@ -18,7 +18,10 @@ type FITSHeader struct {
 		Value   string
 		Comment string
 	}
-	Dates    map[string]string
+	Dates map[string]struct {
+		Value   string
+		Comment string
+	}
 	Comments []string
 	History  []string
 	End      bool
@@ -38,7 +41,10 @@ func NewFITSHeader() FITSHeader {
 			Value   string
 			Comment string
 		}),
-		Dates:    make(map[string]string),
+		Dates: make(map[string]struct {
+			Value   string
+			Comment string
+		}),
 		Comments: make([]string, 0),
 		History:  make([]string, 0),
 		End:      false,
@@ -67,7 +73,7 @@ func (h *FITSHeader) Write(w io.Writer) {
 	}
 
 	for k, v := range h.Dates {
-		writeString(w, k, v, "")
+		writeString(w, k, v.Value, v.Comment)
 	}
 
 	h.End = writeEnd(w)
