@@ -133,8 +133,12 @@ func TestNewDefaultFITSHeaderWriteFloat(t *testing.T) {
 
 	sb := strings.Builder{}
 
-	header.Floats = map[string]float32{
-		"TEST": 1.0,
+	header.Floats["HFR"] = struct {
+		Value   float32
+		Comment string
+	}{
+		Value:   0.1632387,
+		Comment: "Median Half-Flux Radius (HFR) of the detected stars",
 	}
 
 	header.Write(&sb)
