@@ -83,6 +83,27 @@ func TestNewDefaultFITSHeaderWriteStringContinue(t *testing.T) {
 	}
 }
 
+func TestNewDefaultFITSHeaderWriteDate(t *testing.T) {
+	var header = NewFITSHeader()
+
+	sb := strings.Builder{}
+
+	header.Dates["EXPTIME"] = struct {
+		Value   string
+		Comment string
+	}{Value: "2022-11-01T11:30:48.294Z", Comment: "ISO 8601 UTC Datetime YYYY-MM-DDTHH:mm:ss.sssZ"}
+
+	header.Write(&sb)
+
+	got := sb.String()
+
+	want := 240
+
+	if len(got) != want {
+		t.Errorf("NewFITSHeader() Header.Write() exopected length of 160 characters: got %v, want %v", len(got), want)
+	}
+}
+
 func TestNewDefaultFITSHeaderWriteInt(t *testing.T) {
 	var header = NewFITSHeader()
 
