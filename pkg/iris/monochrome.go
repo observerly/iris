@@ -15,6 +15,7 @@ type MonochromeExposure struct {
 	Width     int
 	Height    int
 	Raw       [][]uint32
+	ADU       int32
 	Buffer    bytes.Buffer
 	Image     *image.Gray
 	Otsu      *image.Gray
@@ -23,13 +24,14 @@ type MonochromeExposure struct {
 	Pixels    int
 }
 
-func NewMonochromeExposure(exposure [][]uint32, xs int, ys int) MonochromeExposure {
+func NewMonochromeExposure(exposure [][]uint32, adu int32, xs int, ys int) MonochromeExposure {
 	img := image.NewGray(image.Rect(0, 0, xs, ys))
 
 	mono := MonochromeExposure{
 		Width:  xs,
 		Height: ys,
 		Raw:    exposure,
+		ADU:    adu,
 		Buffer: bytes.Buffer{},
 		Image:  img,
 		Pixels: xs * ys,
@@ -99,7 +101,7 @@ func (m *MonochromeExposure) Preprocess() (bytes.Buffer, error) {
 	gray := image.NewGray(bounds)
 
 	setPixel := func(gray *image.Gray, x int, y int) {
-		gray.SetGray(x, y, color.Gray{uint8(m.Raw[x][y])})
+		gray.SetGray(x, y, color.Gray{uint8(m.Raw[x][y] / uint32(m.ADU))})
 	}
 
 	utils.DeferForEachPixel(size, func(x, y int) {
@@ -123,7 +125,7 @@ func (m *MonochromeExposure) ApplyNoiseReduction() (bytes.Buffer, error) {
 	m.Noise = noise.GetGaussianNoise()
 
 	setPixel := func(gray *image.Gray, x int, y int) {
-		pixel := m.Raw[x][y]
+		pixel := m.Raw[x][y] / uint32(m.ADU)
 
 		if pixel < uint32(m.Noise) {
 			gray.SetGray(x, y, color.Gray{Y: 0})
