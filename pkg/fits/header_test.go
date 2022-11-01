@@ -109,8 +109,12 @@ func TestNewDefaultFITSHeaderWriteInt(t *testing.T) {
 
 	sb := strings.Builder{}
 
-	header.Ints = map[string]int32{
-		"TEST": 1,
+	header.Ints["BITPIX"] = struct {
+		Value   int32
+		Comment string
+	}{
+		Value:   32,
+		Comment: "Number of bits per data pixel",
 	}
 
 	header.Write(&sb)
