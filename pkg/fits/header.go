@@ -8,7 +8,10 @@ import (
 
 // FITS Header struct:
 type FITSHeader struct {
-	Bools    map[string]bool
+	Bools map[string]struct {
+		Value   bool
+		Comment string
+	}
 	Ints     map[string]int32
 	Floats   map[string]float32
 	Strings  map[string]string
@@ -22,7 +25,10 @@ type FITSHeader struct {
 // Create a new instance of FITS header:
 func NewFITSHeader() FITSHeader {
 	return FITSHeader{
-		Bools:    make(map[string]bool),
+		Bools: make(map[string]struct {
+			Value   bool
+			Comment string
+		}),
 		Ints:     make(map[string]int32),
 		Floats:   make(map[string]float32),
 		Strings:  make(map[string]string),
@@ -39,7 +45,7 @@ func NewFITSHeader() FITSHeader {
 */
 func (h *FITSHeader) Write(w io.Writer) {
 	for k, v := range h.Bools {
-		writeBool(w, k, v, "")
+		writeBool(w, k, v.Value, v.Comment)
 	}
 
 	for k, v := range h.Strings {
