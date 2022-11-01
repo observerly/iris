@@ -12,7 +12,10 @@ type FITSHeader struct {
 		Value   bool
 		Comment string
 	}
-	Ints    map[string]int32
+	Ints map[string]struct {
+		Value   int32
+		Comment string
+	}
 	Floats  map[string]float32
 	Strings map[string]struct {
 		Value   string
@@ -35,7 +38,10 @@ func NewFITSHeader() FITSHeader {
 			Value   bool
 			Comment string
 		}),
-		Ints:   make(map[string]int32),
+		Ints: make(map[string]struct {
+			Value   int32
+			Comment string
+		}),
 		Floats: make(map[string]float32),
 		Strings: make(map[string]struct {
 			Value   string
@@ -65,7 +71,7 @@ func (h *FITSHeader) Write(w io.Writer) {
 	}
 
 	for k, v := range h.Ints {
-		writeInt(w, k, v, "")
+		writeInt(w, k, v.Value, v.Comment)
 	}
 
 	for k, v := range h.Floats {
