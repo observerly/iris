@@ -19,16 +19,18 @@ type FITSImage struct {
 }
 
 // Creates a new instance of FITS image initialized with empty header
-func NewFITSImage() *FITSImage {
+func NewFITSImage(bitpix int32, naxis int32, naxis1 int32, naxis2 int32) *FITSImage {
+	h := NewFITSHeader(bitpix, naxis, naxis1, naxis2)
+
 	return &FITSImage{
-		Header: NewFITSHeader(),
+		Header: h,
 		Bscale: 1,
 	}
 }
 
 // Creates a new instance of FITS image from given naxisn:
 // (Data is not copied, allocated if nil. naxisn is deep copied)
-func NewFITSImageFromNaxisn(naxisn []int32, data []float32) *FITSImage {
+func NewFITSImageFromNaxisn(naxisn []int32, data []float32, bitpix int32, naxis int32, naxis1 int32, naxis2 int32) *FITSImage {
 	numPixels := int32(1)
 
 	for _, naxis := range naxisn {
@@ -39,10 +41,12 @@ func NewFITSImageFromNaxisn(naxisn []int32, data []float32) *FITSImage {
 		data = make([]float32, numPixels)
 	}
 
+	h := NewFITSHeader(bitpix, naxis, naxis1, naxis2)
+
 	return &FITSImage{
 		ID:       0,
 		Filename: "",
-		Header:   NewFITSHeader(),
+		Header:   h,
 		Bitpix:   -32,
 		Bzero:    0,
 		Bscale:   1,
