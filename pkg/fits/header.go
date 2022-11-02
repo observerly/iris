@@ -35,8 +35,8 @@ type FITSHeader struct {
 }
 
 // Create a new instance of FITS header:
-func NewFITSHeader() FITSHeader {
-	return FITSHeader{
+func NewFITSHeader(bitpix int32, naxis int32, naxis1 int32, naxis2 int32) FITSHeader {
+	h := FITSHeader{
 		Bools: make(map[string]struct {
 			Value   bool
 			Comment string
@@ -61,6 +61,74 @@ func NewFITSHeader() FITSHeader {
 		History:  make([]string, 0),
 		End:      false,
 	}
+
+	h.Bools["SIMPLE"] = struct {
+		Value   bool
+		Comment string
+	}{true, FITS_STANDARD}
+
+	h.Ints["BITPIX"] = struct {
+		Value   int32
+		Comment string
+	}{
+		Value:   bitpix,
+		Comment: "Number of bits per data pixel",
+	}
+
+	h.Ints["NAXIS"] = struct {
+		Value   int32
+		Comment string
+	}{
+		Value:   naxis,
+		Comment: "Number of data axes",
+	}
+
+	h.Ints["NAXIS1"] = struct {
+		Value   int32
+		Comment string
+	}{
+		Value:   naxis1,
+		Comment: "Length of data axis 1",
+	}
+
+	h.Ints["NAXIS2"] = struct {
+		Value   int32
+		Comment string
+	}{
+		Value:   naxis2,
+		Comment: "Length of data axis 2",
+	}
+
+	h.Ints["PCOUNT"] = struct {
+		Value   int32
+		Comment string
+	}{
+		Value:   0,
+		Comment: "",
+	}
+
+	h.Ints["GCOUNT"] = struct {
+		Value   int32
+		Comment string
+	}{
+		Value:   1,
+		Comment: "",
+	}
+
+	h.Strings["XTENSION"] = struct {
+		Value   string
+		Comment string
+	}{
+		Value:   "IMAGE␣␣␣",
+		Comment: "FITS Image Extension",
+	}
+
+	h.Strings["PROGRAM"] = struct {
+		Value   string
+		Comment string
+	}{Value: "@observerly/iris", Comment: "@observerly/iris FITS Exposure Generator"}
+
+	return h
 }
 
 /*

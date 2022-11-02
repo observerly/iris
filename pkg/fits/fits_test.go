@@ -2,7 +2,7 @@ package iris
 
 import "testing"
 
-var img = NewFITSImage()
+var img = NewFITSImage(16, 2, 600, 800)
 
 func TestNewDefaultFITSImageHeaderEnd(t *testing.T) {
 	var got = img.Header.End
@@ -24,7 +24,7 @@ func TestNewDefaultFITSImageBScale(t *testing.T) {
 	}
 }
 
-var imgNaxisn = NewFITSImageFromNaxisn([]int32{8, 8}, nil)
+var imgNaxisn = NewFITSImageFromNaxisn([]int32{8, 8}, nil, 16, 2, 600, 800)
 
 func TestNewFromNaxisnFITSImageID(t *testing.T) {
 	var got = imgNaxisn.ID
