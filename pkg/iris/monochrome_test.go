@@ -428,7 +428,7 @@ func TestNewNoiseExtractorGaussianNoisePngImage(t *testing.T) {
 	}
 }
 
-func TestNewNoiseExtractorGaussianNoise16PngImage(t *testing.T) {
+func TestNewMonochrome16NoiseExtractorGaussianNoise16PngImage(t *testing.T) {
 	f, err := os.Open("../../images/noise16.jpeg")
 
 	if err != nil {

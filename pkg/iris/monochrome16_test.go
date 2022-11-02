@@ -2,6 +2,7 @@ package iris
 
 import (
 	"fmt"
+	"image/jpeg"
 	"os"
 	"testing"
 )
@@ -176,6 +177,74 @@ func TestNewMonochrome16ExposurePreprocess16x16(t *testing.T) {
 	}
 }
 
+func TestNewNoiseExtractorGaussianNoise16PngImage(t *testing.T) {
+	f, err := os.Open("../../images/noise16.jpeg")
+
+	if err != nil {
+		t.Errorf("Error opening image: %s", err)
+	}
+
+	defer f.Close()
+
+	img, err := jpeg.Decode(f)
+
+	if err != nil {
+		t.Errorf("Error decoding image: %s", err)
+	}
+
+	bounds := img.Bounds()
+
+	ex := make([][]uint32, bounds.Dx())
+
+	for x := 0; x < bounds.Dx(); x++ {
+		col := make([]uint32, bounds.Dy())
+		ex[x] = col
+	}
+
+	mono := NewMonochrome16Exposure(ex, 1, bounds.Dx(), bounds.Dy())
+
+	for j := 0; j < bounds.Dy(); j++ {
+		for i := 0; i < bounds.Dx(); i++ {
+			r, g, b, _ := img.At(i, j).RGBA()
+			lum := 0.299*float64(r) + 0.587*float64(g) + 0.114*float64(b)
+			mono.Raw[i][j] = uint32(lum)
+		}
+	}
+
+	mono.Preprocess()
+
+	// Extract the noise from the image:
+	bytes, err := mono.ApplyNoiseReduction()
+
+	if err != nil {
+		t.Errorf("Error extracting noise from image: %s", err)
+	}
+
+	// Save the image to the root folder:
+	f, err = os.Create("noise16.jpg")
+
+	if err != nil {
+		t.Errorf("Error creating image: %s", err)
+	}
+
+	defer f.Close()
+
+	defer func() {
+		if err := f.Close(); err != nil {
+			t.Errorf("Expected the image buffer to be saved successfully, but got %q", err)
+		}
+
+		// Clean up the file after we have finished with the test:
+		os.Remove("noise16.jpg")
+	}()
+
+	_, err = f.Write(bytes.Bytes())
+
+	if err != nil {
+		t.Errorf("Error writing image: %s", err)
+	}
+}
+
 func TestNewMonochrome16ExposureOtsuThreshold(t *testing.T) {
 	var ex = [][]uint32{
 		{6, 6, 6, 6, 6, 6, 6, 6, 9, 6, 6, 6, 6, 6, 6, 6},
@@ -196,7 +265,7 @@ func TestNewMonochrome16ExposureOtsuThreshold(t *testing.T) {
 		{6, 7, 8, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 8, 7, 6},
 	}
 
-	mono := NewMonochromeExposure(ex, 1, 16, 16)
+	mono := NewMonochrome16Exposure(ex, 1, 16, 16)
 
 	var x int = mono.Width
 
