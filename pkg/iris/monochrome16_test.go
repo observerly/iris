@@ -1,6 +1,7 @@
 package iris
 
 import (
+	"os"
 	"testing"
 )
 
@@ -49,5 +50,73 @@ func TestNewMonochrome16ExposureGetBuffer(t *testing.T) {
 
 	if err != nil {
 		t.Errorf("Expected no error when creating the output buffer, got %q", err)
+	}
+}
+
+func TestNewMonochrome16ExposureOtsuThreshold(t *testing.T) {
+	var ex = [][]uint32{
+		{6, 6, 6, 6, 6, 6, 6, 6, 9, 6, 6, 6, 6, 6, 6, 6},
+		{6, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 7, 6},
+		{7, 8, 9, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 9, 8, 7},
+		{6, 7, 8, 6, 31, 35, 6, 6, 6, 6, 6, 6, 6, 8, 7, 6},
+		{6, 6, 6, 6, 34, 36, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6},
+		{6, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 7, 6},
+		{7, 8, 9, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 213, 8, 7},
+		{6, 7, 8, 6, 6, 6, 6, 6, 9, 6, 6, 6, 6, 8, 7, 6},
+		{6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6},
+		{6, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 7, 6},
+		{7, 8, 9, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 9, 8, 7},
+		{6, 7, 212, 211, 213, 6, 6, 6, 6, 6, 6, 6, 6, 8, 7, 6},
+		{6, 6, 213, 214, 213, 10, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6},
+		{6, 89, 211, 212, 211, 8, 8, 8, 8, 8, 8, 9, 8, 8, 7, 6},
+		{7, 71, 100, 108, 7, 7, 7, 7, 7, 7, 7, 7, 7, 9, 8, 7},
+		{6, 7, 8, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 8, 7, 6},
+	}
+
+	mono := NewMonochromeExposure(ex, 1, 16, 16)
+
+	var x int = mono.Width
+
+	var y int = mono.Height
+
+	if x != 16 {
+		t.Errorf("got %q, wanted %q", x, 16)
+	}
+
+	if y != 16 {
+		t.Errorf("got %q, wanted %q", y, 16)
+	}
+
+	mono.Preprocess()
+
+	buff, err := mono.ApplyOtsuThreshold()
+
+	if err != nil {
+		t.Errorf("Expected the buffer to be created successfully, but got %q", err)
+	}
+
+	f, err := os.Create("16x16otsuimage.jpg")
+
+	if err != nil {
+		panic(err)
+	}
+
+	defer func() {
+		if err := f.Close(); err != nil {
+			t.Errorf("Expected the image buffer to be saved successfully, but got %q", err)
+		}
+
+		// Clean up the file after we have finished with the test:
+		os.Remove("16x16otsuimage.jpg")
+	}()
+
+	n, err := f.Write(buff.Bytes())
+
+	if err != nil {
+		t.Errorf("Expected the image buffer to be saved successfully, but got %q", err)
+	}
+
+	if n >= 1086 {
+		t.Errorf("Expected the number of bytes to be approximately less than 1086, but got %q", n)
 	}
 }

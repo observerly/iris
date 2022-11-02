@@ -46,3 +46,44 @@ func (m *Monochrome16Exposure) GetBuffer(img *image.Gray16) (bytes.Buffer, error
 
 	return buff, nil
 }
+
+func (m *Monochrome16Exposure) GetOtsuThresholdValue(img *image.Gray16, size image.Point, histogram [65535]uint64) uint16 {
+	var threshold uint16
+
+	var sumHistogram float64
+	var sumBackground float64
+	var weightBackground int
+	var weightForeground int
+
+	pixels := size.X * size.Y
+
+	maxVariance := 0.0
+
+	for i, bin := range histogram {
+		weightBackground += int(bin)
+
+		if weightBackground == 0 {
+			continue
+		}
+
+		weightForeground = pixels - weightBackground
+
+		if weightForeground == 0 {
+			break
+		}
+
+		sumBackground += float64(uint64(i) * bin)
+
+		meanBackground := float64(sumBackground) / float64(weightBackground)
+		meanForeground := (sumHistogram - sumBackground) / float64(weightForeground)
+
+		variance := float64(weightBackground) * float64(weightForeground) * (meanBackground - meanForeground) * (meanBackground - meanForeground)
+
+		if variance > maxVariance {
+			maxVariance = variance
+			threshold = uint16(i)
+		}
+	}
+
+	return threshold
+}
