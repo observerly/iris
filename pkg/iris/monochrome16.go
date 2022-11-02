@@ -3,7 +3,10 @@ package iris
 import (
 	"bytes"
 	"image"
+	"image/color"
 	"image/jpeg"
+
+	"github.com/observerly/iris/pkg/utils"
 )
 
 type Monochrome16Exposure struct {
@@ -86,4 +89,24 @@ func (m *Monochrome16Exposure) GetOtsuThresholdValue(img *image.Gray16, size ima
 	}
 
 	return threshold
+}
+
+func (m *Monochrome16Exposure) Preprocess() (bytes.Buffer, error) {
+	bounds := m.Image.Bounds()
+
+	size := bounds.Size()
+
+	gray := image.NewGray16(bounds)
+
+	setPixel := func(gray *image.Gray16, x int, y int) {
+		gray.SetGray16(x, y, color.Gray16{uint16(m.Raw[x][y])})
+	}
+
+	utils.DeferForEachPixel(size, func(x, y int) {
+		setPixel(gray, x, y)
+	})
+
+	m.Image = gray
+
+	return m.GetBuffer(m.Image)
 }
