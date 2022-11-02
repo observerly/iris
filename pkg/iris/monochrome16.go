@@ -6,6 +6,7 @@ import (
 	"image/color"
 	"image/jpeg"
 
+	"github.com/observerly/iris/pkg/photometry"
 	"github.com/observerly/iris/pkg/utils"
 )
 
@@ -100,6 +101,36 @@ func (m *Monochrome16Exposure) Preprocess() (bytes.Buffer, error) {
 
 	setPixel := func(gray *image.Gray16, x int, y int) {
 		gray.SetGray16(x, y, color.Gray16{uint16(m.Raw[x][y])})
+	}
+
+	utils.DeferForEachPixel(size, func(x, y int) {
+		setPixel(gray, x, y)
+	})
+
+	m.Image = gray
+
+	return m.GetBuffer(m.Image)
+}
+
+func (m *Monochrome16Exposure) ApplyNoiseReduction() (bytes.Buffer, error) {
+	bounds := m.Image.Bounds()
+
+	size := bounds.Size()
+
+	gray := image.NewGray16(bounds)
+
+	noise := photometry.NewNoiseExtractor(m.Raw, m.Width, m.Height)
+
+	m.Noise = noise.GetGaussianNoise()
+
+	setPixel := func(gray *image.Gray16, x int, y int) {
+		pixel := m.Raw[x][y]
+
+		if pixel < uint32(m.Noise) {
+			gray.SetGray16(x, y, color.Gray16{Y: 0})
+		} else {
+			gray.SetGray16(x, y, color.Gray16{uint16(pixel - uint32(m.Noise))})
+		}
 	}
 
 	utils.DeferForEachPixel(size, func(x, y int) {
