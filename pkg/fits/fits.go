@@ -22,6 +22,22 @@ type FITSImage struct {
 func NewFITSImage(bitpix int32, naxis int32, naxis1 int32, naxis2 int32) *FITSImage {
 	h := NewFITSHeader(bitpix, naxis, naxis1, naxis2)
 
+	h.Ints["PCOUNT"] = struct {
+		Value   int32
+		Comment string
+	}{
+		Value:   0,
+		Comment: "",
+	}
+
+	h.Ints["GCOUNT"] = struct {
+		Value   int32
+		Comment string
+	}{
+		Value:   1,
+		Comment: "",
+	}
+
 	return &FITSImage{
 		Header: h,
 		Bscale: 1,
@@ -42,6 +58,22 @@ func NewFITSImageFromNaxisn(naxisn []int32, data []float32, bitpix int32, naxis 
 	}
 
 	h := NewFITSHeader(bitpix, naxis, naxis1, naxis2)
+
+	h.Ints["PCOUNT"] = struct {
+		Value   int32
+		Comment string
+	}{
+		Value:   0,
+		Comment: "",
+	}
+
+	h.Ints["GCOUNT"] = struct {
+		Value   int32
+		Comment string
+	}{
+		Value:   1,
+		Comment: "",
+	}
 
 	return &FITSImage{
 		ID:       0,

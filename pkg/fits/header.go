@@ -99,22 +99,6 @@ func NewFITSHeader(bitpix int32, naxis int32, naxis1 int32, naxis2 int32) FITSHe
 		Comment: "Length of data axis 2",
 	}
 
-	h.Ints["PCOUNT"] = struct {
-		Value   int32
-		Comment string
-	}{
-		Value:   0,
-		Comment: "",
-	}
-
-	h.Ints["GCOUNT"] = struct {
-		Value   int32
-		Comment string
-	}{
-		Value:   1,
-		Comment: "",
-	}
-
 	h.Strings["XTENSION"] = struct {
 		Value   string
 		Comment string
