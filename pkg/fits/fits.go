@@ -1,4 +1,4 @@
-package iris
+package fits
 
 const FITS_STANDARD = "FITS Standard 4.0"
 
