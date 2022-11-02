@@ -41,3 +41,13 @@ func TestNewMonochrome16ExposurePixels(t *testing.T) {
 		t.Errorf("got %q, wanted %q", got, want)
 	}
 }
+
+func TestNewMonochrome16ExposureGetBuffer(t *testing.T) {
+	mono := NewMonochrome16Exposure(ex16, 1, 800, 600)
+
+	_, err := mono.GetBuffer(mono.Image)
+
+	if err != nil {
+		t.Errorf("Expected no error when creating the output buffer, got %q", err)
+	}
+}
