@@ -3,6 +3,7 @@ package iris
 import (
 	"bytes"
 	"image"
+	"image/jpeg"
 )
 
 type Monochrome16Exposure struct {
@@ -32,4 +33,16 @@ func NewMonochrome16Exposure(exposure [][]uint32, adu int32, xs int, ys int) Mon
 	}
 
 	return mono
+}
+
+func (m *Monochrome16Exposure) GetBuffer(img *image.Gray16) (bytes.Buffer, error) {
+	var buff bytes.Buffer
+
+	err := jpeg.Encode(&buff, img, &jpeg.Options{Quality: 100})
+
+	if err != nil {
+		return buff, err
+	}
+
+	return buff, nil
 }
