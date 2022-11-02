@@ -6,6 +6,7 @@ import (
 	"image/color"
 	"image/jpeg"
 
+	"github.com/observerly/iris/pkg/histogram"
 	"github.com/observerly/iris/pkg/photometry"
 	"github.com/observerly/iris/pkg/utils"
 )
@@ -140,4 +141,33 @@ func (m *Monochrome16Exposure) ApplyNoiseReduction() (bytes.Buffer, error) {
 	m.Image = gray
 
 	return m.GetBuffer(m.Image)
+}
+
+func (m *Monochrome16Exposure) ApplyOtsuThreshold() (bytes.Buffer, error) {
+	bounds := m.Image.Bounds()
+
+	size := bounds.Size()
+
+	// Get the Otsu Method's threshold value for our image:
+	m.Threshold = m.GetOtsuThresholdValue(m.Image, size, histogram.HistogramGray16(m.Image))
+
+	gray := image.NewGray16(bounds)
+
+	setPixel := func(gray *image.Gray16, x int, y int) {
+		pixel := m.Image.Gray16At(x, y).Y
+
+		if pixel < m.Threshold {
+			gray.SetGray16(x, y, color.Gray16{Y: 0})
+		} else {
+			gray.SetGray16(x, y, color.Gray16{Y: pixel})
+		}
+	}
+
+	utils.DeferForEachPixel(size, func(x, y int) {
+		setPixel(gray, x, y)
+	})
+
+	m.Otsu = gray
+
+	return m.GetBuffer(m.Otsu)
 }
