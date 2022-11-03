@@ -389,7 +389,7 @@ func TestNewMonochrome16ExposureNoiseReduction16x16(t *testing.T) {
 	}
 }
 
-func TestNewGetFITSImage(t *testing.T) {
+func TestNewMonochrome16ExposureGetFITSImage(t *testing.T) {
 	f, err := os.Open("../../images/noise16.jpeg")
 
 	if err != nil {
