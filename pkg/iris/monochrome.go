@@ -6,6 +6,7 @@ import (
 	"image/color"
 	"image/jpeg"
 
+	"github.com/observerly/iris/pkg/fits"
 	"github.com/observerly/iris/pkg/histogram"
 	"github.com/observerly/iris/pkg/photometry"
 	"github.com/observerly/iris/pkg/utils"
@@ -50,6 +51,26 @@ func (m *MonochromeExposure) GetBuffer(img *image.Gray) (bytes.Buffer, error) {
 	}
 
 	return buff, nil
+}
+
+func (m *MonochromeExposure) GetFITSImage() *fits.FITSImage {
+	f := fits.NewFITSImageFrom2DData(
+		m.Raw,
+		8,
+		2,
+		int32(m.Width),
+		int32(m.Height),
+	)
+
+	f.Header.Strings["SENSOR"] = struct {
+		Value   string
+		Comment string
+	}{
+		Value:   "Monochrome",
+		Comment: "",
+	}
+
+	return f
 }
 
 func (m *MonochromeExposure) GetOtsuThresholdValue(img *image.Gray, size image.Point, histogram [256]uint64) uint8 {
