@@ -109,11 +109,18 @@ func NewFITSImageFrom2DData(ex [][]uint32, bitpix int32, naxis int32, naxis1 int
 
 	f := NewFITSImage(bitpix, naxis, naxis1, naxis2)
 
-	f.Data = data
-
-	f.Pixels = pixels
-
-	return f
+	return &FITSImage{
+		ID:       f.ID,
+		Filename: f.Filename,
+		Header:   f.Header,
+		Bitpix:   bitpix,
+		Bzero:    f.Bzero,
+		Bscale:   f.Bscale,
+		Naxisn:   []int32{naxis1, naxis2},
+		Pixels:   pixels,
+		Data:     data,
+		Exposure: 0,
+	}
 }
 
 // Creates a new instance of FITS image from given image:
