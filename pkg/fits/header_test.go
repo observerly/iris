@@ -1,7 +1,6 @@
 package fits
 
 import (
-	"fmt"
 	"strings"
 	"testing"
 )
@@ -75,8 +74,6 @@ func TestNewDefaultFITSHeaderWriteStringContinue(t *testing.T) {
 	got := sb.String()
 
 	want := 720
-
-	fmt.Println(got)
 
 	if len(got) != want {
 		t.Errorf("NewFITSHeader() Header.Write() exopected length of 720 characters: got %v, want %v", len(got), want)
