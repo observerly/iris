@@ -1,7 +1,6 @@
 package iris
 
 import (
-	"fmt"
 	"image/jpeg"
 	"os"
 	"testing"
@@ -95,8 +94,6 @@ func TestNewMonochromeExposurePreprocess4x4(t *testing.T) {
 	if err != nil {
 		t.Errorf("Expected the image buffer to be saved successfully, but got %q", err)
 	}
-
-	fmt.Println(n)
 
 	if n >= 512 {
 		t.Errorf("Expected the number of bytes to be approximately less than 128, but got %v", n)
