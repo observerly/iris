@@ -13,7 +13,7 @@ type FITSImage struct {
 	Bzero    float32    // Zero offset. (True pixel value is Bzero + Bscale * Data[i]).
 	Bscale   float32    // Value scaler. (True pixel value is Bzero + Bscale * Data[i]).
 	Naxisn   []int32    // Axis dimensions. Most quickly varying dimension first (i.e. X,Y)
-	Pixels   int32      // Number of pixels in the image. Product of Naxisn[]
+	Pixels   int32      // Number of pixels in the image. Product of Naxisn[] or naxis1 and naxis2
 	Data     []float32  // The image data
 	Exposure float32    // Image exposure in seconds
 }
@@ -87,6 +87,33 @@ func NewFITSImageFromNaxisn(naxisn []int32, data []float32, bitpix int32, naxis 
 		Data:     data,
 		Exposure: 0,
 	}
+}
+
+// Creates a new instance of FITS image from given 2D exposure array
+// (Data is not copied, allocated if nil. naxisn is deep copied)
+func NewFITSImageFrom2DData(ex [][]uint32, bitpix int32, naxis int32, naxis1 int32, naxis2 int32) *FITSImage {
+	pixels := naxis1 * naxis2
+
+	var data []float32
+
+	// Flatten the 2D Colour Filter Array array into a 1D array:
+	for _, row := range ex {
+		for _, col := range row {
+			data = append(data, float32(col))
+		}
+	}
+
+	if data == nil {
+		data = make([]float32, pixels)
+	}
+
+	f := NewFITSImage(bitpix, naxis, naxis1, naxis2)
+
+	f.Data = data
+
+	f.Pixels = pixels
+
+	return f
 }
 
 // Creates a new instance of FITS image from given image:
