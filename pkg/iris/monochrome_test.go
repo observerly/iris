@@ -495,3 +495,62 @@ func TestNewMonochrome16NoiseExtractorGaussianNoise16PngImage(t *testing.T) {
 		t.Errorf("Error writing image: %s", err)
 	}
 }
+
+func TestNewMonochromeExposureGetFITSImage(t *testing.T) {
+	f, err := os.Open("../../images/noise16.jpeg")
+
+	if err != nil {
+		t.Errorf("Error opening image: %s", err)
+	}
+
+	defer f.Close()
+
+	img, err := jpeg.Decode(f)
+
+	if err != nil {
+		t.Errorf("Error decoding image: %s", err)
+	}
+
+	bounds := img.Bounds()
+
+	ex := make([][]uint32, bounds.Dx())
+
+	for x := 0; x < bounds.Dx(); x++ {
+		col := make([]uint32, bounds.Dy())
+		ex[x] = col
+	}
+
+	mono := NewMonochromeExposure(ex, 255, bounds.Dx(), bounds.Dy())
+
+	for j := 0; j < bounds.Dy(); j++ {
+		for i := 0; i < bounds.Dx(); i++ {
+			r, g, b, _ := img.At(i, j).RGBA()
+			lum := 0.299*float64(r) + 0.587*float64(g) + 0.114*float64(b)
+			mono.Raw[i][j] = uint32(lum)
+		}
+	}
+
+	mono.Preprocess()
+
+	fit := mono.GetFITSImage()
+
+	if fit == nil {
+		t.Errorf("Expected the FITS image to be instantiated successfully, but got nil")
+	}
+
+	if fit.Data == nil {
+		t.Errorf("Expected the FITS image data to be instantiated successfully, but got nil")
+	}
+
+	if len(fit.Data) != bounds.Dx()*bounds.Dy() {
+		t.Errorf("Expected the FITS image data to be %d, but got %d", bounds.Dx()*bounds.Dy(), len(fit.Data))
+	}
+
+	if fit.Header.Ints["NAXIS1"].Value != int32(bounds.Dx()) {
+		t.Errorf("Expected the FITS image header NAXIS1 to be %q, but got %q", bounds.Dx(), fit.Header.Ints["NAXIS1"])
+	}
+
+	if fit.Header.Ints["NAXIS2"].Value != int32(bounds.Dy()) {
+		t.Errorf("Expected the FITS image header NAXIS2 to be %q, but got %q", bounds.Dy(), fit.Header.Ints["NAXIS2"])
+	}
+}
