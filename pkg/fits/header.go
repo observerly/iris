@@ -39,7 +39,7 @@ type FITSHeader struct {
 }
 
 // Create a new instance of FITS header:
-func NewFITSHeader(bitpix int32, naxis int32, naxis1 int32, naxis2 int32) FITSHeader {
+func NewFITSHeader(naxis int32, naxis1 int32, naxis2 int32) FITSHeader {
 	h := FITSHeader{
 		Bools: make(map[string]struct {
 			Value   bool
@@ -66,7 +66,7 @@ func NewFITSHeader(bitpix int32, naxis int32, naxis1 int32, naxis2 int32) FITSHe
 		End:      false,
 	}
 
-	h.Bitpix = bitpix
+	h.Bitpix = -32
 
 	h.Naxis = naxis
 
@@ -94,45 +94,65 @@ func NewFITSHeader(bitpix int32, naxis int32, naxis1 int32, naxis2 int32) FITSHe
   Writes a FITS header according to the FITS standard
   @see https://fits.gsfc.nasa.gov/standard40/fits_standard40aa-le.pdf
 */
-func (h *FITSHeader) Write(w io.Writer) {
+func (h *FITSHeader) Write(w io.Writer) error {
+	sb := strings.Builder{}
+
 	// SIMPLE needs to be the leading HDR value:
-	writeBool(w, "SIMPLE", true, FITS_STANDARD)
+	writeBool(&sb, "SIMPLE", true, FITS_STANDARD)
 	// BITPIX needs to be the seconda leading HDR value:
-	writeInt(w, "BITPIX", h.Bitpix, "Number of bits per data pixel")
+	writeInt(&sb, "BITPIX", -32, "Number of bits per data pixel")
 	// NAXIS header:
-	writeInt(w, "NAXIS", h.Naxis, "[1] Number of array dimensions")
+	writeInt(&sb, "NAXIS", h.Naxis, "[1] Number of array dimensions")
 	// NAXIS1 header:
-	writeInt(w, "NAXIS1", h.Naxis1, "[1] Length of data axis 1")
+	writeInt(&sb, "NAXIS1", h.Naxis1, "[1] Length of data axis 1")
 	// NAXIS2 header:
-	writeInt(w, "NAXIS2", h.Naxis2, "[1] Length of data axis 2")
+	writeInt(&sb, "NAXIS2", h.Naxis2, "[1] Length of data axis 2")
 
 	// BSCALE Header
-	writeInt(w, "BSCALE", 1, "")
+	writeInt(&sb, "BSCALE", 1, "")
 	// BZERO Header
-	writeInt(w, "BZERO", 0, "")
+	writeInt(&sb, "BZERO", 0, "")
 
 	// Write the rest of the header values:
 	for k, v := range h.Bools {
-		writeBool(w, k, v.Value, v.Comment)
+		writeBool(&sb, k, v.Value, v.Comment)
 	}
 
 	for k, v := range h.Strings {
-		writeString(w, k, v.Value, v.Comment)
+		writeString(&sb, k, v.Value, v.Comment)
 	}
 
 	for k, v := range h.Ints {
-		writeInt(w, k, v.Value, v.Comment)
+		writeInt(&sb, k, v.Value, v.Comment)
 	}
 
 	for k, v := range h.Floats {
-		writeFloat(w, k, v.Value, v.Comment)
+		writeFloat(&sb, k, v.Value, v.Comment)
 	}
 
 	for k, v := range h.Dates {
-		writeString(w, k, v.Value, v.Comment)
+		writeString(&sb, k, v.Value, v.Comment)
 	}
 
-	h.End = writeEnd(w)
+	h.End = writeEnd(&sb)
+
+	// Pad current header block with spaces if necessary:
+	bytesInHeaderBlock := (sb.Len() % 2880)
+
+	if bytesInHeaderBlock > 0 {
+		for i := bytesInHeaderBlock; i < 2880; i++ {
+			sb.WriteRune(' ')
+		}
+	}
+
+	// Write the FITS Header block to the writer:
+	_, err := w.Write([]byte(sb.String()))
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // Writes a FITS header boolean T/F value
