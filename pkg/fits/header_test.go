@@ -1,6 +1,7 @@
 package fits
 
 import (
+	"bytes"
 	"strings"
 	"testing"
 )
@@ -20,16 +21,16 @@ func TestNewDefaultFITSHeaderEnd(t *testing.T) {
 func TestNewDefaultFITSHeaderWriteBoolean(t *testing.T) {
 	var header = NewFITSHeader(2, 600, 800)
 
-	sb := strings.Builder{}
+	buf := new(bytes.Buffer)
 
 	header.Bools["SIMPLE"] = struct {
 		Value   bool
 		Comment string
 	}{Value: true, Comment: FITS_STANDARD}
 
-	header.Write(&sb)
+	header.WriteToBuffer(buf)
 
-	got := sb.String()
+	got := buf.String()
 
 	want := 2880
 
@@ -41,16 +42,16 @@ func TestNewDefaultFITSHeaderWriteBoolean(t *testing.T) {
 func TestNewDefaultFITSHeaderWriteString(t *testing.T) {
 	var header = NewFITSHeader(2, 600, 800)
 
-	sb := strings.Builder{}
+	buf := new(bytes.Buffer)
 
 	header.Strings["SIMPLE"] = struct {
 		Value   string
 		Comment string
 	}{Value: "T", Comment: FITS_STANDARD}
 
-	header.Write(&sb)
+	header.WriteToBuffer(buf)
 
-	got := sb.String()
+	got := buf.String()
 
 	want := 2880
 
@@ -62,16 +63,16 @@ func TestNewDefaultFITSHeaderWriteString(t *testing.T) {
 func TestNewDefaultFITSHeaderWriteStringContinue(t *testing.T) {
 	var header = NewFITSHeader(2, 600, 800)
 
-	sb := strings.Builder{}
+	buf := new(bytes.Buffer)
 
 	header.Strings["PROGRAM"] = struct {
 		Value   string
 		Comment string
 	}{Value: "observerly Online FITS Exposure Generator", Comment: FITS_STANDARD}
 
-	header.Write(&sb)
+	header.WriteToBuffer(buf)
 
-	got := sb.String()
+	got := buf.String()
 
 	want := 2880
 
@@ -83,16 +84,16 @@ func TestNewDefaultFITSHeaderWriteStringContinue(t *testing.T) {
 func TestNewDefaultFITSHeaderWriteDate(t *testing.T) {
 	var header = NewFITSHeader(2, 600, 800)
 
-	sb := strings.Builder{}
+	buf := new(bytes.Buffer)
 
 	header.Dates["EXPTIME"] = struct {
 		Value   string
 		Comment string
 	}{Value: "2022-11-01T11:30:48.294Z", Comment: "ISO 8601 UTC Datetime YYYY-MM-DDTHH:mm:ss.sssZ"}
 
-	header.Write(&sb)
+	header.WriteToBuffer(buf)
 
-	got := sb.String()
+	got := buf.String()
 
 	want := 2880
 
@@ -104,7 +105,7 @@ func TestNewDefaultFITSHeaderWriteDate(t *testing.T) {
 func TestNewDefaultFITSHeaderWriteInt(t *testing.T) {
 	var header = NewFITSHeader(2, 600, 800)
 
-	sb := strings.Builder{}
+	buf := new(bytes.Buffer)
 
 	header.Ints["BITPIX"] = struct {
 		Value   int32
@@ -114,9 +115,9 @@ func TestNewDefaultFITSHeaderWriteInt(t *testing.T) {
 		Comment: "Number of bits per data pixel",
 	}
 
-	header.Write(&sb)
+	header.WriteToBuffer(buf)
 
-	got := sb.String()
+	got := buf.String()
 
 	want := 2880
 
@@ -128,7 +129,7 @@ func TestNewDefaultFITSHeaderWriteInt(t *testing.T) {
 func TestNewDefaultFITSHeaderWriteFloat(t *testing.T) {
 	var header = NewFITSHeader(2, 600, 800)
 
-	sb := strings.Builder{}
+	buf := new(bytes.Buffer)
 
 	header.Floats["HFR"] = struct {
 		Value   float32
@@ -138,9 +139,9 @@ func TestNewDefaultFITSHeaderWriteFloat(t *testing.T) {
 		Comment: "Median Half-Flux Radius (HFR) of the detected stars",
 	}
 
-	header.Write(&sb)
+	header.WriteToBuffer(buf)
 
-	got := sb.String()
+	got := buf.String()
 
 	want := 2880
 
@@ -152,16 +153,16 @@ func TestNewDefaultFITSHeaderWriteFloat(t *testing.T) {
 func TestNewDefaultFITSHeaderWriteEnd(t *testing.T) {
 	var header = NewFITSHeader(2, 600, 800)
 
-	sb := strings.Builder{}
+	buf := new(bytes.Buffer)
 
 	header.Strings["PROGRAM"] = struct {
 		Value   string
 		Comment string
 	}{Value: "observerly Ltd", Comment: FITS_STANDARD}
 
-	header.Write(&sb)
+	header.WriteToBuffer(buf)
 
-	got := sb.String()
+	got := buf.String()
 
 	want := 2880
 
