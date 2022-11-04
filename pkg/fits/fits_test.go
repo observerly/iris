@@ -8,7 +8,7 @@ import (
 )
 
 func TestNewDefaultFITSImageHeaderEnd(t *testing.T) {
-	var img = NewFITSImage(16, 2, 600, 800)
+	var img = NewFITSImage(2, 600, 800)
 
 	var got = img.Header.End
 
@@ -20,7 +20,7 @@ func TestNewDefaultFITSImageHeaderEnd(t *testing.T) {
 }
 
 func TestNewDefaultFITSImageBScale(t *testing.T) {
-	var img = NewFITSImage(16, 2, 600, 800)
+	var img = NewFITSImage(2, 600, 800)
 
 	var got = img.Bscale
 
@@ -123,7 +123,7 @@ func TestNewFITSImageFrom2DDataID(t *testing.T) {
 		{6, 7, 8, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 8, 7, 6},
 	}
 
-	var img2DData = NewFITSImageFrom2DData(ex, 16, 2, 16, 16)
+	var img2DData = NewFITSImageFrom2DData(ex, 2, 16, 16)
 
 	var got = img2DData.ID
 
@@ -154,7 +154,7 @@ func TestNewFITSImageFrom2DDataPixels(t *testing.T) {
 		{6, 7, 8, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 8, 7, 6},
 	}
 
-	var img2DData = NewFITSImageFrom2DData(ex, 16, 2, 16, 16)
+	var img2DData = NewFITSImageFrom2DData(ex, 2, 16, 16)
 
 	var got = img2DData.Data
 
@@ -185,7 +185,7 @@ func TestNewFITSImageFrom2DDataData(t *testing.T) {
 		{6, 7, 8, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 8, 7, 6},
 	}
 
-	var img2DData = NewFITSImageFrom2DData(ex, 16, 2, 16, 16)
+	var img2DData = NewFITSImageFrom2DData(ex, 2, 16, 16)
 
 	var got = img2DData.Data
 
@@ -302,7 +302,7 @@ func TestNewFITSImageFrom2DDataWriteFloatData(t *testing.T) {
 		}
 	}
 
-	var fit = NewFITSImageFrom2DData(ex, 16, 2, int32(bounds.Dx()), int32(bounds.Dy()))
+	var fit = NewFITSImageFrom2DData(ex, 2, int32(bounds.Dx()), int32(bounds.Dy()))
 
 	var w io.Writer = os.Stdout
 

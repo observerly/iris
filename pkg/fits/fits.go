@@ -25,27 +25,13 @@ type FITSImage struct {
 }
 
 // Creates a new instance of FITS image initialized with empty header
-func NewFITSImage(bitpix int32, naxis int32, naxis1 int32, naxis2 int32) *FITSImage {
-	h := NewFITSHeader(bitpix, naxis, naxis1, naxis2)
-
-	h.Ints["PCOUNT"] = struct {
-		Value   int32
-		Comment string
-	}{
-		Value:   0,
-		Comment: "",
-	}
-
-	h.Ints["GCOUNT"] = struct {
-		Value   int32
-		Comment string
-	}{
-		Value:   1,
-		Comment: "",
-	}
+func NewFITSImage(naxis int32, naxis1 int32, naxis2 int32) *FITSImage {
+	h := NewFITSHeader(naxis, naxis1, naxis2)
 
 	return &FITSImage{
 		Header: h,
+		Bitpix: -32,
+		Bzero:  0,
 		Bscale: 1,
 	}
 }
@@ -63,23 +49,7 @@ func NewFITSImageFromNaxisn(naxisn []int32, data []float32, bitpix int32, naxis 
 		data = make([]float32, numPixels)
 	}
 
-	h := NewFITSHeader(bitpix, naxis, naxis1, naxis2)
-
-	h.Ints["PCOUNT"] = struct {
-		Value   int32
-		Comment string
-	}{
-		Value:   0,
-		Comment: "",
-	}
-
-	h.Ints["GCOUNT"] = struct {
-		Value   int32
-		Comment string
-	}{
-		Value:   1,
-		Comment: "",
-	}
+	h := NewFITSHeader(naxis, naxis1, naxis2)
 
 	return &FITSImage{
 		ID:       0,
@@ -97,7 +67,7 @@ func NewFITSImageFromNaxisn(naxisn []int32, data []float32, bitpix int32, naxis 
 
 // Creates a new instance of FITS image from given 2D exposure array
 // (Data is not copied, allocated if nil. naxisn is deep copied)
-func NewFITSImageFrom2DData(ex [][]uint32, bitpix int32, naxis int32, naxis1 int32, naxis2 int32) *FITSImage {
+func NewFITSImageFrom2DData(ex [][]uint32, naxis int32, naxis1 int32, naxis2 int32) *FITSImage {
 	pixels := naxis1 * naxis2
 
 	var data []float32
@@ -113,13 +83,13 @@ func NewFITSImageFrom2DData(ex [][]uint32, bitpix int32, naxis int32, naxis1 int
 		data = make([]float32, pixels)
 	}
 
-	f := NewFITSImage(bitpix, naxis, naxis1, naxis2)
+	f := NewFITSImage(naxis, naxis1, naxis2)
 
 	return &FITSImage{
 		ID:       f.ID,
 		Filename: f.Filename,
 		Header:   f.Header,
-		Bitpix:   bitpix,
+		Bitpix:   -32,
 		Bzero:    f.Bzero,
 		Bscale:   f.Bscale,
 		Naxisn:   []int32{naxis1, naxis2},

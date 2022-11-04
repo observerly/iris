@@ -56,7 +56,6 @@ func (m *Monochrome16Exposure) GetBuffer(img *image.Gray16) (bytes.Buffer, error
 func (m *Monochrome16Exposure) GetFITSImage() *fits.FITSImage {
 	f := fits.NewFITSImageFrom2DData(
 		m.Raw,
-		16,
 		2,
 		int32(m.Width),
 		int32(m.Height),
