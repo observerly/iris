@@ -31,10 +31,10 @@ func TestNewDefaultFITSHeaderWriteBoolean(t *testing.T) {
 
 	got := sb.String()
 
-	want := 640
+	want := 880
 
 	if len(got) != want {
-		t.Errorf("NewFITSHeader() Header.Write() exopected length of 640 characters: got %v, want %v", len(got), want)
+		t.Errorf("NewFITSHeader() Header.Write() exopected length of 880 characters: got %v, want %v", len(got), want)
 	}
 }
 
@@ -52,10 +52,10 @@ func TestNewDefaultFITSHeaderWriteString(t *testing.T) {
 
 	got := sb.String()
 
-	want := 720
+	want := 880
 
 	if len(got) != want {
-		t.Errorf("NewFITSHeader() Header.Write() exopected length of 720 characters: got %v, want %v", len(got), want)
+		t.Errorf("NewFITSHeader() Header.Write() exopected length of 880 characters: got %v, want %v", len(got), want)
 	}
 }
 
@@ -73,10 +73,10 @@ func TestNewDefaultFITSHeaderWriteStringContinue(t *testing.T) {
 
 	got := sb.String()
 
-	want := 720
+	want := 880
 
 	if len(got) != want {
-		t.Errorf("NewFITSHeader() Header.Write() exopected length of 720 characters: got %v, want %v", len(got), want)
+		t.Errorf("NewFITSHeader() Header.Write() exopected length of 880 characters: got %v, want %v", len(got), want)
 	}
 }
 
@@ -94,10 +94,10 @@ func TestNewDefaultFITSHeaderWriteDate(t *testing.T) {
 
 	got := sb.String()
 
-	want := 800
+	want := 960
 
 	if len(got) != want {
-		t.Errorf("NewFITSHeader() Header.Write() exopected length of 800 characters: got %v, want %v", len(got), want)
+		t.Errorf("NewFITSHeader() Header.Write() exopected length of 960 characters: got %v, want %v", len(got), want)
 	}
 }
 
@@ -118,10 +118,10 @@ func TestNewDefaultFITSHeaderWriteInt(t *testing.T) {
 
 	got := sb.String()
 
-	want := 640
+	want := 880
 
 	if len(got) != want {
-		t.Errorf("NewFITSHeader() Header.Write() exopected length of 640 characters: got %v, want %v", len(got), want)
+		t.Errorf("NewFITSHeader() Header.Write() exopected length of 880 characters: got %v, want %v", len(got), want)
 	}
 }
 
@@ -142,10 +142,10 @@ func TestNewDefaultFITSHeaderWriteFloat(t *testing.T) {
 
 	got := sb.String()
 
-	want := 720
+	want := 880
 
 	if len(got) != want {
-		t.Errorf("NewFITSHeader() Header.Write() exopected length of 720 characters: got %v, want %v", len(got), want)
+		t.Errorf("NewFITSHeader() Header.Write() exopected length of 880 characters: got %v, want %v", len(got), want)
 	}
 }
 
@@ -163,10 +163,10 @@ func TestNewDefaultFITSHeaderWriteEnd(t *testing.T) {
 
 	got := sb.String()
 
-	want := 640
+	want := 800
 
 	if len(got) != want {
-		t.Errorf("NewFITSHeader() Header.Write() exopected length of 640 characters: got %v, want %v", len(got), want)
+		t.Errorf("NewFITSHeader() Header.Write() exopected length of 800 characters: got %v, want %v", len(got), want)
 	}
 
 	if !header.End {

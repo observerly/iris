@@ -8,7 +8,11 @@ import (
 
 // FITS Header struct:
 type FITSHeader struct {
-	Bools map[string]struct {
+	Bitpix int32
+	Naxis  int32
+	Naxis1 int32
+	Naxis2 int32
+	Bools  map[string]struct {
 		Value   bool
 		Comment string
 	}
@@ -62,42 +66,13 @@ func NewFITSHeader(bitpix int32, naxis int32, naxis1 int32, naxis2 int32) FITSHe
 		End:      false,
 	}
 
-	h.Bools["SIMPLE"] = struct {
-		Value   bool
-		Comment string
-	}{true, FITS_STANDARD}
+	h.Bitpix = bitpix
 
-	h.Ints["BITPIX"] = struct {
-		Value   int32
-		Comment string
-	}{
-		Value:   bitpix,
-		Comment: "Number of bits per data pixel",
-	}
+	h.Naxis = naxis
 
-	h.Ints["NAXIS"] = struct {
-		Value   int32
-		Comment string
-	}{
-		Value:   naxis,
-		Comment: "Number of data axes",
-	}
+	h.Naxis1 = naxis1
 
-	h.Ints["NAXIS1"] = struct {
-		Value   int32
-		Comment string
-	}{
-		Value:   naxis1,
-		Comment: "Length of data axis 1",
-	}
-
-	h.Ints["NAXIS2"] = struct {
-		Value   int32
-		Comment string
-	}{
-		Value:   naxis2,
-		Comment: "Length of data axis 2",
-	}
+	h.Naxis2 = naxis2
 
 	h.Strings["XTENSION"] = struct {
 		Value   string
@@ -120,6 +95,23 @@ func NewFITSHeader(bitpix int32, naxis int32, naxis1 int32, naxis2 int32) FITSHe
   @see https://fits.gsfc.nasa.gov/standard40/fits_standard40aa-le.pdf
 */
 func (h *FITSHeader) Write(w io.Writer) {
+	// SIMPLE needs to be the leading HDR value:
+	writeBool(w, "SIMPLE", true, FITS_STANDARD)
+	// BITPIX needs to be the seconda leading HDR value:
+	writeInt(w, "BITPIX", h.Bitpix, "Number of bits per data pixel")
+	// NAXIS header:
+	writeInt(w, "NAXIS", h.Naxis, "[1] Number of array dimensions")
+	// NAXIS1 header:
+	writeInt(w, "NAXIS1", h.Naxis1, "[1] Length of data axis 1")
+	// NAXIS2 header:
+	writeInt(w, "NAXIS2", h.Naxis2, "[1] Length of data axis 2")
+
+	// BSCALE Header
+	writeInt(w, "BSCALE", 1, "")
+	// BZERO Header
+	writeInt(w, "BZERO", 0, "")
+
+	// Write the rest of the header values:
 	for k, v := range h.Bools {
 		writeBool(w, k, v.Value, v.Comment)
 	}
