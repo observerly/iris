@@ -1,5 +1,11 @@
 package fits
 
+import (
+	"bytes"
+	"encoding/binary"
+	"strings"
+)
+
 const FITS_STANDARD = "FITS Standard 4.0"
 
 // FITS Image struct:
@@ -140,4 +146,36 @@ func NewFITSImageFromImage(img *FITSImage) *FITSImage {
 		Data:     data,
 		Exposure: img.Exposure,
 	}
+}
+
+// Writes FITS binary body data in network byte order to buffer
+func writeFloat32ArrayToBuffer(data []float32) (*bytes.Buffer, error) {
+	buf := new(bytes.Buffer)
+
+	err := binary.Write(buf, binary.BigEndian, data)
+
+	if err != nil {
+		return nil, err
+	}
+
+	// Complete the last partial block, for strictly FITS compliant software
+	totalBytes := len(data) << 2
+
+	partial := totalBytes % 2880
+
+	if partial != 0 {
+		sb := strings.Builder{}
+
+		for i := partial; i < 2880; i++ {
+			sb.WriteRune(' ')
+		}
+
+		err := binary.Write(buf, binary.BigEndian, []byte(sb.String()))
+
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return buf, nil
 }
