@@ -543,11 +543,11 @@ func TestNewMonochromeExposureGetFITSImage(t *testing.T) {
 		t.Errorf("Expected the FITS image data to be %d, but got %d", bounds.Dx()*bounds.Dy(), len(fit.Data))
 	}
 
-	if fit.Header.Ints["NAXIS1"].Value != int32(bounds.Dx()) {
-		t.Errorf("Expected the FITS image header NAXIS1 to be %q, but got %q", bounds.Dx(), fit.Header.Ints["NAXIS1"])
+	if fit.Header.Naxis1 != int32(bounds.Dx()) {
+		t.Errorf("Expected the FITS image header NAXIS1 to be %q, but got %q", bounds.Dx(), fit.Header.Naxis1)
 	}
 
-	if fit.Header.Ints["NAXIS2"].Value != int32(bounds.Dy()) {
-		t.Errorf("Expected the FITS image header NAXIS2 to be %q, but got %q", bounds.Dy(), fit.Header.Ints["NAXIS2"])
+	if fit.Header.Naxis2 != int32(bounds.Dy()) {
+		t.Errorf("Expected the FITS image header NAXIS2 to be %q, but got %q", bounds.Dy(), fit.Header.Naxis2)
 	}
 }
