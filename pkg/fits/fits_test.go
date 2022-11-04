@@ -1,6 +1,9 @@
 package fits
 
 import (
+	"image/jpeg"
+	"io"
+	"os"
 	"testing"
 )
 
@@ -264,5 +267,58 @@ func TestNewFromImageFITSImagePixels(t *testing.T) {
 
 	if got != want {
 		t.Errorf("NewFITSImageFromNaxisn() Pixels: got %v, want %v", got, want)
+	}
+}
+
+func TestNewFITSImageFrom2DDataWriteFloatData(t *testing.T) {
+	f, err := os.Open("../../images/noise16.jpeg")
+
+	if err != nil {
+		t.Errorf("Error opening image: %s", err)
+	}
+
+	defer f.Close()
+
+	img, err := jpeg.Decode(f)
+
+	if err != nil {
+		t.Errorf("Error decoding image: %s", err)
+	}
+
+	bounds := img.Bounds()
+
+	ex := make([][]uint32, bounds.Dx())
+
+	for x := 0; x < bounds.Dx(); x++ {
+		col := make([]uint32, bounds.Dy())
+		ex[x] = col
+	}
+
+	for j := 0; j < bounds.Dy(); j++ {
+		for i := 0; i < bounds.Dx(); i++ {
+			r, g, b, _ := img.At(i, j).RGBA()
+			lum := 0.299*float64(r) + 0.587*float64(g) + 0.114*float64(b)
+			ex[i][j] = uint32(lum)
+		}
+	}
+
+	var fit = NewFITSImageFrom2DData(ex, 16, 2, int32(bounds.Dx()), int32(bounds.Dy()))
+
+	var w io.Writer = os.Stdout
+
+	buf, err := writeFloat32ArrayToBuffer(fit.Data)
+
+	if err != nil {
+		t.Errorf("Error writing float32 array: %s", err)
+	}
+
+	if buf == nil {
+		t.Errorf("Error writing float32 array: %s", err)
+	}
+
+	_, err = w.Write(buf.Bytes())
+
+	if err != nil {
+		t.Errorf("Error writing float32 array to standard output: %s", err)
 	}
 }
