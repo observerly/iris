@@ -66,7 +66,7 @@ func (m *MonochromeExposure) GetFITSImage() *fits.FITSImage {
 		Comment string
 	}{
 		Value:   "Monochrome",
-		Comment: "",
+		Comment: "ASCOM Alpaca Sensor Type",
 	}
 
 	return f
