@@ -119,9 +119,7 @@ func NewFITSImageFromImage(img *FITSImage) *FITSImage {
 }
 
 // Writes FITS binary body data in network byte order to buffer
-func writeFloat32ArrayToBuffer(data []float32) (*bytes.Buffer, error) {
-	buf := new(bytes.Buffer)
-
+func writeFloat32ArrayToBuffer(buf *bytes.Buffer, data []float32) (*bytes.Buffer, error) {
 	err := binary.Write(buf, binary.BigEndian, data)
 
 	if err != nil {

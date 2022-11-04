@@ -1,6 +1,7 @@
 package fits
 
 import (
+	"bytes"
 	"image/jpeg"
 	"io"
 	"os"
@@ -306,7 +307,9 @@ func TestNewFITSImageFrom2DDataWriteFloatData(t *testing.T) {
 
 	var w io.Writer = os.Stdout
 
-	buf, err := writeFloat32ArrayToBuffer(fit.Data)
+	buf := new(bytes.Buffer)
+
+	buf, err = writeFloat32ArrayToBuffer(buf, fit.Data)
 
 	if err != nil {
 		t.Errorf("Error writing float32 array: %s", err)
