@@ -325,3 +325,67 @@ func TestNewFITSImageFrom2DDataWriteFloatData(t *testing.T) {
 		t.Errorf("Error writing float32 array to standard output: %s", err)
 	}
 }
+
+func TestNEWFITSImageFrom2DDataWrite(t *testing.T) {
+	f, err := os.Open("../../images/noise16.jpeg")
+
+	if err != nil {
+		t.Errorf("Error opening image: %s", err)
+	}
+
+	defer f.Close()
+
+	img, err := jpeg.Decode(f)
+
+	if err != nil {
+		t.Errorf("Error decoding image: %s", err)
+	}
+
+	bounds := img.Bounds()
+
+	ex := make([][]uint32, bounds.Dx())
+
+	for y := 0; y < bounds.Dy(); y++ {
+		row := make([]uint32, bounds.Dx())
+		ex[y] = row
+	}
+
+	for j := 0; j < bounds.Dy(); j++ {
+		for i := 0; i < bounds.Dx(); i++ {
+			r, g, b, _ := img.At(i, j).RGBA()
+			lum := 0.299*float64(r) + 0.587*float64(g) + 0.114*float64(b)
+			ex[j][i] = uint32(lum)
+		}
+	}
+
+	var fit = NewFITSImageFrom2DData(ex, 2, int32(bounds.Dx()), int32(bounds.Dy()))
+
+	f, err = os.OpenFile("noise16.fits", os.O_WRONLY|os.O_CREATE, 0644)
+
+	if err != nil {
+		t.Errorf("Error opening image: %s", err)
+	}
+
+	defer f.Close()
+
+	defer func() {
+		if err := f.Close(); err != nil {
+			t.Errorf("Expected the image buffer to be saved successfully, but got %q", err)
+		}
+
+		// Clean up the file after we have finished with the test:
+		os.Remove("noise16.fits")
+	}()
+
+	buf, err := fit.WriteToBuffer()
+
+	if err != nil {
+		t.Errorf("Error writing image: %s", err)
+	}
+
+	_, err = f.Write(buf.Bytes())
+
+	if err != nil {
+		t.Errorf("Error writing image: %s", err)
+	}
+}

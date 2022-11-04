@@ -118,6 +118,27 @@ func NewFITSImageFromImage(img *FITSImage) *FITSImage {
 	}
 }
 
+// Writes an in-memory FITS image to an io.Writer output stream
+func (f *FITSImage) WriteToBuffer() (*bytes.Buffer, error) {
+	buf := new(bytes.Buffer)
+
+	// Write the header:
+	buf, err := f.Header.WriteToBuffer(buf)
+
+	if err != nil {
+		return nil, err
+	}
+
+	// Write the data:
+	buf, err = writeFloat32ArrayToBuffer(buf, f.Data)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return buf, nil
+}
+
 // Writes FITS binary body data in network byte order to buffer
 func writeFloat32ArrayToBuffer(buf *bytes.Buffer, data []float32) (*bytes.Buffer, error) {
 	err := binary.Write(buf, binary.BigEndian, data)
