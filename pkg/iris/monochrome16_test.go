@@ -193,20 +193,20 @@ func TestNewNoiseExtractorGaussianNoise16PngImage(t *testing.T) {
 
 	ex := make([][]uint32, bounds.Dx())
 
-	for x := 0; x < bounds.Dx(); x++ {
-		col := make([]uint32, bounds.Dy())
-		ex[x] = col
+	for y := 0; y < bounds.Dy(); y++ {
+		row := make([]uint32, bounds.Dx())
+		ex[y] = row
 	}
-
-	mono := NewMonochrome16Exposure(ex, 1, bounds.Dx(), bounds.Dy())
 
 	for j := 0; j < bounds.Dy(); j++ {
 		for i := 0; i < bounds.Dx(); i++ {
 			r, g, b, _ := img.At(i, j).RGBA()
 			lum := 0.299*float64(r) + 0.587*float64(g) + 0.114*float64(b)
-			mono.Raw[i][j] = uint32(lum)
+			ex[j][i] = uint32(lum)
 		}
 	}
+
+	mono := NewMonochrome16Exposure(ex, 65535, bounds.Dx(), bounds.Dy())
 
 	mono.Preprocess()
 
@@ -405,20 +405,20 @@ func TestNewMonochrome16ExposureGetFITSImage(t *testing.T) {
 
 	ex := make([][]uint32, bounds.Dx())
 
-	for x := 0; x < bounds.Dx(); x++ {
-		col := make([]uint32, bounds.Dy())
-		ex[x] = col
+	for y := 0; y < bounds.Dy(); y++ {
+		row := make([]uint32, bounds.Dx())
+		ex[y] = row
 	}
-
-	mono := NewMonochrome16Exposure(ex, 65535, bounds.Dx(), bounds.Dy())
 
 	for j := 0; j < bounds.Dy(); j++ {
 		for i := 0; i < bounds.Dx(); i++ {
 			r, g, b, _ := img.At(i, j).RGBA()
 			lum := 0.299*float64(r) + 0.587*float64(g) + 0.114*float64(b)
-			mono.Raw[i][j] = uint32(lum)
+			ex[j][i] = uint32(lum)
 		}
 	}
+
+	mono := NewMonochrome16Exposure(ex, 65535, bounds.Dx(), bounds.Dy())
 
 	mono.Preprocess()
 
@@ -442,5 +442,34 @@ func TestNewMonochrome16ExposureGetFITSImage(t *testing.T) {
 
 	if fit.Header.Naxis2 != int32(bounds.Dy()) {
 		t.Errorf("Expected the FITS image header NAXIS2 to be %q, but got %q", bounds.Dy(), fit.Header.Naxis2)
+	}
+
+	f, err = os.OpenFile("noise16monochrome.fits", os.O_WRONLY|os.O_CREATE, 0644)
+
+	if err != nil {
+		t.Errorf("Error opening image: %s", err)
+	}
+
+	defer f.Close()
+
+	defer func() {
+		if err := f.Close(); err != nil {
+			t.Errorf("Expected the image buffer to be saved successfully, but got %q", err)
+		}
+
+		// Clean up the file after we have finished with the test:
+		os.Remove("noise16monochrome.fits")
+	}()
+
+	buf, err := fit.WriteToBuffer()
+
+	if err != nil {
+		t.Errorf("Error writing image: %s", err)
+	}
+
+	_, err = f.Write(buf.Bytes())
+
+	if err != nil {
+		t.Errorf("Error writing image: %s", err)
 	}
 }
