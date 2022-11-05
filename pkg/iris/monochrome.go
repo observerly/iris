@@ -116,17 +116,13 @@ func (m *MonochromeExposure) GetOtsuThresholdValue(img *image.Gray, size image.P
 func (m *MonochromeExposure) Preprocess() (bytes.Buffer, error) {
 	bounds := m.Image.Bounds()
 
-	size := bounds.Size()
-
 	gray := image.NewGray(bounds)
 
-	setPixel := func(gray *image.Gray, x int, y int) {
-		gray.SetGray(x, y, color.Gray{uint8(m.Raw[x][y])})
+	for j := 0; j < bounds.Dy(); j++ {
+		for i := 0; i < bounds.Dx(); i++ {
+			gray.SetGray(i, j, color.Gray{uint8(m.Raw[j][i])})
+		}
 	}
-
-	utils.DeferForEachPixel(size, func(x, y int) {
-		setPixel(gray, x, y)
-	})
 
 	m.Image = gray
 
@@ -136,27 +132,23 @@ func (m *MonochromeExposure) Preprocess() (bytes.Buffer, error) {
 func (m *MonochromeExposure) ApplyNoiseReduction() (bytes.Buffer, error) {
 	bounds := m.Image.Bounds()
 
-	size := bounds.Size()
-
 	gray := image.NewGray(bounds)
 
 	noise := photometry.NewNoiseExtractor(m.Raw, m.Width, m.Height)
 
 	m.Noise = noise.GetGaussianNoise()
 
-	setPixel := func(gray *image.Gray, x int, y int) {
-		pixel := m.Raw[x][y]
+	for j := 0; j < bounds.Dy(); j++ {
+		for i := 0; i < bounds.Dx(); i++ {
+			pixel := m.Raw[j][i]
 
-		if pixel < uint32(m.Noise) {
-			gray.SetGray(x, y, color.Gray{Y: 0})
-		} else {
-			gray.SetGray(x, y, color.Gray{uint8(pixel - uint32(m.Noise))})
+			if pixel < uint32(m.Noise) {
+				gray.SetGray(i, j, color.Gray{Y: 0})
+			} else {
+				gray.SetGray(i, j, color.Gray{uint8(pixel - uint32(m.Noise))})
+			}
 		}
 	}
-
-	utils.DeferForEachPixel(size, func(x, y int) {
-		setPixel(gray, x, y)
-	})
 
 	m.Image = gray
 
