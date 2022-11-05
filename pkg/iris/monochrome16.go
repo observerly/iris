@@ -9,7 +9,6 @@ import (
 	"github.com/observerly/iris/pkg/fits"
 	"github.com/observerly/iris/pkg/histogram"
 	"github.com/observerly/iris/pkg/photometry"
-	"github.com/observerly/iris/pkg/utils"
 )
 
 type Monochrome16Exposure struct {
@@ -116,17 +115,13 @@ func (m *Monochrome16Exposure) GetOtsuThresholdValue(img *image.Gray16, size ima
 func (m *Monochrome16Exposure) Preprocess() (bytes.Buffer, error) {
 	bounds := m.Image.Bounds()
 
-	size := bounds.Size()
-
 	gray := image.NewGray16(bounds)
 
-	setPixel := func(gray *image.Gray16, x int, y int) {
-		gray.SetGray16(x, y, color.Gray16{uint16(m.Raw[x][y])})
+	for j := 0; j < bounds.Dy(); j++ {
+		for i := 0; i < bounds.Dx(); i++ {
+			gray.SetGray16(i, j, color.Gray16{uint16(m.Raw[j][i])})
+		}
 	}
-
-	utils.DeferForEachPixel(size, func(x, y int) {
-		setPixel(gray, x, y)
-	})
 
 	m.Image = gray
 
@@ -136,27 +131,23 @@ func (m *Monochrome16Exposure) Preprocess() (bytes.Buffer, error) {
 func (m *Monochrome16Exposure) ApplyNoiseReduction() (bytes.Buffer, error) {
 	bounds := m.Image.Bounds()
 
-	size := bounds.Size()
-
 	gray := image.NewGray16(bounds)
 
 	noise := photometry.NewNoiseExtractor(m.Raw, m.Width, m.Height)
 
 	m.Noise = noise.GetGaussianNoise()
 
-	setPixel := func(gray *image.Gray16, x int, y int) {
-		pixel := m.Raw[x][y]
+	for j := 0; j < bounds.Dy(); j++ {
+		for i := 0; i < bounds.Dx(); i++ {
+			pixel := m.Raw[j][i]
 
-		if pixel < uint32(m.Noise) {
-			gray.SetGray16(x, y, color.Gray16{Y: 0})
-		} else {
-			gray.SetGray16(x, y, color.Gray16{uint16(pixel - uint32(m.Noise))})
+			if pixel < uint32(m.Noise) {
+				gray.SetGray16(i, j, color.Gray16{Y: 0})
+			} else {
+				gray.SetGray16(i, j, color.Gray16{uint16(pixel - uint32(m.Noise))})
+			}
 		}
 	}
-
-	utils.DeferForEachPixel(size, func(x, y int) {
-		setPixel(gray, x, y)
-	})
 
 	m.Image = gray
 
@@ -173,19 +164,17 @@ func (m *Monochrome16Exposure) ApplyOtsuThreshold() (bytes.Buffer, error) {
 
 	gray := image.NewGray16(bounds)
 
-	setPixel := func(gray *image.Gray16, x int, y int) {
-		pixel := m.Image.Gray16At(x, y).Y
+	for j := 0; j < bounds.Dy(); j++ {
+		for i := 0; i < bounds.Dx(); i++ {
+			pixel := m.Image.Gray16At(i, j).Y
 
-		if pixel < m.Threshold {
-			gray.SetGray16(x, y, color.Gray16{Y: 0})
-		} else {
-			gray.SetGray16(x, y, color.Gray16{Y: pixel})
+			if pixel < m.Threshold {
+				gray.SetGray16(i, j, color.Gray16{Y: 0})
+			} else {
+				gray.SetGray16(i, j, color.Gray16{Y: pixel})
+			}
 		}
 	}
-
-	utils.DeferForEachPixel(size, func(x, y int) {
-		setPixel(gray, x, y)
-	})
 
 	m.Otsu = gray
 
