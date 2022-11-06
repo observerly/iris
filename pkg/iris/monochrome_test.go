@@ -469,7 +469,7 @@ func TestNewMonochrome16NoiseExtractorGaussianNoise16PngImage(t *testing.T) {
 	}
 
 	// Save the image to the root folder:
-	f, err = os.Create("noise16.jpg")
+	f, err = os.Create("noise.jpg")
 
 	if err != nil {
 		t.Errorf("Error creating image: %s", err)
@@ -483,7 +483,7 @@ func TestNewMonochrome16NoiseExtractorGaussianNoise16PngImage(t *testing.T) {
 		}
 
 		// Clean up the file after we have finished with the test:
-		os.Remove("noise16.jpg")
+		os.Remove("noise.jpg")
 	}()
 
 	_, err = f.Write(bytes.Bytes())

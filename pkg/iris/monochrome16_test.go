@@ -1,7 +1,10 @@
 package iris
 
 import (
+	"encoding/json"
+	"fmt"
 	"image/jpeg"
+	"io/ioutil"
 	"os"
 	"testing"
 )
@@ -459,6 +462,90 @@ func TestNewMonochrome16ExposureGetFITSImage(t *testing.T) {
 
 		// Clean up the file after we have finished with the test:
 		os.Remove("noise16monochrome.fits")
+	}()
+
+	buf, err := fit.WriteToBuffer()
+
+	if err != nil {
+		t.Errorf("Error writing image: %s", err)
+	}
+
+	_, err = f.Write(buf.Bytes())
+
+	if err != nil {
+		t.Errorf("Error writing image: %s", err)
+	}
+}
+
+func TestNewMonochrome16ExposureFromASCOMGetFITSImage(t *testing.T) {
+	type CameraExposure struct {
+		BayerXOffset int32      `json:"bayerXOffset"`
+		BayerYOffset int32      `json:"bayerYOffset"`
+		CCDXSize     int32      `json:"ccdXSize"`
+		CCDYSize     int32      `json:"ccdYSize"`
+		Image        [][]uint32 `json:"exposure"`
+		MaxADU       int32      `json:"maxADU"`
+		Rank         uint32     `json:"rank"`
+		SensorType   string     `json:"sensorType"`
+	}
+
+	file, err := ioutil.ReadFile("../../data/m42-800x600.json")
+
+	if err != nil {
+		t.Errorf("Error opening from JSON data: %s", err)
+	}
+
+	data := CameraExposure{}
+
+	_ = json.Unmarshal([]byte(file), &data)
+
+	fmt.Println("Should be 800", len(data.Image))
+
+	xs := 800
+
+	ys := 600
+
+	mono := NewMonochrome16Exposure(data.Image, 65535, xs, ys)
+
+	mono.PreprocessImageArray(800, 600)
+
+	fit := mono.GetFITSImage()
+
+	if fit == nil {
+		t.Errorf("Expected the FITS image to be instantiated successfully, but got nil")
+	}
+
+	if fit.Data == nil {
+		t.Errorf("Expected the FITS image data to be instantiated successfully, but got nil")
+	}
+
+	if len(fit.Data) != xs*ys {
+		t.Errorf("Expected the FITS image data to be %d, but got %d", xs*ys, len(fit.Data))
+	}
+
+	if fit.Header.Naxis1 != int32(xs) {
+		t.Errorf("Expected the FITS image header NAXIS1 to be %q, but got %q", xs, fit.Header.Naxis1)
+	}
+
+	if fit.Header.Naxis2 != int32(ys) {
+		t.Errorf("Expected the FITS image header NAXIS2 to be %q, but got %q", ys, fit.Header.Naxis2)
+	}
+
+	f, err := os.OpenFile("m42-800x600.fits", os.O_WRONLY|os.O_CREATE, 0644)
+
+	if err != nil {
+		t.Errorf("Error opening image: %s", err)
+	}
+
+	defer f.Close()
+
+	defer func() {
+		if err := f.Close(); err != nil {
+			t.Errorf("Expected the image buffer to be saved successfully, but got %q", err)
+		}
+
+		// Clean up the file after we have finished with the test:
+		os.Remove("m42-800x600.fits")
 	}()
 
 	buf, err := fit.WriteToBuffer()
