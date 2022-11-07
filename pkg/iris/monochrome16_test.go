@@ -489,7 +489,7 @@ func TestNewMonochrome16ExposureFromASCOMGetFITSImage(t *testing.T) {
 		SensorType   string     `json:"sensorType"`
 	}
 
-	file, err := ioutil.ReadFile("../../data/m42-800x600.json")
+	file, err := ioutil.ReadFile("../../data/m42-800x600-monochrome.json")
 
 	if err != nil {
 		t.Errorf("Error opening from JSON data: %s", err)
