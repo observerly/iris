@@ -2,7 +2,6 @@ package iris
 
 import (
 	"encoding/json"
-	"fmt"
 	"image/jpeg"
 	"io/ioutil"
 	"os"
@@ -498,8 +497,6 @@ func TestNewMonochrome16ExposureFromASCOMGetFITSImage(t *testing.T) {
 	data := CameraExposure{}
 
 	_ = json.Unmarshal([]byte(file), &data)
-
-	fmt.Println("Should be 800", len(data.Image))
 
 	xs := 800
 
