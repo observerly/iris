@@ -194,6 +194,53 @@ func TestNewRGGBPreprocess(t *testing.T) {
 		t.Errorf("Expected to be able to preprocess the RGGB CFA image, but got %q", err)
 	}
 }
+
+func TestNewRGGBExposureRGBChannelDebayered(t *testing.T) {
+	type CameraExposure struct {
+		BayerXOffset int32      `json:"bayerXOffset"`
+		BayerYOffset int32      `json:"bayerYOffset"`
+		CCDXSize     int32      `json:"ccdXSize"`
+		CCDYSize     int32      `json:"ccdYSize"`
+		Image        [][]uint32 `json:"exposure"`
+		MaxADU       int32      `json:"maxADU"`
+		Rank         uint32     `json:"rank"`
+		SensorType   string     `json:"sensorType"`
+	}
+
+	file, err := ioutil.ReadFile("../../data/m42-800x600-rggb.json")
+
+	if err != nil {
+		t.Errorf("Error opening from JSON data: %s", err)
+	}
+
+	ex := CameraExposure{}
+
+	_ = json.Unmarshal([]byte(file), &ex)
+
+	w := 1200
+
+	h := 800
+
+	rggb := NewRGGBExposure(ex.Image, 256, w, h, ex.SensorType)
+
+	_, err = rggb.Preprocess()
+
+	if err != nil {
+		t.Errorf("Expected to be able to preprocess the RGGB CFA image, but got %q", err)
+	}
+
+	if len(rggb.R) != w*h {
+		t.Errorf("Expected the R channel to be %d pixels, but got %d", w*h, len(rggb.R))
+	}
+
+	if len(rggb.G) != w*h {
+		t.Errorf("Expected the G channel to be %d pixels, but got %d", w*h, len(rggb.R))
+	}
+
+	if len(rggb.B) != w*h {
+		t.Errorf("Expected the B channel to be %d pixels, but got %d", w*h, len(rggb.R))
+	}
+}
 func TestNewRGGBExposureDebayerBilinearInterpolation(t *testing.T) {
 	type CameraExposure struct {
 		BayerXOffset int32      `json:"bayerXOffset"`
