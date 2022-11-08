@@ -16,6 +16,9 @@ type RGGBExposure struct {
 	Width             int
 	Height            int
 	Raw               [][]uint32
+	R                 []float32
+	G                 []float32
+	B                 []float32
 	ADU               int32
 	Buffer            bytes.Buffer
 	Image             *image.RGBA
@@ -145,6 +148,12 @@ func (b *RGGBExposure) DebayerBilinearInterpolation() error {
 	}()
 
 	red, green, blue := <-R, <-G, <-B
+
+	b.R = red
+
+	b.G = green
+
+	b.B = blue
 
 	// Stack The RGB channels into a single image:
 	for j := 0; j < b.Height; j++ {
