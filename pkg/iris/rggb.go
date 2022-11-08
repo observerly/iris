@@ -52,6 +52,21 @@ func (b *RGGBExposure) GetBayerMatrixOffset() (xOffset int, yOffset int, err err
 }
 
 /**
+
+**/
+func (b *RGGBExposure) GetBuffer(img *image.RGBA) (bytes.Buffer, error) {
+	var buff bytes.Buffer
+
+	err := jpeg.Encode(&buff, img, &jpeg.Options{Quality: 100})
+
+	if err != nil {
+		return buff, err
+	}
+
+	return buff, nil
+}
+
+/**
 	Perform Debayering w/ Bilinear Interpolation Technique
 **/
 func (b *RGGBExposure) DebayerBilinearInterpolation(xOffset int, yOffset int) error {
@@ -129,5 +144,5 @@ func (b *RGGBExposure) Preprocess() (bytes.Buffer, error) {
 		return b.Buffer, err
 	}
 
-	return b.Buffer, nil
+	return b.GetBuffer(b.Image)
 }
