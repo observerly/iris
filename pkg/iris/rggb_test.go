@@ -9,7 +9,7 @@ import (
 )
 
 func TestNewRGGBExposureWidth(t *testing.T) {
-	rggb := NewRGGBExposure(ex, 800, 600, "RGGB")
+	rggb := NewRGGBExposure(ex, 1, 800, 600, "RGGB")
 
 	var got int = rggb.Width
 
@@ -21,7 +21,7 @@ func TestNewRGGBExposureWidth(t *testing.T) {
 }
 
 func TestNewRGGBExposureHeight(t *testing.T) {
-	rggb := NewRGGBExposure(ex, 800, 600, "RGGB")
+	rggb := NewRGGBExposure(ex, 1, 800, 600, "RGGB")
 
 	var got int = rggb.Height
 
@@ -33,7 +33,7 @@ func TestNewRGGBExposureHeight(t *testing.T) {
 }
 
 func TestNewRGGBExpsourePixels(t *testing.T) {
-	rggb := NewRGGBExposure(ex, 800, 600, "RGGB")
+	rggb := NewRGGBExposure(ex, 1, 800, 600, "RGGB")
 
 	var got int = rggb.Pixels
 
@@ -45,7 +45,7 @@ func TestNewRGGBExpsourePixels(t *testing.T) {
 }
 
 func TestNewRGGBGetBayerMatrixOffset(t *testing.T) {
-	rggb := NewRGGBExposure(ex, 800, 600, "RGGB")
+	rggb := NewRGGBExposure(ex, 1, 800, 600, "RGGB")
 
 	xOffset, yOffset, err := rggb.GetBayerMatrixOffset()
 
@@ -63,7 +63,7 @@ func TestNewRGGBGetBayerMatrixOffset(t *testing.T) {
 }
 
 func TestNewGRBGGetBayerMatrixOffset(t *testing.T) {
-	rggb := NewRGGBExposure(ex, 800, 600, "GRBG")
+	rggb := NewRGGBExposure(ex, 1, 800, 600, "GRBG")
 
 	xOffset, yOffset, err := rggb.GetBayerMatrixOffset()
 
@@ -81,7 +81,7 @@ func TestNewGRBGGetBayerMatrixOffset(t *testing.T) {
 }
 
 func TestNewGBRGGetBayerMatrixOffset(t *testing.T) {
-	rggb := NewRGGBExposure(ex, 800, 600, "GBRG")
+	rggb := NewRGGBExposure(ex, 1, 800, 600, "GBRG")
 
 	xOffset, yOffset, err := rggb.GetBayerMatrixOffset()
 
@@ -99,7 +99,7 @@ func TestNewGBRGGetBayerMatrixOffset(t *testing.T) {
 }
 
 func TestNewBGGRGetBayerMatrixOffset(t *testing.T) {
-	rggb := NewRGGBExposure(ex, 800, 600, "BGGR")
+	rggb := NewRGGBExposure(ex, 1, 800, 600, "BGGR")
 
 	xOffset, yOffset, err := rggb.GetBayerMatrixOffset()
 
@@ -117,7 +117,7 @@ func TestNewBGGRGetBayerMatrixOffset(t *testing.T) {
 }
 
 func TestNewRGGBGetBayerMatrixOffsetInvalid(t *testing.T) {
-	rggb := NewRGGBExposure(ex, 800, 600, "INVALID")
+	rggb := NewRGGBExposure(ex, 1, 800, 600, "INVALID")
 
 	_, _, err := rggb.GetBayerMatrixOffset()
 
@@ -146,7 +146,7 @@ func TestNewRGGBDebayerBilinearInterpolation(t *testing.T) {
 		{6, 7, 8, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 8, 7, 191},
 	}
 
-	rggb := NewRGGBExposure(ex, 16, 16, "RGGB")
+	rggb := NewRGGBExposure(ex, 1, 16, 16, "RGGB")
 
 	err := rggb.DebayerBilinearInterpolation()
 
@@ -186,7 +186,7 @@ func TestNewRGGBPreprocess(t *testing.T) {
 		{6, 7, 8, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 8, 7, 191},
 	}
 
-	rggb := NewRGGBExposure(ex, 16, 16, "RGGB")
+	rggb := NewRGGBExposure(ex, 1, 16, 16, "RGGB")
 
 	_, err := rggb.Preprocess()
 
@@ -220,7 +220,7 @@ func TestNewRGGBExposureDebayerBilinearInterpolation(t *testing.T) {
 
 	h := 800
 
-	rggb := NewRGGBExposure(ex.Image, w, h, ex.SensorType)
+	rggb := NewRGGBExposure(ex.Image, 256, w, h, ex.SensorType)
 
 	buff, err := rggb.Preprocess()
 

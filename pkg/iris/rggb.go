@@ -15,23 +15,25 @@ import (
 type RGGBExposure struct {
 	Width             int
 	Height            int
-	ColourFilterArray string
 	Raw               [][]uint32
+	ADU               int32
 	Buffer            bytes.Buffer
 	Image             *image.RGBA
+	ColourFilterArray string
 	Pixels            int
 }
 
-func NewRGGBExposure(exposure [][]uint32, xs int, ys int, cfa string) *RGGBExposure {
+func NewRGGBExposure(exposure [][]uint32, adu int32, xs int, ys int, cfa string) *RGGBExposure {
 	img := image.NewRGBA(image.Rect(0, 0, xs, ys))
 
 	return &RGGBExposure{
 		Width:             xs,
 		Height:            ys,
-		ColourFilterArray: cfa,
 		Raw:               exposure,
+		ADU:               adu,
 		Buffer:            bytes.Buffer{},
 		Image:             img,
+		ColourFilterArray: cfa,
 		Pixels:            xs * ys,
 	}
 }
