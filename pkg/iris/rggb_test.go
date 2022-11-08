@@ -1,7 +1,10 @@
 package iris
 
 import (
+	"encoding/json"
 	"image/jpeg"
+	"io/ioutil"
+	"os"
 	"testing"
 )
 
@@ -145,13 +148,7 @@ func TestNewRGGBDebayerBilinearInterpolation(t *testing.T) {
 
 	rggb := NewRGGBExposure(ex, 16, 16, "RGGB")
 
-	xOffset, yOffset, err := rggb.GetBayerMatrixOffset()
-
-	if err != nil {
-		t.Errorf("Expected the CFA string to be valid, but got %q", err)
-	}
-
-	err = rggb.DebayerBilinearInterpolation(xOffset, yOffset)
+	err := rggb.DebayerBilinearInterpolation()
 
 	if err != nil {
 		t.Errorf("Expected the debayering to be successful, but got %q", err)
@@ -195,5 +192,60 @@ func TestNewRGGBPreprocess(t *testing.T) {
 
 	if err != nil {
 		t.Errorf("Expected to be able to preprocess the RGGB CFA image, but got %q", err)
+	}
+}
+func TestNewRGGBExposureDebayerBilinearInterpolation(t *testing.T) {
+	type CameraExposure struct {
+		BayerXOffset int32      `json:"bayerXOffset"`
+		BayerYOffset int32      `json:"bayerYOffset"`
+		CCDXSize     int32      `json:"ccdXSize"`
+		CCDYSize     int32      `json:"ccdYSize"`
+		Image        [][]uint32 `json:"exposure"`
+		MaxADU       int32      `json:"maxADU"`
+		Rank         uint32     `json:"rank"`
+		SensorType   string     `json:"sensorType"`
+	}
+
+	file, err := ioutil.ReadFile("../../data/m42-800x600-rggb.json")
+
+	if err != nil {
+		t.Errorf("Error opening from JSON data: %s", err)
+	}
+
+	ex := CameraExposure{}
+
+	_ = json.Unmarshal([]byte(file), &ex)
+
+	w := 1200
+
+	h := 800
+
+	rggb := NewRGGBExposure(ex.Image, w, h, ex.SensorType)
+
+	buff, err := rggb.Preprocess()
+
+	if err != nil {
+		t.Errorf("Expected the debayering to be successful, but got %q", err)
+	}
+
+	f, err := os.Create("m42-800x600-rggb.jpg")
+
+	if err != nil {
+		panic(err)
+	}
+
+	defer func() {
+		if err := f.Close(); err != nil {
+			t.Errorf("Expected the image buffer to be saved successfully, but got %q", err)
+		}
+
+		// Clean up the file after we have finished with the test:
+		os.Remove("m42-800x600-rggb.jpg")
+	}()
+
+	_, err = f.Write(buff.Bytes())
+
+	if err != nil {
+		t.Errorf("Expected the image buffer to be saved successfully, but got %q", err)
 	}
 }

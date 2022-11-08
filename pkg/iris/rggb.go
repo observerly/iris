@@ -7,6 +7,9 @@ import (
 	"image/color"
 	"image/jpeg"
 	"strings"
+	"sync"
+
+	"github.com/observerly/iris/pkg/photometry"
 )
 
 type RGGBExposure struct {
@@ -69,17 +72,35 @@ func (b *RGGBExposure) GetBuffer(img *image.RGBA) (bytes.Buffer, error) {
 /**
 	Perform Debayering w/ Bilinear Interpolation Technique
 **/
-func (b *RGGBExposure) DebayerBilinearInterpolation(xOffset int, yOffset int) error {
+func (b *RGGBExposure) DebayerBilinearInterpolation() error {
+	var wg sync.WaitGroup
+
+	wg.Add(3)
+
+	R := make(chan []float32, b.Pixels)
+
+	G := make(chan []float32, b.Pixels)
+
+	B := make(chan []float32, b.Pixels)
+
+	errors := make(chan error, 3)
+
 	var raw []uint32
 
 	// Flatten the 2D Colour Filter Array array into a 1D array:
-	for _, a := range b.Raw {
-		raw = append(raw, a...)
+	for _, row := range b.Raw {
+		raw = append(raw, row...)
 	}
 
 	w := uint32(b.Width)
 
 	h := uint32(b.Height)
+
+	xOffset, yOffset, err := b.GetBayerMatrixOffset()
+
+	if err != nil {
+		return err
+	}
 
 	xo := uint32(xOffset)
 
@@ -91,31 +112,45 @@ func (b *RGGBExposure) DebayerBilinearInterpolation(xOffset int, yOffset int) er
 
 	y := h - yo & ^uint32(1)
 
-	R := make([]float32, int(x)*int(y))
-
-	G := make([]float32, int(x)*int(y))
-
-	B := make([]float32, int(x)*int(y))
-
 	// Perform Bi-Linear Interpolation on the Colour Filter Array:
-	for i := uint32(0); i < y; i += 2 {
-		for j := uint32(0); j < x; j += 2 {
-			// Obtain a Convolution in the Red channel:
-			R = BiLinearConvolveRedChannel(i, j, raw, R, w, h, xo, yo, x, y)
-			// Obtain a Convolution in the Green channel:
-			G = BiLinearConvolveGreenChannel(i, j, raw, G, w, h, xo, yo, x, y)
-			// Obtain a Convolution in the Blue channel:
-			B = BiLinearConvolveBlueChannel(i, j, raw, B, w, h, xo, yo, x, y)
-		}
-	}
+	go func() {
+		defer wg.Done()
+		// Obtain a Convolution in the Red channel:
+		red := photometry.BiLinearConvolveRedChannel(raw, w, h, xo, yo, x, y)
+		R <- red
+	}()
+
+	go func() {
+		defer wg.Done()
+		// Obtain a Convolution in the Green channel:
+		green := photometry.BiLinearConvolveGreenChannel(raw, w, h, xo, yo, x, y)
+		G <- green
+	}()
+
+	go func() {
+		defer wg.Done()
+		// Obtain a Convolution in the Blue channel:
+		blue := photometry.BiLinearConvolveBlueChannel(raw, w, h, xo, yo, x, y)
+		B <- blue
+	}()
+
+	go func() {
+		wg.Wait()
+		close(R)
+		close(G)
+		close(B)
+		close(errors)
+	}()
+
+	red, green, blue := <-R, <-G, <-B
 
 	// Stack The RGB channels into a single image:
-	for i := 0; i < b.Height; i++ {
-		for j := 0; j < b.Width; j++ {
+	for j := 0; j < b.Height; j++ {
+		for i := 0; i < b.Width; i++ {
 			b.Image.Set(i, j, color.RGBA{
-				R: uint8(R[i*b.Height+j]),
-				G: uint8(G[i*b.Height+j]),
-				B: uint8(B[i*b.Height+j]),
+				R: uint8(red[j*b.Width+i]),
+				G: uint8(green[j*b.Width+i]),
+				B: uint8(blue[j*b.Width+i]),
 				A: 255,
 			})
 		}
@@ -125,20 +160,8 @@ func (b *RGGBExposure) DebayerBilinearInterpolation(xOffset int, yOffset int) er
 }
 
 func (b *RGGBExposure) Preprocess() (bytes.Buffer, error) {
-	xOffset, yOffset, err := b.GetBayerMatrixOffset()
-
-	if err != nil {
-		return b.Buffer, err
-	}
-
-	err = b.DebayerBilinearInterpolation(xOffset, yOffset)
-
-	if err != nil {
-		return b.Buffer, err
-	}
-
-	// Encode the image as a JPEG:
-	err = jpeg.Encode(&b.Buffer, b.Image, &jpeg.Options{Quality: 100})
+	// Perform Debayering w/ Bilinear Interpolation Technique:
+	err := b.DebayerBilinearInterpolation()
 
 	if err != nil {
 		return b.Buffer, err
