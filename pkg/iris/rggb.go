@@ -26,6 +26,11 @@ type RGGBExposure struct {
 	Pixels            int
 }
 
+type RGGBColor struct {
+	Name    string
+	Channel []float32
+}
+
 func NewRGGBExposure(exposure [][]uint32, adu int32, xs int, ys int, cfa string) *RGGBExposure {
 	img := image.NewRGBA(image.Rect(0, 0, xs, ys))
 
