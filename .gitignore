@@ -14,3 +14,6 @@
 # Dependency directories (remove the comment below to include it)
 # vendor/
 playground
+
+# Editor directories and files
+.DS_Store
