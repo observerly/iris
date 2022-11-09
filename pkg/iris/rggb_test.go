@@ -263,9 +263,9 @@ func TestNewRGGBExposureDebayerBilinearInterpolation(t *testing.T) {
 
 	_ = json.Unmarshal([]byte(file), &ex)
 
-	w := 1200
+	w := 1600
 
-	h := 800
+	h := 1200
 
 	rggb := NewRGGBExposure(ex.Image, 256, w, h, ex.SensorType)
 
@@ -318,9 +318,9 @@ func TestNewRGGBExposurePreprocessImageArray(t *testing.T) {
 
 	_ = json.Unmarshal([]byte(file), &ex)
 
-	w := 1200
+	w := 1600
 
-	h := 800
+	h := 1200
 
 	for j := 0; j < h; j++ {
 		for i := 0; i < w; i++ {
@@ -355,5 +355,278 @@ func TestNewRGGBExposurePreprocessImageArray(t *testing.T) {
 
 	if err != nil {
 		t.Errorf("Expected the image buffer to be saved successfully, but got %q", err)
+	}
+}
+
+func TestNewRGGBExposureGetFITSImageForRedChannel(t *testing.T) {
+	type CameraExposure struct {
+		BayerXOffset int32      `json:"bayerXOffset"`
+		BayerYOffset int32      `json:"bayerYOffset"`
+		CCDXSize     int32      `json:"ccdXSize"`
+		CCDYSize     int32      `json:"ccdYSize"`
+		Image        [][]uint32 `json:"exposure"`
+		MaxADU       int32      `json:"maxADU"`
+		Rank         uint32     `json:"rank"`
+		SensorType   string     `json:"sensorType"`
+	}
+
+	file, err := ioutil.ReadFile("../../data/m42-800x600-rggb.json")
+
+	if err != nil {
+		t.Errorf("Error opening from JSON data: %s", err)
+	}
+
+	ex := CameraExposure{}
+
+	_ = json.Unmarshal([]byte(file), &ex)
+
+	w := 1600
+
+	h := 1200
+
+	for j := 0; j < h; j++ {
+		for i := 0; i < w; i++ {
+			ex.Image[i][j] = ex.Image[i][j] / 256
+		}
+	}
+
+	rggb := NewRGGBExposure(ex.Image, 256, w, h, ex.SensorType)
+
+	rggb.PreprocessImageArray(w, h)
+
+	fit := rggb.GetFITSImageForChannel(RGGBColor{
+		Name:    "Red",
+		Channel: rggb.R,
+	})
+
+	if fit == nil {
+		t.Errorf("Expected the FITS image to be instantiated successfully, but got nil")
+	}
+
+	if fit.Data == nil {
+		t.Errorf("Expected the FITS image data to be instantiated successfully, but got nil")
+	}
+
+	if len(fit.Data) != w*h {
+		t.Errorf("Expected the FITS image data to be %d, but got %d", w*h, len(fit.Data))
+	}
+
+	if fit.Header.Naxis1 != int32(w) {
+		t.Errorf("Expected the FITS image header NAXIS1 to be %q, but got %q", w, fit.Header.Naxis1)
+	}
+
+	if fit.Header.Naxis2 != int32(h) {
+		t.Errorf("Expected the FITS image header NAXIS2 to be %q, but got %q", h, fit.Header.Naxis2)
+	}
+
+	f, err := os.OpenFile("m42-800x600-rggb-R-channel.fits", os.O_WRONLY|os.O_CREATE, 0644)
+
+	if err != nil {
+		t.Errorf("Error opening image: %s", err)
+	}
+
+	defer f.Close()
+
+	defer func() {
+		if err := f.Close(); err != nil {
+			t.Errorf("Expected the image buffer to be saved successfully, but got %q", err)
+		}
+
+		// Clean up the file after we have finished with the test:
+		os.Remove("m42-800x600-rggb-R-channel.fits")
+	}()
+
+	buf, err := fit.WriteToBuffer()
+
+	if err != nil {
+		t.Errorf("Error writing image: %s", err)
+	}
+
+	_, err = f.Write(buf.Bytes())
+
+	if err != nil {
+		t.Errorf("Error writing image: %s", err)
+	}
+}
+
+func TestNewRGGBExposureGetFITSImageForGreenChannel(t *testing.T) {
+	type CameraExposure struct {
+		BayerXOffset int32      `json:"bayerXOffset"`
+		BayerYOffset int32      `json:"bayerYOffset"`
+		CCDXSize     int32      `json:"ccdXSize"`
+		CCDYSize     int32      `json:"ccdYSize"`
+		Image        [][]uint32 `json:"exposure"`
+		MaxADU       int32      `json:"maxADU"`
+		Rank         uint32     `json:"rank"`
+		SensorType   string     `json:"sensorType"`
+	}
+
+	file, err := ioutil.ReadFile("../../data/m42-800x600-rggb.json")
+
+	if err != nil {
+		t.Errorf("Error opening from JSON data: %s", err)
+	}
+
+	ex := CameraExposure{}
+
+	_ = json.Unmarshal([]byte(file), &ex)
+
+	w := 1600
+
+	h := 1200
+
+	for j := 0; j < h; j++ {
+		for i := 0; i < w; i++ {
+			ex.Image[i][j] = ex.Image[i][j] / 256
+		}
+	}
+
+	rggb := NewRGGBExposure(ex.Image, 256, w, h, ex.SensorType)
+
+	rggb.PreprocessImageArray(w, h)
+
+	fit := rggb.GetFITSImageForChannel(RGGBColor{
+		Name:    "Green",
+		Channel: rggb.G,
+	})
+
+	if fit == nil {
+		t.Errorf("Expected the FITS image to be instantiated successfully, but got nil")
+	}
+
+	if fit.Data == nil {
+		t.Errorf("Expected the FITS image data to be instantiated successfully, but got nil")
+	}
+
+	if len(fit.Data) != w*h {
+		t.Errorf("Expected the FITS image data to be %d, but got %d", w*h, len(fit.Data))
+	}
+
+	if fit.Header.Naxis1 != int32(w) {
+		t.Errorf("Expected the FITS image header NAXIS1 to be %q, but got %q", w, fit.Header.Naxis1)
+	}
+
+	if fit.Header.Naxis2 != int32(h) {
+		t.Errorf("Expected the FITS image header NAXIS2 to be %q, but got %q", h, fit.Header.Naxis2)
+	}
+
+	f, err := os.OpenFile("m42-800x600-rggb-G-channel.fits", os.O_WRONLY|os.O_CREATE, 0644)
+
+	if err != nil {
+		t.Errorf("Error opening image: %s", err)
+	}
+
+	defer f.Close()
+
+	defer func() {
+		if err := f.Close(); err != nil {
+			t.Errorf("Expected the image buffer to be saved successfully, but got %q", err)
+		}
+
+		// Clean up the file after we have finished with the test:
+		os.Remove("m42-800x600-rggb-G-channel.fits")
+	}()
+
+	buf, err := fit.WriteToBuffer()
+
+	if err != nil {
+		t.Errorf("Error writing image: %s", err)
+	}
+
+	_, err = f.Write(buf.Bytes())
+
+	if err != nil {
+		t.Errorf("Error writing image: %s", err)
+	}
+}
+
+func TestNewRGGBExposureGetFITSImageForBlueChannel(t *testing.T) {
+	type CameraExposure struct {
+		BayerXOffset int32      `json:"bayerXOffset"`
+		BayerYOffset int32      `json:"bayerYOffset"`
+		CCDXSize     int32      `json:"ccdXSize"`
+		CCDYSize     int32      `json:"ccdYSize"`
+		Image        [][]uint32 `json:"exposure"`
+		MaxADU       int32      `json:"maxADU"`
+		Rank         uint32     `json:"rank"`
+		SensorType   string     `json:"sensorType"`
+	}
+
+	file, err := ioutil.ReadFile("../../data/m42-800x600-rggb.json")
+
+	if err != nil {
+		t.Errorf("Error opening from JSON data: %s", err)
+	}
+
+	ex := CameraExposure{}
+
+	_ = json.Unmarshal([]byte(file), &ex)
+
+	w := 1600
+
+	h := 1200
+
+	for j := 0; j < h; j++ {
+		for i := 0; i < w; i++ {
+			ex.Image[i][j] = ex.Image[i][j] / 256
+		}
+	}
+
+	rggb := NewRGGBExposure(ex.Image, 256, w, h, ex.SensorType)
+
+	rggb.PreprocessImageArray(w, h)
+
+	fit := rggb.GetFITSImageForChannel(RGGBColor{
+		Name:    "Blue",
+		Channel: rggb.B,
+	})
+
+	if fit == nil {
+		t.Errorf("Expected the FITS image to be instantiated successfully, but got nil")
+	}
+
+	if fit.Data == nil {
+		t.Errorf("Expected the FITS image data to be instantiated successfully, but got nil")
+	}
+
+	if len(fit.Data) != w*h {
+		t.Errorf("Expected the FITS image data to be %d, but got %d", w*h, len(fit.Data))
+	}
+
+	if fit.Header.Naxis1 != int32(w) {
+		t.Errorf("Expected the FITS image header NAXIS1 to be %q, but got %q", w, fit.Header.Naxis1)
+	}
+
+	if fit.Header.Naxis2 != int32(h) {
+		t.Errorf("Expected the FITS image header NAXIS2 to be %q, but got %q", h, fit.Header.Naxis2)
+	}
+
+	f, err := os.OpenFile("m42-800x600-rggb-B-channel.fits", os.O_WRONLY|os.O_CREATE, 0644)
+
+	if err != nil {
+		t.Errorf("Error opening image: %s", err)
+	}
+
+	defer f.Close()
+
+	defer func() {
+		if err := f.Close(); err != nil {
+			t.Errorf("Expected the image buffer to be saved successfully, but got %q", err)
+		}
+
+		// Clean up the file after we have finished with the test:
+		os.Remove("m42-800x600-rggb-B-channel.fits")
+	}()
+
+	buf, err := fit.WriteToBuffer()
+
+	if err != nil {
+		t.Errorf("Error writing image: %s", err)
+	}
+
+	_, err = f.Write(buf.Bytes())
+
+	if err != nil {
+		t.Errorf("Error writing image: %s", err)
 	}
 }
