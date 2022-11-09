@@ -9,6 +9,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/observerly/iris/pkg/fits"
 	"github.com/observerly/iris/pkg/photometry"
 )
 
@@ -64,9 +65,6 @@ func (b *RGGBExposure) GetBayerMatrixOffset() (xOffset int, yOffset int, err err
 	}
 }
 
-/**
-
-**/
 func (b *RGGBExposure) GetBuffer(img *image.RGBA) (bytes.Buffer, error) {
 	var buff bytes.Buffer
 
@@ -77,6 +75,47 @@ func (b *RGGBExposure) GetBuffer(img *image.RGBA) (bytes.Buffer, error) {
 	}
 
 	return buff, nil
+}
+
+/**
+	Convert an R or G or B channel to a FITS standard image
+**/
+func (b *RGGBExposure) GetFITSImageForChannel(color RGGBColor) *fits.FITSImage {
+	// Create a 2D array of the specific RGB channel from flattened 1D color channel array:
+	raw := make([][]uint32, b.Height)
+
+	for j := 0; j < b.Height; j++ {
+		row := make([]uint32, b.Width)
+		for i := 0; i < b.Width; i++ {
+			row[i] = uint32(color.Channel[j*b.Width+i])
+		}
+		raw[j] = row
+	}
+
+	f := fits.NewFITSImageFrom2DData(
+		raw,
+		2,
+		int32(b.Width),
+		int32(b.Height),
+	)
+
+	f.Header.Strings["SENSOR"] = struct {
+		Value   string
+		Comment string
+	}{
+		Value:   "RGGB",
+		Comment: "ASCOM Alpaca Sensor Type",
+	}
+
+	f.Header.Strings["CHANNEL"] = struct {
+		Value   string
+		Comment string
+	}{
+		Value:   color.Name,
+		Comment: "RGB Channel",
+	}
+
+	return f
 }
 
 /**
