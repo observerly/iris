@@ -70,17 +70,13 @@ func NewFITSImageFromNaxisn(naxisn []int32, data []float32, bitpix int32, naxis 
 func NewFITSImageFrom2DData(ex [][]uint32, naxis int32, naxis1 int32, naxis2 int32) *FITSImage {
 	pixels := naxis1 * naxis2
 
-	var data []float32
+	data := make([]float32, 0)
 
 	// Flatten the 2D Colour Filter Array array into a 1D array:
 	for _, row := range ex {
 		for _, col := range row {
 			data = append(data, float32(col))
 		}
-	}
-
-	if data == nil {
-		data = make([]float32, pixels)
 	}
 
 	f := NewFITSImage(naxis, naxis1, naxis2)
