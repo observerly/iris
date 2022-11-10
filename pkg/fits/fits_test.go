@@ -162,7 +162,7 @@ func TestNewFITSImageFrom2DDataPixels(t *testing.T) {
 	var want = img2DData.Pixels
 
 	if len(got) != int(want) {
-		t.Errorf("NewFITSImageFrom2DData() Data Length should be 256 pixels: got %v, want %v", got, want)
+		t.Errorf("NewFITSImageFrom2DData() Data Length should be 256 pixels: got %v, want %v", len(got), want)
 	}
 }
 
