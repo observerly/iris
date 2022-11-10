@@ -119,6 +119,60 @@ func (b *RGGBExposure) GetFITSImageForChannel(color RGGBColor) *fits.FITSImage {
 }
 
 /**
+	Return each R, G, B FITS standard images
+**/
+func (b *RGGBExposure) GetFITSImages() (*fits.FITSImage, *fits.FITSImage, *fits.FITSImage) {
+	var wg sync.WaitGroup
+
+	wg.Add(3)
+
+	R := make(chan *fits.FITSImage, 1)
+
+	G := make(chan *fits.FITSImage, 1)
+
+	B := make(chan *fits.FITSImage, 1)
+
+	go func() {
+		defer wg.Done()
+		// Get the FITS image for the R channel:
+		red := b.GetFITSImageForChannel(RGGBColor{
+			Name:    "Red",
+			Channel: b.R,
+		})
+		R <- red
+	}()
+
+	go func() {
+		defer wg.Done()
+		// Get the FITS image for the G channel:
+		green := b.GetFITSImageForChannel(RGGBColor{
+			Name:    "Green",
+			Channel: b.G,
+		})
+		G <- green
+	}()
+
+	go func() {
+		defer wg.Done()
+		// Get the FITS image for the B channel:
+		blue := b.GetFITSImageForChannel(RGGBColor{
+			Name:    "Blue",
+			Channel: b.B,
+		})
+		B <- blue
+	}()
+
+	go func() {
+		wg.Wait()
+		close(R)
+		close(G)
+		close(B)
+	}()
+
+	return <-R, <-G, <-B
+}
+
+/**
 	Perform Debayering w/ Bilinear Interpolation Technique
 **/
 func (b *RGGBExposure) DebayerBilinearInterpolation() error {
