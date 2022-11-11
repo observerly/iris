@@ -15,6 +15,7 @@ type MonochromeExposure struct {
 	Width     int
 	Height    int
 	Raw       [][]uint32
+	Processed [][]uint32
 	ADU       int32
 	Buffer    bytes.Buffer
 	Image     *image.Gray
@@ -28,13 +29,14 @@ func NewMonochromeExposure(exposure [][]uint32, adu int32, xs int, ys int) Monoc
 	img := image.NewGray(image.Rect(0, 0, xs, ys))
 
 	mono := MonochromeExposure{
-		Width:  xs,
-		Height: ys,
-		Raw:    exposure,
-		ADU:    adu,
-		Buffer: bytes.Buffer{},
-		Image:  img,
-		Pixels: xs * ys,
+		Width:     xs,
+		Height:    ys,
+		Raw:       exposure,
+		Processed: exposure,
+		ADU:       adu,
+		Buffer:    bytes.Buffer{},
+		Image:     img,
+		Pixels:    xs * ys,
 	}
 
 	return mono
@@ -145,6 +147,8 @@ func (m *MonochromeExposure) PreprocessImageArray(xs int, ys int) (bytes.Buffer,
 
 	m.Raw = ex
 
+	m.Processed = ex
+
 	return m.Preprocess()
 }
 
@@ -179,8 +183,11 @@ func (m *MonochromeExposure) ApplyNoiseReduction() (bytes.Buffer, error) {
 
 			if pixel < uint32(m.Noise) {
 				gray.SetGray(i, j, color.Gray{Y: 0})
+				m.Processed[j][i] = 0
 			} else {
-				gray.SetGray(i, j, color.Gray{uint8(pixel - uint32(m.Noise))})
+				reduction := pixel - uint32(m.Noise)
+				gray.SetGray(i, j, color.Gray{uint8(reduction)})
+				m.Processed[j][i] = reduction
 			}
 		}
 	}
@@ -206,8 +213,10 @@ func (m *MonochromeExposure) ApplyOtsuThreshold() (bytes.Buffer, error) {
 
 			if pixel < uint32(m.Threshold) {
 				gray.SetGray(i, j, color.Gray{Y: 0})
+				m.Processed[j][i] = 0
 			} else {
 				gray.SetGray(i, j, color.Gray{Y: uint8(pixel)})
+				m.Processed[j][i] = pixel
 			}
 		}
 	}
