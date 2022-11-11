@@ -202,12 +202,12 @@ func (m *Monochrome16Exposure) ApplyOtsuThreshold() (bytes.Buffer, error) {
 
 	for j := 0; j < bounds.Dy(); j++ {
 		for i := 0; i < bounds.Dx(); i++ {
-			pixel := m.Image.Gray16At(i, j).Y
+			pixel := m.Raw[j][i]
 
-			if pixel < m.Threshold {
+			if pixel < uint32(m.Threshold) {
 				gray.SetGray16(i, j, color.Gray16{Y: 0})
 			} else {
-				gray.SetGray16(i, j, color.Gray16{Y: pixel})
+				gray.SetGray16(i, j, color.Gray16{Y: uint16(pixel)})
 			}
 		}
 	}
