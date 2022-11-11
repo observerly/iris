@@ -79,6 +79,10 @@ func NewFITSImageFrom2DData(ex [][]uint32, naxis int32, naxis1 int32, naxis2 int
 		}
 	}
 
+	if len(data) == 0 {
+		data = make([]float32, pixels)
+	}
+
 	f := NewFITSImage(naxis, naxis1, naxis2)
 
 	return &FITSImage{
