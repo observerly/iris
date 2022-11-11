@@ -15,6 +15,7 @@ type Monochrome16Exposure struct {
 	Width     int
 	Height    int
 	Raw       [][]uint32
+	Processed [][]uint32
 	ADU       int32
 	Buffer    bytes.Buffer
 	Image     *image.Gray16
@@ -28,13 +29,14 @@ func NewMonochrome16Exposure(exposure [][]uint32, adu int32, xs int, ys int) Mon
 	img := image.NewGray16(image.Rect(0, 0, xs, ys))
 
 	mono := Monochrome16Exposure{
-		Width:  xs,
-		Height: ys,
-		Raw:    exposure,
-		ADU:    adu,
-		Buffer: bytes.Buffer{},
-		Image:  img,
-		Pixels: xs * ys,
+		Width:     xs,
+		Height:    ys,
+		Raw:       exposure,
+		Processed: exposure,
+		ADU:       adu,
+		Buffer:    bytes.Buffer{},
+		Image:     img,
+		Pixels:    xs * ys,
 	}
 
 	return mono
@@ -145,6 +147,8 @@ func (m *Monochrome16Exposure) PreprocessImageArray(xs int, ys int) (bytes.Buffe
 
 	m.Raw = ex
 
+	m.Processed = ex
+
 	return m.Preprocess()
 }
 
@@ -179,8 +183,11 @@ func (m *Monochrome16Exposure) ApplyNoiseReduction() (bytes.Buffer, error) {
 
 			if pixel < uint32(m.Noise) {
 				gray.SetGray16(i, j, color.Gray16{Y: 0})
+				m.Processed[j][i] = 0
 			} else {
-				gray.SetGray16(i, j, color.Gray16{uint16(pixel - uint32(m.Noise))})
+				reduction := pixel - uint32(m.Noise)
+				gray.SetGray16(i, j, color.Gray16{uint16(reduction)})
+				m.Processed[j][i] = reduction
 			}
 		}
 	}
@@ -206,8 +213,10 @@ func (m *Monochrome16Exposure) ApplyOtsuThreshold() (bytes.Buffer, error) {
 
 			if pixel < uint32(m.Threshold) {
 				gray.SetGray16(i, j, color.Gray16{Y: 0})
+				m.Processed[j][i] = 0
 			} else {
 				gray.SetGray16(i, j, color.Gray16{Y: uint16(pixel)})
+				m.Processed[j][i] = pixel
 			}
 		}
 	}
