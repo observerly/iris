@@ -9,7 +9,6 @@ import (
 	"github.com/observerly/iris/pkg/fits"
 	"github.com/observerly/iris/pkg/histogram"
 	"github.com/observerly/iris/pkg/photometry"
-	"github.com/observerly/iris/pkg/utils"
 )
 
 type MonochromeExposure struct {
@@ -201,19 +200,17 @@ func (m *MonochromeExposure) ApplyOtsuThreshold() (bytes.Buffer, error) {
 
 	gray := image.NewGray(bounds)
 
-	setPixel := func(gray *image.Gray, x int, y int) {
-		pixel := m.Image.GrayAt(x, y).Y
+	for j := 0; j < bounds.Dy(); j++ {
+		for i := 0; i < bounds.Dx(); i++ {
+			pixel := m.Raw[j][i]
 
-		if pixel < m.Threshold {
-			gray.SetGray(x, y, color.Gray{Y: 0})
-		} else {
-			gray.SetGray(x, y, color.Gray{Y: pixel})
+			if pixel < uint32(m.Threshold) {
+				gray.SetGray(i, j, color.Gray{Y: 0})
+			} else {
+				gray.SetGray(i, j, color.Gray{Y: uint8(pixel)})
+			}
 		}
 	}
-
-	utils.DeferForEachPixel(size, func(x, y int) {
-		setPixel(gray, x, y)
-	})
 
 	m.Otsu = gray
 
