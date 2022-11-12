@@ -2,8 +2,10 @@ package iris
 
 import (
 	"bytes"
+	"fmt"
 	"image"
 	"image/jpeg"
+	"strings"
 )
 
 type RGGB64Exposure struct {
@@ -32,6 +34,24 @@ func NewRGGB64Exposure(exposure [][]uint32, adu int32, xs int, ys int, cfa strin
 		Image:             img,
 		ColourFilterArray: cfa,
 		Pixels:            xs * ys,
+	}
+}
+
+/**
+	Accepts a CFA (Color Filter Array) string, e.g., "RGGB" and returns the Bayering Matrix offset
+**/
+func (b *RGGB64Exposure) GetBayerMatrixOffset() (xOffset int, yOffset int, err error) {
+	switch strings.ToLower(b.ColourFilterArray) {
+	case "rggb":
+		return 0, 0, nil
+	case "grbg":
+		return 1, 0, nil
+	case "gbrg":
+		return 0, 1, nil
+	case "bggr":
+		return 1, 1, nil
+	default:
+		return 0, 0, fmt.Errorf("unknown color filter array string: %v", b.ColourFilterArray)
 	}
 }
 
