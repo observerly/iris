@@ -3,6 +3,7 @@ package iris
 import (
 	"bytes"
 	"image"
+	"image/jpeg"
 )
 
 type RGGB64Exposure struct {
@@ -32,4 +33,16 @@ func NewRGGB64Exposure(exposure [][]uint32, adu int32, xs int, ys int, cfa strin
 		ColourFilterArray: cfa,
 		Pixels:            xs * ys,
 	}
+}
+
+func (b *RGGB64Exposure) GetBuffer(img *image.RGBA64) (bytes.Buffer, error) {
+	var buff bytes.Buffer
+
+	err := jpeg.Encode(&buff, img, &jpeg.Options{Quality: 100})
+
+	if err != nil {
+		return buff, err
+	}
+
+	return buff, nil
 }

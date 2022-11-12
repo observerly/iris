@@ -37,3 +37,13 @@ func TestNewRGGB64ExpsourePixels(t *testing.T) {
 		t.Errorf("got %q, wanted %q", got, want)
 	}
 }
+
+func TestNewRGGB64ExposureGetBuffer(t *testing.T) {
+	rggb := NewRGGB64Exposure(ex, 1, 800, 600, "RGGB")
+
+	_, err := rggb.GetBuffer(rggb.Image)
+
+	if err != nil {
+		t.Errorf("Expected no error when creating the output buffer, got %q", err)
+	}
+}
