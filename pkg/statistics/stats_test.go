@@ -37,3 +37,33 @@ func TestCalculateMeanStdDevVar(t *testing.T) {
 		t.Errorf("variance should be 8.25, but got %v", variance)
 	}
 }
+
+func TestCalculateMedianOdd(t *testing.T) {
+	data := []float32{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+
+	median := calcMedian(data)
+
+	if median != 5.5 {
+		t.Errorf("median should be 5.5, but got %v", median)
+	}
+}
+
+func TestCalculateMedianEven(t *testing.T) {
+	data := []float32{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
+
+	median := calcMedian(data)
+
+	if median != 6 {
+		t.Errorf("median should be 6, but got %v", median)
+	}
+}
+
+func TestCalculateMedianDispersedRandom(t *testing.T) {
+	data := []float32{10, 12, 23, 23, 16, 23, 21, 16}
+
+	median := calcMedian(data)
+
+	if median != 18.5 {
+		t.Errorf("median should be 18.5, but got %v", median)
+	}
+}
