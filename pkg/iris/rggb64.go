@@ -166,3 +166,14 @@ func (b *RGGB64Exposure) DebayerBilinearInterpolation() error {
 
 	return nil
 }
+
+func (b *RGGB64Exposure) Preprocess() (bytes.Buffer, error) {
+	// Perform Debayering w/ Bilinear Interpolation Technique:
+	err := b.DebayerBilinearInterpolation()
+
+	if err != nil {
+		return b.Buffer, err
+	}
+
+	return b.GetBuffer(b.Image)
+}
