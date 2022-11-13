@@ -19,3 +19,21 @@ func TestCalculateMinMeanMax(t *testing.T) {
 		t.Errorf("max should be 10, but got %v", max)
 	}
 }
+
+func TestCalculateMeanStdDevVar(t *testing.T) {
+	data := []float32{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+
+	mean, stddev, variance := calcMeanStdDevVar(data)
+
+	if mean != 5.5 {
+		t.Errorf("mean should be 5.5, but got %v", mean)
+	}
+
+	if stddev != 2.872281323269 {
+		t.Errorf("stddev should be 2.872281323269, but got %v", stddev)
+	}
+
+	if variance != 8.25 {
+		t.Errorf("variance should be 8.25, but got %v", variance)
+	}
+}
