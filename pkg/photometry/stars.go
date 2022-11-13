@@ -2,10 +2,10 @@ package photometry
 
 type Star struct {
 	Index     int32   // Index of the star in the data array. int32(x)+width*int32(y)
-	Value     uint32  // Value of the star in the data array. data[index]
+	Value     float32 // Value of the star in the data array. data[index]
 	X         float32 // Precise star x position
 	Y         float32 // Precise star y position
-	Intensity uint32  // Intensity of the star at position { X, Y }
+	Intensity float32 // Intensity of the star at position { X, Y }
 	HFR       float32 // Half-Flux Radius of the star, in pixels
 }
 
@@ -14,18 +14,20 @@ type StarsExtractor struct {
 	Height    int
 	Threshold float32
 	Radius    float32
-	Raw       []uint32
+	Raw       []float32
 	Stars     []Star
 	HFR       float32
 }
 
 func NewStarsExtractor(exposure [][]uint32, xs int, ys int, radius float32) *StarsExtractor {
 	// Locate the brightest pixels in the data array above the threshold and return them as stars:
-	var raw []uint32
+	var raw []float32
 
 	// Flatten the 2D Colour Filter Array array into a 1D array:
 	for _, a := range exposure {
-		raw = append(raw, a...)
+		for _, b := range a {
+			raw = append(raw, float32(b))
+		}
 	}
 
 	stars := make([]Star, 0)
@@ -41,19 +43,38 @@ func NewStarsExtractor(exposure [][]uint32, xs int, ys int, radius float32) *Sta
 }
 
 func (s *StarsExtractor) GetBrightPixels() []Star {
-	stars := s.Stars
+	return findBrightPixels(s.Raw, int32(s.Width), s.Threshold, int32(s.Radius))
+}
 
-	for index, value := range s.Raw {
-		// If the value of the pixel is above the threshold, append it to the stars array:
-		if float32(value) > s.Threshold {
-			is := Star{Index: int32(index), Value: value, X: float32(index % s.Width), Y: float32(index / s.Width), Intensity: value, HFR: 1.0}
+/**
+	findBrightPixels()
+
+	Find pixels above the threshold and return them as stars. Applies early
+	overlap rejection based on radius to reduce allocations.
+
+	Uses central pixel value as initial mass, 1 as initial HFR.
+**/
+func findBrightPixels(data []float32, width int32, threshold float32, radius int32) []Star {
+	// Roughly, we'll locate 100 bright stars []Star{}
+	stars := make([]Star, len(data)/100)[:0]
+
+	for i, v := range data {
+		if v > threshold {
+			is := Star{
+				Index:     int32(i),
+				Value:     v,
+				X:         float32(int32(i) % width),
+				Y:         float32(int32(i) / width),
+				Intensity: v,
+				HFR:       1,
+			}
 
 			// Check if the star is within the radius of any other stars for optimisation:
 			if len(stars) > 0 {
 				star := stars[len(stars)-1]
 
 				// Replace previous bright star with current if it is perceived brighter:
-				if star.Y == is.Y && star.X >= is.X-float32(s.Radius) && star.Value <= is.Value {
+				if star.Y == is.Y && star.X >= is.X-float32(radius) && star.Value <= is.Value {
 					stars[len(stars)-1] = is
 				}
 			}
