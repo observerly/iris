@@ -38,3 +38,10 @@ func calcMeanStdDevVar(data []float32) (mean float32, stddev float32, variance f
 
 	return mmean, stddev, xvar
 }
+
+func calcMedian(data []float32) float32 {
+	if len(data)%2 == 0 {
+		return (data[len(data)/2-1] + data[len(data)/2]) / 2
+	}
+	return data[len(data)/2]
+}
