@@ -57,3 +57,13 @@ func TestCalculateMedianEven(t *testing.T) {
 		t.Errorf("median should be 6, but got %v", median)
 	}
 }
+
+func TestCalculateMedianDispersedRandom(t *testing.T) {
+	data := []float32{10, 12, 23, 23, 16, 23, 21, 16}
+
+	median := calcMedian(data)
+
+	if median != 18.5 {
+		t.Errorf("median should be 18.5, but got %v", median)
+	}
+}
