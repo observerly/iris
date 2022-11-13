@@ -1,4 +1,11 @@
 mode: atomic
+github.com/observerly/iris/pkg/statistics/stats.go:3.78,6.25 2 1
+github.com/observerly/iris/pkg/statistics/stats.go:16.2,16.56 1 1
+github.com/observerly/iris/pkg/statistics/stats.go:6.25,7.15 1 10
+github.com/observerly/iris/pkg/statistics/stats.go:10.3,10.15 1 10
+github.com/observerly/iris/pkg/statistics/stats.go:13.3,13.13 1 10
+github.com/observerly/iris/pkg/statistics/stats.go:7.15,9.4 1 0
+github.com/observerly/iris/pkg/statistics/stats.go:10.15,12.4 1 9
 github.com/observerly/iris/pkg/fits/fits.go:28.71,37.2 2 7
 github.com/observerly/iris/pkg/fits/fits.go:41.127,44.31 2 12
 github.com/observerly/iris/pkg/fits/fits.go:48.2,48.17 1 12
