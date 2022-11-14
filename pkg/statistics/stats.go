@@ -42,6 +42,35 @@ func calcMeanStdDevVar(data []float32) (mean float32, stddev float32, variance f
 	return mmean, stddev, xvar
 }
 
+func calcMinMeanMaxStdDevVar(data []float32) (min float32, mean float32, max float32, stddev float32, variance float32) {
+	mmin, mmean, mmax, xvar := float32(data[0]), float32(0), float32(data[0]), float32(0)
+
+	for _, v := range data {
+		if v < mmin {
+			mmin = v
+		}
+
+		if v > mmax {
+			mmax = v
+		}
+
+		mmean += v
+	}
+
+	mmean /= float32(len(data))
+
+	for _, x := range data {
+		diff := x - mmean
+		xvar += diff * diff
+	}
+
+	xvar /= float32(len(data))
+
+	stddev = float32(math.Sqrt(float64(xvar)))
+
+	return mmin, mmean, mmax, stddev, xvar
+}
+
 func calcMedian(data []float32) float32 {
 	p := make([]float64, len(data))
 
