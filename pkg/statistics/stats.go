@@ -5,6 +5,35 @@ import (
 	"sort"
 )
 
+// Statistics on data arrays, calculated on demand
+type Stats struct {
+	Width    int       // Width of a line in the underlying data array (for noise)
+	Data     []float32 // The underlying data array
+	Min      float32   // Minimum
+	Max      float32   // Maximum
+	Mean     float32   // Mean (average)
+	StdDev   float32   // Standard Deviation (norm 2, sigma)
+	Variance float32   // Variance (sigma^2)
+	Location float32   // Selected location indicator (standard: randomized sigma-clipped median using randomized Qn)
+	Scale    float32   // Selected scale indicator (standard: randomized Qn)
+	Noise    float32   // Noise Estimation
+}
+
+func NewStats(data []float32, xs int) *Stats {
+	min, mean, max, stddev, variance := calcMinMeanMaxStdDevVar(data)
+
+	return &Stats{
+		Width:    xs,
+		Data:     data,
+		Min:      min,
+		Max:      max,
+		Mean:     mean,
+		StdDev:   stddev,
+		Variance: variance,
+		Noise:    0,
+	}
+}
+
 func calcMinMeanMax(data []float32) (min float32, mean float32, max float32) {
 	mmin, mmean, mmax := float32(data[0]), float32(0), float32(data[0])
 
