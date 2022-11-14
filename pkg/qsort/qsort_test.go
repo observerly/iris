@@ -99,3 +99,23 @@ func TestQSelectFloat32DispersedRandom(t *testing.T) {
 		t.Errorf("Expected 21, got %f", v)
 	}
 }
+
+func TestQSelectFirstQuartileFloat32(t *testing.T) {
+	a := []float32{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+
+	v := QSelectFirstQuartileFloat32(a)
+
+	if v != 3 {
+		t.Errorf("Expected 2, got %f", v)
+	}
+}
+
+func TestQSelectFirstQuartileFloat32DispersedRandom(t *testing.T) {
+	a := []float32{10, 12, 23, 23, 16, 23, 21, 16}
+
+	v := QSelectFirstQuartileFloat32(a)
+
+	if v != 16 {
+		t.Errorf("Expected 12, got %f", v)
+	}
+}
