@@ -49,3 +49,52 @@ func QSortFloat32(a []float32) {
 		QSortFloat32(a[index+1:])
 	}
 }
+
+/*
+	Select kth lowest element from an array of float32. Partially reorders the array.
+
+	Array must not contain IEEE NaN
+*/
+func QSelectFloat32(a []float32, k int) float32 {
+	left, right := 0, len(a)-1
+
+	for left < right {
+		mid := (left + right) >> 1
+
+		pivot := a[mid]
+
+		l, r := left-1, right+1
+
+		for {
+			for {
+				l++
+				if a[l] >= pivot {
+					break
+				}
+			}
+			for {
+				r--
+				if a[r] <= pivot {
+					break
+				}
+			}
+			if l >= r {
+				break
+			}
+			a[l], a[r] = a[r], a[l]
+		}
+
+		index := r
+
+		offset := index - left + 1
+
+		if k <= offset {
+			right = index
+		} else {
+			left = index + 1
+			k = k - offset
+		}
+	}
+
+	return a[left]
+}
