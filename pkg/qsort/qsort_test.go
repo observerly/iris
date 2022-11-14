@@ -1,6 +1,8 @@
 package qsort
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestQPartitionFloat32(t *testing.T) {
 	a := []float32{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
@@ -117,5 +119,41 @@ func TestQSelectFirstQuartileFloat32DispersedRandom(t *testing.T) {
 
 	if v != 16 {
 		t.Errorf("Expected 12, got %f", v)
+	}
+}
+
+func TestQSelectMedianFloat32Odd(t *testing.T) {
+	a := []float32{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+
+	median := float32(5.5)
+
+	got := QSelectMedianFloat32(a)
+
+	if median != got {
+		t.Errorf("median should be 5.5, but got %v", median)
+	}
+}
+
+func TestQSelectMedianFloat32Even(t *testing.T) {
+	a := []float32{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
+
+	median := float32(6)
+
+	got := QSelectMedianFloat32(a)
+
+	if median != got {
+		t.Errorf("median should be 6, but got %v", median)
+	}
+}
+
+func TestQSelectMedianFloat32DispersedRandom(t *testing.T) {
+	a := []float32{10, 12, 23, 23, 16, 23, 21, 16}
+
+	median := float32(18.5)
+
+	got := QSelectMedianFloat32(a)
+
+	if median != got {
+		t.Errorf("median should be 18.5, but got %v", median)
 	}
 }
