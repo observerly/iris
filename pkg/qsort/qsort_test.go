@@ -29,3 +29,53 @@ func TestQPartitionFloat32DispersedRandom(t *testing.T) {
 		t.Errorf("Expected pivot to be 16, got %f", a[pivot])
 	}
 }
+
+func TestQSortFloat32(t *testing.T) {
+	a := []float32{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+
+	QSortFloat32(a)
+
+	for i, v := range a {
+		if v != float32(i+1) {
+			t.Errorf("Expected %d, got %f", i+1, v)
+		}
+	}
+}
+
+func TestQSortFloat32DispersedRandom(t *testing.T) {
+	a := []float32{10, 12, 23, 23, 16, 23, 21, 16}
+
+	QSortFloat32(a)
+
+	if a[0] != 10 {
+		t.Errorf("Expected 10, got %f", a[0])
+	}
+
+	if a[1] != 12 {
+		t.Errorf("Expected 12, got %f", a[1])
+	}
+
+	if a[2] != 16 {
+		t.Errorf("Expected 16, got %f", a[2])
+	}
+
+	if a[3] != 16 {
+		t.Errorf("Expected 16, got %f", a[3])
+	}
+
+	if a[4] != 21 {
+		t.Errorf("Expected 21, got %f", a[4])
+	}
+
+	if a[5] != 23 {
+		t.Errorf("Expected 23, got %f", a[5])
+	}
+
+	if a[6] != 23 {
+		t.Errorf("Expected 23, got %f", a[6])
+	}
+
+	if a[7] != 23 {
+		t.Errorf("Expected 23, got %f", a[7])
+	}
+}

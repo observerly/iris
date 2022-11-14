@@ -36,3 +36,16 @@ func QPartitionFloat32(a []float32) int {
 		a[l], a[r] = a[r], a[l]
 	}
 }
+
+/*
+	Sort an array of float32 in ascending order.
+
+	Array must not contain IEEE NaN
+*/
+func QSortFloat32(a []float32) {
+	if len(a) > 1 {
+		index := QPartitionFloat32(a)
+		QSortFloat32(a[:index+1])
+		QSortFloat32(a[index+1:])
+	}
+}
