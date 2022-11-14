@@ -3,26 +3,35 @@ package photometry
 import "math"
 
 type NoiseExtractor struct {
-	Width  int
+	Width  int // Width of a line in the underlying data array (for noise)
 	Height int
 	Noise  float64
-	Raw    []uint32
+	Raw    [][]uint32
+	Data   []float32 // The underlying data array
 }
 
-func NewNoiseExtractor(exposure [][]uint32, xs int, ys int) *NoiseExtractor {
-	// Locate the brightest pixels in the data array above the threshold and return them as stars:
-	var raw []uint32
+func NewNoiseExtractor(ex [][]uint32, xs int, ys int) *NoiseExtractor {
+	pixels := xs * ys
 
-	// Flatten the 2D Exposure Array array into a 1D array:
-	for _, a := range exposure {
-		raw = append(raw, a...)
+	data := make([]float32, pixels)
+
+	// Flatten the 2D Colour Filter Array array into a 1D array:
+	for _, row := range ex {
+		for _, col := range row {
+			data = append(data, float32(col))
+		}
+	}
+
+	if len(data) == 0 {
+		data = make([]float32, pixels)
 	}
 
 	return &NoiseExtractor{
 		Width:  xs,
 		Height: ys,
 		Noise:  0,
-		Raw:    raw,
+		Raw:    ex,
+		Data:   data,
 	}
 }
 
@@ -41,7 +50,7 @@ func (n *NoiseExtractor) GetGaussianNoise() float64 {
 
 	xs := int32(n.Width)
 
-	ys := int32(len(n.Raw)) / xs
+	ys := int32(len(n.Data)) / xs
 
 	// Offsets for the 3x3 kernel:
 	offset := []int32{
@@ -64,8 +73,8 @@ func (n *NoiseExtractor) GetGaussianNoise() float64 {
 
 			// Convolve the pixel with the weight matrix:
 			for j, o := range offset {
-				if i+o >= 0 && i+o < int32(len(n.Raw)) {
-					conv += float64(weight[j]) * float64(n.Raw[i+o])
+				if i+o >= 0 && i+o < int32(len(n.Data)) {
+					conv += float64(weight[j]) * float64(n.Data[i+o])
 				}
 			}
 
