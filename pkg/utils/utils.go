@@ -8,6 +8,30 @@ import (
 )
 
 /*
+	Creates a mask of given pixel radius.
+
+	Returns a list of index offsets
+*/
+func CreateRadialPixelMask(width int32, radius float32) []int32 {
+	mask := []int32{}
+
+	rad := int32(radius)
+
+	for y := -rad; y <= rad; y++ {
+		for x := -rad; x <= rad; x++ {
+			dist := float32(math.Sqrt(float64(y*y + x*x)))
+
+			if dist <= radius+1e-8 {
+				offset := y*int32(width) + x
+				mask = append(mask, offset)
+			}
+		}
+	}
+
+	return mask
+}
+
+/*
   DeferForEachPixel
 
   Loop through all of the image pixels avaialble and calls a functions for each { x, y } pixel position.
