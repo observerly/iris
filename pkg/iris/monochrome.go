@@ -15,6 +15,7 @@ type MonochromeExposure struct {
 	Width     int
 	Height    int
 	Raw       [][]uint32
+	Data      []float32 // The underlying data array
 	Processed [][]uint32
 	ADU       int32
 	Buffer    bytes.Buffer
@@ -26,17 +27,20 @@ type MonochromeExposure struct {
 }
 
 func NewMonochromeExposure(exposure [][]uint32, adu int32, xs int, ys int) MonochromeExposure {
+	pixels := xs * ys
+
 	img := image.NewGray(image.Rect(0, 0, xs, ys))
 
 	mono := MonochromeExposure{
 		Width:     xs,
 		Height:    ys,
 		Raw:       exposure,
+		Data:      make([]float32, pixels),
 		Processed: exposure,
 		ADU:       adu,
 		Buffer:    bytes.Buffer{},
 		Image:     img,
-		Pixels:    xs * ys,
+		Pixels:    pixels,
 	}
 
 	return mono
@@ -148,6 +152,17 @@ func (m *MonochromeExposure) PreprocessImageArray(xs int, ys int) (bytes.Buffer,
 	m.Raw = ex
 
 	m.Processed = ex
+
+	data := make([]float32, xs*ys)
+
+	// Flatten the 2D Colour Filter Array array into a 1D array:
+	for _, row := range ex {
+		for _, col := range row {
+			data = append(data, float32(col))
+		}
+	}
+
+	m.Data = data
 
 	return m.Preprocess()
 }
