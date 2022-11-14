@@ -107,3 +107,33 @@ func QSelectFloat32(a []float32, k int) float32 {
 func QSelectFirstQuartileFloat32(a []float32) float32 {
 	return QSelectFloat32(a, (len(a)>>2)+1)
 }
+
+/*
+	Select median of an array of float32. Partially reorders the array.
+
+	Array must not contain IEEE NaN
+*/
+func QSelectMedianFloat32(a []float32) float32 {
+	// Quickly  select the midpoint element:
+	k := (len(a) >> 1) + 1
+
+	// Get the upper kth element:
+	upper := QSelectFloat32(a, k)
+
+	// For odd lengths, the found element is the median:
+	if (len(a) & 1) != 0 {
+		return upper
+	}
+
+	// For even lengths, calculate the maximum of all elements below the pivot:
+	lower := a[0]
+
+	for i := 1; i < k-1; i++ {
+		if a[i] > lower {
+			lower = a[i]
+		}
+	}
+
+	// Return average of the upper and lower elements:
+	return 0.5 * (lower + upper)
+}
