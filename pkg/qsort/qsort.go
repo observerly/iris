@@ -98,3 +98,12 @@ func QSelectFloat32(a []float32, k int) float32 {
 
 	return a[left]
 }
+
+/*
+	Select first quartile of an array of float32. Partially reorders the array.
+
+	Array must not contain IEEE NaN
+*/
+func QSelectFirstQuartileFloat32(a []float32) float32 {
+	return QSelectFloat32(a, (len(a)>>2)+1)
+}
