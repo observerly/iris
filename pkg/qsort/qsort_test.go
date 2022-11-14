@@ -79,3 +79,23 @@ func TestQSortFloat32DispersedRandom(t *testing.T) {
 		t.Errorf("Expected 23, got %f", a[7])
 	}
 }
+
+func TestQSelectFloat32(t *testing.T) {
+	a := []float32{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+
+	v := QSelectFloat32(a, 5)
+
+	if v != 5 {
+		t.Errorf("Expected 5, got %f", v)
+	}
+}
+
+func TestQSelectFloat32DispersedRandom(t *testing.T) {
+	a := []float32{10, 12, 23, 23, 16, 23, 21, 16}
+
+	v := QSelectFloat32(a, 5)
+
+	if v != 21 {
+		t.Errorf("Expected 21, got %f", v)
+	}
+}
