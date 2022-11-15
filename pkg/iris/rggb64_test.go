@@ -734,3 +734,81 @@ func TestNewRGGB64ExposureGetFITSImages(t *testing.T) {
 		t.Errorf("Expected the FITS image header CHANNEL to be %q, but got %q", "Blue", b.Header.Strings["CHANNEL"].Value)
 	}
 }
+
+func TestNewRGGB64ExposureGetMonochrome16FromColorChannel(t *testing.T) {
+	type CameraExposure struct {
+		BayerXOffset int32      `json:"bayerXOffset"`
+		BayerYOffset int32      `json:"bayerYOffset"`
+		CCDXSize     int32      `json:"ccdXSize"`
+		CCDYSize     int32      `json:"ccdYSize"`
+		Image        [][]uint32 `json:"exposure"`
+		MaxADU       int32      `json:"maxADU"`
+		Rank         uint32     `json:"rank"`
+		SensorType   string     `json:"sensorType"`
+	}
+
+	file, err := ioutil.ReadFile("../../data/m42-800x600-rggb.json")
+
+	if err != nil {
+		t.Errorf("Error opening from JSON data: %s", err)
+	}
+
+	ex := CameraExposure{}
+
+	_ = json.Unmarshal([]byte(file), &ex)
+
+	w := 1600
+
+	h := 1200
+
+	for j := 0; j < h; j++ {
+		for i := 0; i < w; i++ {
+			ex.Image[i][j] = ex.Image[i][j] / 256
+		}
+	}
+
+	rggb := NewRGGB64Exposure(ex.Image, 256, w, h, ex.SensorType)
+
+	rggb.PreprocessImageArray(w, h)
+
+	mono := rggb.GetMonochrome()
+
+	if mono.Width != w {
+		t.Errorf("Expected the monochrome image width to be %d, but got %d", w, mono.Width)
+	}
+
+	if mono.Height != h {
+		t.Errorf("Expected the monochrome image height to be %d, but got %d", h, mono.Height)
+	}
+
+	fit := mono.GetFITSImage()
+
+	f, err := os.OpenFile("m42-1600x1200-monochrome-16.fits", os.O_WRONLY|os.O_CREATE, 0644)
+
+	if err != nil {
+		t.Errorf("Error opening image: %s", err)
+	}
+
+	defer f.Close()
+
+	defer func() {
+		if err := f.Close(); err != nil {
+			t.Errorf("Expected the image buffer to be saved successfully, but got %q", err)
+		}
+
+		// Clean up the file after we have finished with the test:
+		os.Remove("m42-1600x1200-monochrome-16.fits")
+	}()
+
+	buf, err := fit.WriteToBuffer()
+
+	if err != nil {
+		t.Errorf("Error writing image: %s", err)
+	}
+
+	_, err = f.Write(buf.Bytes())
+
+	if err != nil {
+		t.Errorf("Error writing image: %s", err)
+	}
+}

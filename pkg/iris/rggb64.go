@@ -78,6 +78,39 @@ func (b *RGGB64Exposure) GetBuffer(img *image.RGBA64) (bytes.Buffer, error) {
 }
 
 /**
+	Convert an R or G or B channel to a Monochrome 16 bit exposure
+**/
+func (b *RGGB64Exposure) GetMonochrome() Monochrome16Exposure {
+	// Create a 2D array of the specific RGB channel from flattened 1D color channel array:
+	raw := make([][]uint32, b.Height)
+
+	for j := 0; j < b.Height; j++ {
+		row := make([]uint32, b.Width)
+		for i := 0; i < b.Width; i++ {
+			// Destination Offset:
+			do := j*b.Width + i
+
+			// The RGB to Monochrome natural luminance component Y (from the CIE XYZ system)
+			// captures what is most perceived by humans as color in one channel.
+			lum := 0.299*float64(b.R[do]) + 0.587*float64(b.G[do]) + 0.114*float64(b.B[do])
+
+			row[i] = uint32(lum)
+		}
+
+		raw[j] = row
+	}
+
+	m := NewMonochrome16Exposure(
+		raw,
+		b.ADU,
+		b.Width,
+		b.Height,
+	)
+
+	return m
+}
+
+/**
 	Convert an R or G or B channel to a FITS standard image
 **/
 func (b *RGGB64Exposure) GetFITSImageForChannel(color RGGB64Color) *fits.FITSImage {
