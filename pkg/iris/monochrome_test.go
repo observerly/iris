@@ -270,7 +270,7 @@ func TestNewMonochromeExposureNoiseReduction16x16(t *testing.T) {
 		t.Errorf("got %q, wanted %q", y, 16)
 	}
 
-	mono.Preprocess()
+	mono.PreprocessImageArray(x, y)
 
 	buff, err := mono.ApplyNoiseReduction()
 

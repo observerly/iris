@@ -3,24 +3,14 @@ package photometry
 import "math"
 
 type NoiseExtractor struct {
-	Width  int // Width of a line in the underlying data array (for noise)
-	Height int
-	Noise  float64
-	Raw    [][]uint32
+	Width  int       // Width of a line in the underlying data array (for noise)
+	Height int       // Height of the underlying data array (for noise)
+	Noise  float64   // The noise value
 	Data   []float32 // The underlying data array
 }
 
-func NewNoiseExtractor(ex [][]uint32, xs int, ys int) *NoiseExtractor {
+func NewNoiseExtractor(data []float32, xs int, ys int) *NoiseExtractor {
 	pixels := xs * ys
-
-	data := make([]float32, pixels)
-
-	// Flatten the 2D Colour Filter Array array into a 1D array:
-	for _, row := range ex {
-		for _, col := range row {
-			data = append(data, float32(col))
-		}
-	}
 
 	if len(data) == 0 {
 		data = make([]float32, pixels)
@@ -30,7 +20,6 @@ func NewNoiseExtractor(ex [][]uint32, xs int, ys int) *NoiseExtractor {
 		Width:  xs,
 		Height: ys,
 		Noise:  0,
-		Raw:    ex,
 		Data:   data,
 	}
 }

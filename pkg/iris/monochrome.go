@@ -188,7 +188,7 @@ func (m *MonochromeExposure) ApplyNoiseReduction() (bytes.Buffer, error) {
 
 	gray := image.NewGray(bounds)
 
-	noise := photometry.NewNoiseExtractor(m.Raw, m.Width, m.Height)
+	noise := photometry.NewNoiseExtractor(m.Data, m.Width, m.Height)
 
 	m.Noise = noise.GetGaussianNoise()
 

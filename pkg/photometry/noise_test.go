@@ -1,6 +1,7 @@
 package photometry
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -24,7 +25,22 @@ func TestNewNoiseExtractor(t *testing.T) {
 		{6, 7, 8, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 8, 7, 6},
 	}
 
-	s := NewNoiseExtractor(ex, 16, 16)
+	xs := 16
+
+	ys := 16
+
+	data := make([]float32, xs*ys)
+
+	// Flatten the 2D Colour Filter Array array into a 1D array:
+	for _, row := range ex {
+		for _, col := range row {
+			data = append(data, float32(col))
+		}
+	}
+
+	fmt.Println(data)
+
+	s := NewNoiseExtractor(data, 16, 16)
 
 	if s.Height != 16 {
 		t.Errorf("Height is %d, expected 16", s.Height)
@@ -55,7 +71,22 @@ func TestNewNoiseExtractorGaussianNoise(t *testing.T) {
 		{6, 7, 8, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 8, 7, 6},
 	}
 
-	s := NewNoiseExtractor(ex, 16, 16)
+	xs := 16
+
+	ys := 16
+
+	data := make([]float32, xs*ys)
+
+	// Flatten the 2D Colour Filter Array array into a 1D array:
+	for _, row := range ex {
+		for _, col := range row {
+			data = append(data, float32(col))
+		}
+	}
+
+	fmt.Println(data)
+
+	s := NewNoiseExtractor(data, 16, 16)
 
 	if s.Height != 16 {
 		t.Errorf("Height is %d, expected 16", s.Height)
