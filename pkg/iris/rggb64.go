@@ -65,6 +65,18 @@ func (b *RGGB64Exposure) GetBayerMatrixOffset() (xOffset int, yOffset int, err e
 	}
 }
 
+func (b *RGGB64Exposure) GetBuffer(img *image.RGBA64) (bytes.Buffer, error) {
+	var buff bytes.Buffer
+
+	err := jpeg.Encode(&buff, img, &jpeg.Options{Quality: 100})
+
+	if err != nil {
+		return buff, err
+	}
+
+	return buff, nil
+}
+
 /**
 	Convert an R or G or B channel to a FITS standard image
 **/
@@ -104,18 +116,6 @@ func (b *RGGB64Exposure) GetFITSImageForChannel(color RGGB64Color) *fits.FITSIma
 	}
 
 	return f
-}
-
-func (b *RGGB64Exposure) GetBuffer(img *image.RGBA64) (bytes.Buffer, error) {
-	var buff bytes.Buffer
-
-	err := jpeg.Encode(&buff, img, &jpeg.Options{Quality: 100})
-
-	if err != nil {
-		return buff, err
-	}
-
-	return buff, nil
 }
 
 /**
