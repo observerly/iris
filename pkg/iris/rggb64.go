@@ -167,6 +167,42 @@ func (b *RGGB64Exposure) DebayerBilinearInterpolation() error {
 	return nil
 }
 
+/*
+ 	PreprocessImageArray()
+
+	Preprocesses an ASCOM Alpaca Image Array to a m.Raw 2D array of uint32 values.
+	Converts the 2D array of uint16 values to a 2D array of uint32 values.
+
+	@returns  a bytes.Buffer containing the preprocessed image.
+	@see https://ascom-standards.org/api/#/Camera%20Specific%20Methods/get_camera__device_number__imagearray
+
+	"... "column-major" order (column changes most rapidly) from the image's row and column
+	perspective, while, from the array's perspective, serialisation is actually effected in
+	"row-major" order (rightmost index changes most rapidly). This unintuitive outcome arises
+	because the ASCOM Camera Interface specification defines the image column dimension as
+	the rightmost array dimension."
+
+*/
+func (b *RGGB64Exposure) PreprocessImageArray(xs int, ys int) (bytes.Buffer, error) {
+	// Switch the columns and rows in the image:
+	ex := make([][]uint32, xs)
+
+	for y := 0; y < ys; y++ {
+		row := make([]uint32, xs)
+		ex[y] = row
+	}
+
+	for i := 0; i < xs; i++ {
+		for j := 0; j < ys; j++ {
+			ex[j][i] = b.Raw[i][j]
+		}
+	}
+
+	b.Raw = ex
+
+	return b.Preprocess()
+}
+
 func (b *RGGB64Exposure) Preprocess() (bytes.Buffer, error) {
 	// Perform Debayering w/ Bilinear Interpolation Technique:
 	err := b.DebayerBilinearInterpolation()
