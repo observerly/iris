@@ -641,3 +641,96 @@ func TestNewRGGB64ExposureGetFITSImageForBlueChannel(t *testing.T) {
 		t.Errorf("Error writing image: %s", err)
 	}
 }
+
+func TestNewRGGB64ExposureGetFITSImages(t *testing.T) {
+	type CameraExposure struct {
+		BayerXOffset int32      `json:"bayerXOffset"`
+		BayerYOffset int32      `json:"bayerYOffset"`
+		CCDXSize     int32      `json:"ccdXSize"`
+		CCDYSize     int32      `json:"ccdYSize"`
+		Image        [][]uint32 `json:"exposure"`
+		MaxADU       int32      `json:"maxADU"`
+		Rank         uint32     `json:"rank"`
+		SensorType   string     `json:"sensorType"`
+	}
+
+	file, err := ioutil.ReadFile("../../data/m42-800x600-rggb.json")
+
+	if err != nil {
+		t.Errorf("Error opening from JSON data: %s", err)
+	}
+
+	ex := CameraExposure{}
+
+	_ = json.Unmarshal([]byte(file), &ex)
+
+	w := 1600
+
+	h := 1200
+
+	for j := 0; j < h; j++ {
+		for i := 0; i < w; i++ {
+			ex.Image[i][j] = ex.Image[i][j] / 256
+		}
+	}
+
+	rggb := NewRGGB64Exposure(ex.Image, 256, w, h, ex.SensorType)
+
+	rggb.PreprocessImageArray(w, h)
+
+	r, g, b := rggb.GetFITSImages()
+
+	// Check that each of the channels have been created and have data:
+
+	if r == nil {
+		t.Errorf("Expected the Red Channel FITS image to be instantiated successfully, but got nil")
+	}
+
+	if r.Data == nil {
+		t.Errorf("Expected the FITS image data to be instantiated successfully, but got nil")
+	}
+
+	if g == nil {
+		t.Errorf("Expected the Green Channel FITS image to be instantiated successfully, but got nil")
+	}
+
+	if g.Data == nil {
+		t.Errorf("Expected the FITS image data to be instantiated successfully, but got nil")
+	}
+
+	if b == nil {
+		t.Errorf("Expected the Blue Channel FITS image to be instantiated successfully, but got nil")
+	}
+
+	if b.Data == nil {
+		t.Errorf("Expected the FITS image data to be instantiated successfully, but got nil")
+	}
+
+	// Check that each of the channels have the correct dimensions:
+
+	if len(r.Data) != w*h {
+		t.Errorf("Expected the Red FITS image data to be %d, but got %d", w*h, len(r.Data))
+	}
+
+	if len(g.Data) != w*h {
+		t.Errorf("Expected the Green FITS image data to be %d, but got %d", w*h, len(r.Data))
+	}
+
+	if len(b.Data) != w*h {
+		t.Errorf("Expected the Blue FITS image data to be %d, but got %d", w*h, len(r.Data))
+	}
+
+	// Check that each of the RGB fits images have their associated channel headers:
+
+	if r.Header.Strings["CHANNEL"].Value != "Red" {
+		t.Errorf("Expected the FITS image header CHANNEL to be %q, but got %q", "Red", r.Header.Strings["CHANNEL"].Value)
+	}
+
+	if g.Header.Strings["CHANNEL"].Value != "Green" {
+		t.Errorf("Expected the FITS image header CHANNEL to be %q, but got %q", "Green", g.Header.Strings["CHANNEL"].Value)
+	}
+
+	if b.Header.Strings["CHANNEL"].Value != "Blue" {
+		t.Errorf("Expected the FITS image header CHANNEL to be %q, but got %q", "Blue", b.Header.Strings["CHANNEL"].Value)
+	}
+}
