@@ -152,7 +152,7 @@ func (m *Monochrome16Exposure) PreprocessImageArray(xs int, ys int) (bytes.Buffe
 
 	m.Processed = ex
 
-	data := make([]float32, xs*ys)
+	data := make([]float32, 0)
 
 	// Flatten the 2D Colour Filter Array array into a 1D array:
 	for _, row := range ex {
