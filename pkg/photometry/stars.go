@@ -14,36 +14,26 @@ type StarsExtractor struct {
 	Height    int
 	Threshold float32
 	Radius    float32
-	Raw       []float32
+	Data      []float32
 	Stars     []Star
 	HFR       float32
 }
 
-func NewStarsExtractor(exposure [][]uint32, xs int, ys int, radius float32) *StarsExtractor {
-	// Locate the brightest pixels in the data array above the threshold and return them as stars:
-	var raw []float32
-
-	// Flatten the 2D Colour Filter Array array into a 1D array:
-	for _, a := range exposure {
-		for _, b := range a {
-			raw = append(raw, float32(b))
-		}
-	}
-
-	stars := make([]Star, 0)
+func NewStarsExtractor(data []float32, xs int, ys int, radius float32) *StarsExtractor {
+	stars := make([]Star, 100)
 
 	return &StarsExtractor{
 		Width:     xs,
 		Height:    ys,
 		Threshold: 0,
 		Radius:    radius,
-		Raw:       raw,
+		Data:      data,
 		Stars:     stars,
 	}
 }
 
 func (s *StarsExtractor) GetBrightPixels() []Star {
-	return findBrightPixels(s.Raw, int32(s.Width), s.Threshold, int32(s.Radius))
+	return findBrightPixels(s.Data, int32(s.Width), s.Threshold, int32(s.Radius))
 }
 
 /**

@@ -24,7 +24,20 @@ func TestNewStarsExtractor(t *testing.T) {
 		{6, 7, 8, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 8, 7, 191},
 	}
 
-	s := NewStarsExtractor(ex, 16, 16, 2.5)
+	xs := 16
+
+	ys := 16
+
+	data := make([]float32, xs*ys)
+
+	// Flatten the 2D Colour Filter Array array into a 1D array:
+	for _, row := range ex {
+		for _, col := range row {
+			data = append(data, float32(col))
+		}
+	}
+
+	s := NewStarsExtractor(data, 16, 16, 2.5)
 
 	if s.Height != 16 {
 		t.Errorf("Height is %d, expected 16", s.Height)
@@ -67,7 +80,20 @@ func TestNewGetBrightPixels(t *testing.T) {
 		{6, 7, 8, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 8, 7, 191},
 	}
 
-	s := NewStarsExtractor(ex, 16, 16, 2.5)
+	xs := 16
+
+	ys := 16
+
+	data := make([]float32, xs*ys)
+
+	// Flatten the 2D Colour Filter Array array into a 1D array:
+	for _, row := range ex {
+		for _, col := range row {
+			data = append(data, float32(col))
+		}
+	}
+
+	s := NewStarsExtractor(data, 16, 16, 2.5)
 
 	s.Threshold = 100
 
