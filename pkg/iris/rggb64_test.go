@@ -306,3 +306,65 @@ func TestNewRGGB64ExposureDebayerBilinearInterpolation(t *testing.T) {
 		t.Errorf("Expected the image buffer to be saved successfully, but got %q", err)
 	}
 }
+
+func TestNewRGGB64ExposurePreprocessImageArray(t *testing.T) {
+	type CameraExposure struct {
+		BayerXOffset int32      `json:"bayerXOffset"`
+		BayerYOffset int32      `json:"bayerYOffset"`
+		CCDXSize     int32      `json:"ccdXSize"`
+		CCDYSize     int32      `json:"ccdYSize"`
+		Image        [][]uint32 `json:"exposure"`
+		MaxADU       int32      `json:"maxADU"`
+		Rank         uint32     `json:"rank"`
+		SensorType   string     `json:"sensorType"`
+	}
+
+	file, err := ioutil.ReadFile("../../data/m42-800x600-rggb.json")
+
+	if err != nil {
+		t.Errorf("Error opening from JSON data: %s", err)
+	}
+
+	ex := CameraExposure{}
+
+	_ = json.Unmarshal([]byte(file), &ex)
+
+	w := 1600
+
+	h := 1200
+
+	for j := 0; j < h; j++ {
+		for i := 0; i < w; i++ {
+			ex.Image[i][j] = ex.Image[i][j]
+		}
+	}
+
+	rggb := NewRGGB64Exposure(ex.Image, 65535, w, h, ex.SensorType)
+
+	buff, err := rggb.PreprocessImageArray(w, h)
+
+	if err != nil {
+		t.Errorf("Expected the debayering to be successful, but got %q", err)
+	}
+
+	f, err := os.Create("m42-800x600-rggb-preprocessed64.jpg")
+
+	if err != nil {
+		panic(err)
+	}
+
+	defer func() {
+		if err := f.Close(); err != nil {
+			t.Errorf("Expected the image buffer to be saved successfully, but got %q", err)
+		}
+
+		// Clean up the file after we have finished with the test:
+		os.Remove("m42-800x600-rggb-preprocessed64.jpg")
+	}()
+
+	_, err = f.Write(buff.Bytes())
+
+	if err != nil {
+		t.Errorf("Expected the image buffer to be saved successfully, but got %q", err)
+	}
+}
