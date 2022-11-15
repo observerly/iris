@@ -155,10 +155,10 @@ func (b *RGGB64Exposure) DebayerBilinearInterpolation() error {
 	// Stack The RGB channels into a single image:
 	for j := 0; j < b.Height; j++ {
 		for i := 0; i < b.Width; i++ {
-			b.Image.Set(i, j, color.RGBA{
-				R: uint8(red[j*b.Width+i]),
-				G: uint8(green[j*b.Width+i]),
-				B: uint8(blue[j*b.Width+i]),
+			b.Image.Set(i, j, color.RGBA64{
+				R: uint16(red[j*b.Width+i]),
+				G: uint16(green[j*b.Width+i]),
+				B: uint16(blue[j*b.Width+i]),
 				A: 255,
 			})
 		}
