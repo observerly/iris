@@ -146,3 +146,36 @@ func (s *Stats) FastApproxMedian(data []float32, sample []float32) float32 {
 
 	return median
 }
+
+/*
+	FastApproxQn
+
+	Calculates fast approximate Qn scale estimate of the (presumably large) data by
+	sub-sampling the given number of pairs and taking the first quartile of that.
+
+	Note: this is not a statistically correct median, but it is fast and
+	should be good enough for most purposes. The sub-sampling is done
+	by randomly selecting sub-values from the data array using a random
+	number generator pinned to the maximum of the data array.
+
+	@see http://web.ipac.caltech.edu/staff/fmasci/home/astro_refs/BetterThanMAD.pdf
+*/
+func (s *Stats) FastApproxQn(data []float32, sample []float32) float32 {
+	rng := utils.RNG{}
+
+	// Obtain the maximum value of the random number generator:
+	max := uint32(len(data))
+
+	for i := range sample {
+		index := 1 + rng.Uint32n(max-1)
+		nindex := rng.Uint32n(index)
+		// Take a sub-sample of the data array:
+		sample[i] = float32(math.Abs(float64(data[index] - data[nindex])))
+	}
+
+	// Normalize to the Gaussian standard deviation, for larger samples >> 1000
+	// Source for corrected constant https://rdrr.io/cran/robustbase/man/Qn.html
+	qn := qsort.QSelectFirstQuartileFloat32(sample) * 2.21914
+
+	return qn
+}

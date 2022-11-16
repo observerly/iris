@@ -2,7 +2,6 @@ package stats
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"math"
 	"testing"
@@ -211,13 +210,9 @@ func TestFastApproxMedian(t *testing.T) {
 
 	samples := make([]float32, 8)
 
-	location := stats.FastApproxMedian(mono.Data, samples)
+	location := stats.FastApproxMedian(stats.Data, samples)
 
-	median := calcMedian(mono.Data)
-
-	fmt.Println(location)
-
-	fmt.Println(median)
+	median := calcMedian(stats.Data)
 
 	if median != 26404 {
 		t.Errorf("The true median should be 26404, but got %v", median)
@@ -225,5 +220,48 @@ func TestFastApproxMedian(t *testing.T) {
 
 	if math.Abs(float64(location-median)) > float64(stats.Mean) {
 		t.Errorf("The fast approximate median should be close to the true median, but got %v", location)
+	}
+}
+
+func TestFastApproxQn(t *testing.T) {
+	type CameraExposure struct {
+		BayerXOffset int32      `json:"bayerXOffset"`
+		BayerYOffset int32      `json:"bayerYOffset"`
+		CCDXSize     int32      `json:"ccdXSize"`
+		CCDYSize     int32      `json:"ccdYSize"`
+		Image        [][]uint32 `json:"exposure"`
+		MaxADU       int32      `json:"maxADU"`
+		Rank         uint32     `json:"rank"`
+		SensorType   string     `json:"sensorType"`
+	}
+
+	file, err := ioutil.ReadFile("../../data/m42-800x600-monochrome.json")
+
+	if err != nil {
+		t.Errorf("Error opening from JSON data: %s", err)
+	}
+
+	data := CameraExposure{}
+
+	_ = json.Unmarshal([]byte(file), &data)
+
+	xs := 800
+
+	ys := 600
+
+	mono := iris.NewMonochrome16Exposure(data.Image, 65535, xs, ys)
+
+	mono.PreprocessImageArray(xs, ys)
+
+	stats := NewStats(mono.Data, len(mono.Data))
+
+	samples := make([]float32, 8)
+
+	scale := stats.FastApproxQn(stats.Data, samples)
+
+	stndev := stats.StdDev
+
+	if math.Abs(float64(scale-stndev)) > float64(stats.Mean) {
+		t.Errorf("The fast approximate Qn should be close to the true scale, but got %v", scale)
 	}
 }
