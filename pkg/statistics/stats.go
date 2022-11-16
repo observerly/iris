@@ -12,6 +12,7 @@ import (
 type Stats struct {
 	Width    int       // Width of a line in the underlying data array (for noise)
 	Data     []float32 // The underlying data array
+	ADU      int32     // ADU value of the data
 	Min      float32   // Minimum
 	Max      float32   // Maximum
 	Mean     float32   // Mean (average)
@@ -22,12 +23,13 @@ type Stats struct {
 	Noise    float32   // Noise Estimation
 }
 
-func NewStats(data []float32, xs int) *Stats {
+func NewStats(data []float32, adu int32, xs int) *Stats {
 	min, mean, max, stddev, variance := calcMinMeanMaxStdDevVar(data)
 
 	return &Stats{
 		Width:    xs,
 		Data:     data,
+		ADU:      adu,
 		Min:      min,
 		Max:      max,
 		Mean:     mean,
