@@ -104,7 +104,7 @@ func TestCalculateMedianDispersedRandom(t *testing.T) {
 func TestNewStats(t *testing.T) {
 	data := []float32{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
 
-	stats := NewStats(data, 10)
+	stats := NewStats(data, 65535, 10)
 
 	if stats.Min != 1 {
 		t.Errorf("min should be 1, but got %v", stats.Min)
@@ -157,7 +157,7 @@ func TestNewStatsMonochromeExposure(t *testing.T) {
 
 	mono.PreprocessImageArray(xs, ys)
 
-	stats := NewStats(mono.Data, xs)
+	stats := NewStats(mono.Data, mono.ADU, 10)
 
 	if stats.Min != 3453 {
 		t.Errorf("min should be 3453, but got %v", stats.Min)
@@ -206,7 +206,7 @@ func TestFastApproxMedian(t *testing.T) {
 
 	mono.PreprocessImageArray(xs, ys)
 
-	stats := NewStats(mono.Data, len(mono.Data))
+	stats := NewStats(mono.Data, 65535, len(mono.Data))
 
 	samples := make([]float32, 8)
 
@@ -253,7 +253,7 @@ func TestFastApproxQn(t *testing.T) {
 
 	mono.PreprocessImageArray(xs, ys)
 
-	stats := NewStats(mono.Data, len(mono.Data))
+	stats := NewStats(mono.Data, mono.ADU, len(mono.Data))
 
 	samples := make([]float32, 8)
 
@@ -296,7 +296,7 @@ func TestFastApproxBoundedMedian(t *testing.T) {
 
 	mono.PreprocessImageArray(xs, ys)
 
-	stats := NewStats(mono.Data, len(mono.Data))
+	stats := NewStats(mono.Data, mono.ADU, len(mono.Data))
 
 	samples := make([]float32, 1000)
 
@@ -349,7 +349,7 @@ func TestFastApproxBoundedQn(t *testing.T) {
 
 	mono.PreprocessImageArray(xs, ys)
 
-	stats := NewStats(mono.Data, len(mono.Data))
+	stats := NewStats(mono.Data, mono.ADU, len(mono.Data))
 
 	samples := make([]float32, 1000)
 
