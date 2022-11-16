@@ -371,3 +371,54 @@ func TestFastApproxBoundedQn(t *testing.T) {
 		t.Errorf("The fast approximate bounded median should be close to the true median, but got %v", fscale)
 	}
 }
+
+func TestFastApproxSigmaClippedMedianAndQn(t *testing.T) {
+	type CameraExposure struct {
+		BayerXOffset int32      `json:"bayerXOffset"`
+		BayerYOffset int32      `json:"bayerYOffset"`
+		CCDXSize     int32      `json:"ccdXSize"`
+		CCDYSize     int32      `json:"ccdYSize"`
+		Image        [][]uint32 `json:"exposure"`
+		MaxADU       int32      `json:"maxADU"`
+		Rank         uint32     `json:"rank"`
+		SensorType   string     `json:"sensorType"`
+	}
+
+	file, err := ioutil.ReadFile("../../data/m42-800x600-monochrome.json")
+
+	if err != nil {
+		t.Errorf("Error opening from JSON data: %s", err)
+	}
+
+	data := CameraExposure{}
+
+	_ = json.Unmarshal([]byte(file), &data)
+
+	xs := 800
+
+	ys := 600
+
+	mono := iris.NewMonochrome16Exposure(data.Image, 65535, xs, ys)
+
+	mono.PreprocessImageArray(xs, ys)
+
+	stats := NewStats(mono.Data, mono.ADU, len(mono.Data))
+
+	flocation, fscale := stats.FastApproxSigmaClippedMedianAndQn(stats.Data)
+
+	if flocation != stats.Location {
+		t.Errorf("The sigma clipped median should be stored as stat, but got %v", flocation)
+	}
+
+	if flocation != 26404 {
+		t.Errorf("The sigma clipped median should be 26404, but got %v", flocation)
+	}
+
+	if fscale != stats.Scale {
+		t.Errorf("The randomized Qn should be stored as a stat, but got %v", fscale)
+	}
+
+	if fscale != 8321.775 {
+		t.Errorf("The randomized Qn should be 8321.775, but got %v", flocation)
+	}
+}

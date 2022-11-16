@@ -260,3 +260,48 @@ func (s *Stats) FastApproxBoundedQn(data []float32, sample []float32, lowerBound
 
 	return qn
 }
+
+/*
+	FastApproxSigmaClippedMedianAndQn
+
+	@returns a rapid robust estimation of location and scale. Uses a fast approximate
+	median based on randomized sub-sampling, iteratively sigma clipped with a fast
+	approximate Qn based on random sampling. Exits once the absolute change in
+	location and scale is below epsilon.
+*/
+func (s *Stats) FastApproxSigmaClippedMedianAndQn(data []float32) (float32, float32) {
+	sample := make([]float32, int(float32(len(data))*0.8))
+
+	location := s.FastApproxMedian(data, sample)
+
+	scale := s.FastApproxQn(data, sample)
+
+	sigma := []float32{location - 2*scale, location + 2*scale}
+
+	epsilon := (s.Max - s.Min) / float32(s.ADU)
+
+	for i := 0; ; i++ {
+		lowBound := location - sigma[0]*scale
+		highBound := location + sigma[1]*scale
+
+		// Obtain the fast approximate median of the data within the bounds:
+		nlocation := s.FastApproxBoundedMedian(data, sample, lowBound, highBound)
+
+		// Obtain the fast approximate Qn scale estimate within the bounds:
+		nscale := s.FastApproxBoundedQn(data, sample, lowBound, highBound)
+
+		// Adjust for subsequent clipping:
+		nscale *= 1.134
+
+		// Once converged, return the location and scale:
+		if float32(math.Abs(float64(nlocation-location))+math.Abs(float64(nscale-scale))) <= epsilon || i >= 10 {
+			scale = s.FastApproxQn(data, sample)
+
+			s.Location, s.Scale = location, scale
+
+			return location, scale
+		}
+
+		location, scale = nlocation, nscale
+	}
+}
