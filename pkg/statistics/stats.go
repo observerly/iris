@@ -214,3 +214,47 @@ func (s *Stats) FastApproxBoundedMedian(data []float32, sample []float32, lowerB
 
 	return median
 }
+
+/*
+	FastApproxBoundedQn
+
+	Calculates fast approximate Qn scale estimate of the (presumably large) data by
+	sub-sampling the given number of pairs and taking the first quartile of that.
+
+	Note: this is not a statistically correct median, but it is fast and
+	should be good enough for most purposes. The sub-sampling is done
+	by randomly selecting sub-values from the data array using a random
+	number generator pinned to the maximum of the data array.
+*/
+func (s *Stats) FastApproxBoundedQn(data []float32, sample []float32, lowerBound, higherBound float32) float32 {
+	rng := utils.RNG{}
+
+	// Obtain the maximum value of the random number generator:
+	max := uint32(len(data))
+
+	for i := range sample {
+		var d1, d2 float32
+
+		for {
+			index := 1 + rng.Uint32n(max-1)
+
+			d1 = data[index]
+			if d1 < lowerBound || d1 > higherBound {
+				continue
+			}
+
+			d2 = data[rng.Uint32n(index)]
+			if d2 >= lowerBound && d2 <= higherBound {
+				break
+			}
+		}
+
+		sample[i] = float32(math.Abs(float64(d1 - d2)))
+	}
+
+	// Normalize to the Gaussian standard deviation, for larger samples >> 1000
+	// Source for corrected constant https://rdrr.io/cran/robustbase/man/Qn.html
+	qn := qsort.QSelectFirstQuartileFloat32(sample) * 2.21914
+
+	return qn
+}
