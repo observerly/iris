@@ -123,11 +123,11 @@ func calcMedian(data []float32) float32 {
 	FastApproxMedian
 
 	Calculates fast approximate median of the (presumably large) data by
-	subsampling the given number of values and taking the median of that.
+	sub-sampling the given number of values and taking the median of that.
 
 	Note: this is not a statistically correct median, but it is fast and
 	should be good enough for most purposes.	The sub-sampling is done
-	by randomly selecting sub-values from the data array using a fandom
+	by randomly selecting sub-values from the data array using a random
 	number generator pinned to the maximum of the data array.
 */
 func (s *Stats) FastApproxMedian(data []float32, sample []float32) float32 {
