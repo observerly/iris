@@ -2,7 +2,9 @@ package stats
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
+	"math"
 	"testing"
 
 	"github.com/observerly/iris/pkg/iris"
@@ -172,5 +174,56 @@ func TestNewStatsMonochromeExposure(t *testing.T) {
 
 	if stats.StdDev != 10592.966 {
 		t.Errorf("stddev should be 10592.966, but got %v", stats.StdDev)
+	}
+}
+
+func TestFastApproxMedian(t *testing.T) {
+	type CameraExposure struct {
+		BayerXOffset int32      `json:"bayerXOffset"`
+		BayerYOffset int32      `json:"bayerYOffset"`
+		CCDXSize     int32      `json:"ccdXSize"`
+		CCDYSize     int32      `json:"ccdYSize"`
+		Image        [][]uint32 `json:"exposure"`
+		MaxADU       int32      `json:"maxADU"`
+		Rank         uint32     `json:"rank"`
+		SensorType   string     `json:"sensorType"`
+	}
+
+	file, err := ioutil.ReadFile("../../data/m42-800x600-monochrome.json")
+
+	if err != nil {
+		t.Errorf("Error opening from JSON data: %s", err)
+	}
+
+	data := CameraExposure{}
+
+	_ = json.Unmarshal([]byte(file), &data)
+
+	xs := 800
+
+	ys := 600
+
+	mono := iris.NewMonochrome16Exposure(data.Image, 65535, xs, ys)
+
+	mono.PreprocessImageArray(xs, ys)
+
+	stats := NewStats(mono.Data, len(mono.Data))
+
+	samples := make([]float32, 8)
+
+	location := stats.FastApproxMedian(mono.Data, samples)
+
+	median := calcMedian(mono.Data)
+
+	fmt.Println(location)
+
+	fmt.Println(median)
+
+	if median != 26404 {
+		t.Errorf("The true median should be 26404, but got %v", median)
+	}
+
+	if math.Abs(float64(location-median)) > float64(stats.Mean) {
+		t.Errorf("The fast approximate median should be close to the true median, but got %v", location)
 	}
 }

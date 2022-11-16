@@ -3,6 +3,9 @@ package stats
 import (
 	"math"
 	"sort"
+
+	"github.com/observerly/iris/pkg/qsort"
+	"github.com/observerly/iris/pkg/utils"
 )
 
 // Statistics on data arrays, calculated on demand
@@ -114,4 +117,32 @@ func calcMedian(data []float32) float32 {
 	}
 
 	return float32(p[len(p)/2])
+}
+
+/*
+	FastApproxMedian
+
+	Calculates fast approximate median of the (presumably large) data by
+	subsampling the given number of values and taking the median of that.
+
+	Note: this is not a statistically correct median, but it is fast and
+	should be good enough for most purposes.	The sub-sampling is done
+	by randomly selecting sub-values from the data array using a fandom
+	number generator pinned to the maximum of the data array.
+*/
+func (s *Stats) FastApproxMedian(data []float32, sample []float32) float32 {
+	rng := utils.RNG{}
+
+	// Obtain the maximum value of the random number generator:
+	max := uint32(len(data))
+
+	for i := range sample {
+		index := rng.Uint32n(max)
+		// Take a sub-sample of the data array:
+		sample[i] = data[index]
+	}
+
+	median := qsort.QSelectMedianFloat32(sample)
+
+	return median
 }
