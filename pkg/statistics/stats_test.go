@@ -181,7 +181,7 @@ func TestNewStatsFastMedianFloat32(t *testing.T) {
 
 	stats := NewStats(data, 65535, 10)
 
-	median := stats.FastMedian(data)
+	median := stats.FastMedian()
 
 	if median != 5.5 {
 		t.Errorf("median should be 5.5, but got %v", median)
@@ -222,7 +222,7 @@ func TestFastApproxMedian(t *testing.T) {
 
 	samples := make([]float32, 8)
 
-	location := stats.FastApproxMedian(stats.Data, samples)
+	location := stats.FastApproxMedian(samples)
 
 	median := calcMedian(stats.Data)
 
@@ -269,7 +269,7 @@ func TestFastApproxQn(t *testing.T) {
 
 	samples := make([]float32, 8)
 
-	scale := stats.FastApproxQn(stats.Data, samples)
+	scale := stats.FastApproxQn(samples)
 
 	stndev := stats.StdDev
 
@@ -312,13 +312,13 @@ func TestFastApproxBoundedMedian(t *testing.T) {
 
 	samples := make([]float32, 1000)
 
-	location := stats.FastApproxMedian(stats.Data, samples)
+	location := stats.FastApproxMedian(samples)
 
-	scale := stats.FastApproxQn(stats.Data, samples)
+	scale := stats.FastApproxQn(samples)
 
 	bounds := []float32{location - 2*scale, location + 2*scale}
 
-	fmedian := stats.FastApproxBoundedMedian(stats.Data, samples, bounds[0], bounds[1])
+	fmedian := stats.FastApproxBoundedMedian(samples, bounds[0], bounds[1])
 
 	median := calcMedian(stats.Data)
 
@@ -365,13 +365,13 @@ func TestFastApproxBoundedQn(t *testing.T) {
 
 	samples := make([]float32, 1000)
 
-	location := stats.FastApproxMedian(stats.Data, samples)
+	location := stats.FastApproxMedian(samples)
 
-	scale := stats.FastApproxQn(stats.Data, samples)
+	scale := stats.FastApproxQn(samples)
 
 	bounds := []float32{location - 2*scale, location + 2*scale}
 
-	fscale := stats.FastApproxBoundedQn(stats.Data, samples, bounds[0], bounds[1])
+	fscale := stats.FastApproxBoundedQn(samples, bounds[0], bounds[1])
 
 	median := calcMedian(stats.Data)
 
@@ -416,7 +416,7 @@ func TestFastApproxSigmaClippedMedianAndQn(t *testing.T) {
 
 	stats := NewStats(mono.Data, mono.ADU, len(mono.Data))
 
-	flocation, fscale := stats.FastApproxSigmaClippedMedianAndQn(stats.Data)
+	flocation, fscale := stats.FastApproxSigmaClippedMedianAndQn()
 
 	if flocation != stats.Location {
 		t.Errorf("The sigma clipped median should be stored as stat, but got %v", flocation)

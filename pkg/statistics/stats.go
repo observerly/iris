@@ -138,9 +138,8 @@ func calcMedian(data []float32) float32 {
 
 	Calculates fast median of the data sample
 */
-func (s *Stats) FastMedian(data []float32) float32 {
-	median := qsort.QSelectMedianFloat32(data)
-
+func (s *Stats) FastMedian() float32 {
+	median := qsort.QSelectMedianFloat32(s.Data)
 	return median
 }
 
@@ -155,16 +154,16 @@ func (s *Stats) FastMedian(data []float32) float32 {
 	by randomly selecting sub-values from the data array using a random
 	number generator pinned to the maximum of the data array.
 */
-func (s *Stats) FastApproxMedian(data []float32, sample []float32) float32 {
+func (s *Stats) FastApproxMedian(sample []float32) float32 {
 	rng := utils.RNG{}
 
 	// Obtain the maximum value of the random number generator:
-	max := uint32(len(data))
+	max := uint32(len(s.Data))
 
 	for i := range sample {
 		index := rng.Uint32n(max)
 		// Take a sub-sample of the data array:
-		sample[i] = data[index]
+		sample[i] = s.Data[index]
 	}
 
 	median := qsort.QSelectMedianFloat32(sample)
@@ -185,17 +184,17 @@ func (s *Stats) FastApproxMedian(data []float32, sample []float32) float32 {
 
 	@see http://web.ipac.caltech.edu/staff/fmasci/home/astro_refs/BetterThanMAD.pdf
 */
-func (s *Stats) FastApproxQn(data []float32, sample []float32) float32 {
+func (s *Stats) FastApproxQn(sample []float32) float32 {
 	rng := utils.RNG{}
 
 	// Obtain the maximum value of the random number generator:
-	max := uint32(len(data))
+	max := uint32(len(s.Data))
 
 	for i := range sample {
 		index := 1 + rng.Uint32n(max-1)
 		nindex := rng.Uint32n(index)
 		// Take a sub-sample of the data array:
-		sample[i] = float32(math.Abs(float64(data[index] - data[nindex])))
+		sample[i] = float32(math.Abs(float64(s.Data[index] - s.Data[nindex])))
 	}
 
 	// Normalize to the Gaussian standard deviation, for larger samples >> 1000
@@ -216,16 +215,16 @@ func (s *Stats) FastApproxQn(data []float32, sample []float32) float32 {
 	by randomly selecting sub-values from the data array using a random
 	number generator pinned to the maximum of the data array.
 */
-func (s *Stats) FastApproxBoundedMedian(data []float32, sample []float32, lowerBound, higherBound float32) float32 {
+func (s *Stats) FastApproxBoundedMedian(sample []float32, lowerBound, higherBound float32) float32 {
 	rng := utils.RNG{}
 
 	// Obtain the maximum value of the random number generator:
-	max := uint32(len(data))
+	max := uint32(len(s.Data))
 
 	for i := range sample {
 		var d float32
 		for {
-			d = data[rng.Uint32n(max)]
+			d = s.Data[rng.Uint32n(max)]
 
 			if d >= lowerBound && d <= higherBound {
 				break
@@ -251,11 +250,11 @@ func (s *Stats) FastApproxBoundedMedian(data []float32, sample []float32, lowerB
 	by randomly selecting sub-values from the data array using a random
 	number generator pinned to the maximum of the data array.
 */
-func (s *Stats) FastApproxBoundedQn(data []float32, sample []float32, lowerBound, higherBound float32) float32 {
+func (s *Stats) FastApproxBoundedQn(sample []float32, lowerBound, higherBound float32) float32 {
 	rng := utils.RNG{}
 
 	// Obtain the maximum value of the random number generator:
-	max := uint32(len(data))
+	max := uint32(len(s.Data))
 
 	for i := range sample {
 		var d1, d2 float32
@@ -263,12 +262,12 @@ func (s *Stats) FastApproxBoundedQn(data []float32, sample []float32, lowerBound
 		for {
 			index := 1 + rng.Uint32n(max-1)
 
-			d1 = data[index]
+			d1 = s.Data[index]
 			if d1 < lowerBound || d1 > higherBound {
 				continue
 			}
 
-			d2 = data[rng.Uint32n(index)]
+			d2 = s.Data[rng.Uint32n(index)]
 			if d2 >= lowerBound && d2 <= higherBound {
 				break
 			}
@@ -292,12 +291,12 @@ func (s *Stats) FastApproxBoundedQn(data []float32, sample []float32, lowerBound
 	approximate Qn based on random sampling. Exits once the absolute change in
 	location and scale is below epsilon.
 */
-func (s *Stats) FastApproxSigmaClippedMedianAndQn(data []float32) (float32, float32) {
-	sample := make([]float32, int(float32(len(data))*0.8))
+func (s *Stats) FastApproxSigmaClippedMedianAndQn() (float32, float32) {
+	sample := make([]float32, int(float32(len(s.Data))*0.8))
 
-	location := s.FastApproxMedian(data, sample)
+	location := s.FastApproxMedian(sample)
 
-	scale := s.FastApproxQn(data, sample)
+	scale := s.FastApproxQn(sample)
 
 	sigma := []float32{location - 2*scale, location + 2*scale}
 
@@ -308,17 +307,17 @@ func (s *Stats) FastApproxSigmaClippedMedianAndQn(data []float32) (float32, floa
 		highBound := location + sigma[1]*scale
 
 		// Obtain the fast approximate median of the data within the bounds:
-		nlocation := s.FastApproxBoundedMedian(data, sample, lowBound, highBound)
+		nlocation := s.FastApproxBoundedMedian(sample, lowBound, highBound)
 
 		// Obtain the fast approximate Qn scale estimate within the bounds:
-		nscale := s.FastApproxBoundedQn(data, sample, lowBound, highBound)
+		nscale := s.FastApproxBoundedQn(sample, lowBound, highBound)
 
 		// Adjust for subsequent clipping:
 		nscale *= 1.134
 
 		// Once converged, return the location and scale:
 		if float32(math.Abs(float64(nlocation-location))+math.Abs(float64(nscale-scale))) <= epsilon || i >= 10 {
-			scale = s.FastApproxQn(data, sample)
+			scale = s.FastApproxQn(sample)
 
 			s.Location, s.Scale = location, scale
 
