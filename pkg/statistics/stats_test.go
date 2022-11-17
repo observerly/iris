@@ -176,6 +176,18 @@ func TestNewStatsMonochromeExposure(t *testing.T) {
 	}
 }
 
+func TestNewStatsFastMedianFloat32(t *testing.T) {
+	data := []float32{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+
+	stats := NewStats(data, 65535, 10)
+
+	median := stats.FastMedian(data)
+
+	if median != 5.5 {
+		t.Errorf("median should be 5.5, but got %v", median)
+	}
+}
+
 func TestFastApproxMedian(t *testing.T) {
 	type CameraExposure struct {
 		BayerXOffset int32      `json:"bayerXOffset"`
