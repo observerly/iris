@@ -24,7 +24,19 @@ type Stats struct {
 }
 
 func NewStats(data []float32, adu int32, xs int) *Stats {
-	min, mean, max, stddev, variance := calcMinMeanMaxStdDevVar(data)
+	NaN32 := float32(math.NaN())
+
+	var (
+		min      float32 = NaN32
+		mean     float32 = NaN32
+		max      float32 = NaN32
+		stddev   float32 = NaN32
+		variance float32 = NaN32
+	)
+
+	if len(data) > 0 {
+		min, mean, max, stddev, variance = calcMinMeanMaxStdDevVar(data)
+	}
 
 	return &Stats{
 		Width:    xs,
