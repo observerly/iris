@@ -134,6 +134,17 @@ func calcMedian(data []float32) float32 {
 }
 
 /*
+	FastMedian
+
+	Calculates fast median of the data sample
+*/
+func (s *Stats) FastMedian(data []float32) float32 {
+	median := qsort.QSelectMedianFloat32(data)
+
+	return median
+}
+
+/*
 	FastApproxMedian
 
 	Calculates fast approximate median of the (presumably large) data by
