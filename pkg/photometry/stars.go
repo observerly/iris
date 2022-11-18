@@ -37,7 +37,11 @@ func NewStarsExtractor(data []float32, xs int, ys int, radius float32, adu int32
 }
 
 func (s *StarsExtractor) GetBrightPixels() []Star {
-	return findBrightPixels(s.Data, int32(s.Width), s.Threshold, int32(s.Radius))
+	stars := findBrightPixels(s.Data, int32(s.Width), s.Threshold, int32(s.Radius))
+
+	s.Stars = stars
+
+	return stars
 }
 
 /**
