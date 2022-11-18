@@ -37,7 +37,7 @@ func TestNewStarsExtractor(t *testing.T) {
 		}
 	}
 
-	s := NewStarsExtractor(data, 16, 16, 2.5)
+	s := NewStarsExtractor(data, xs, ys, 2.5, 255)
 
 	if s.Height != 16 {
 		t.Errorf("Height is %d, expected 16", s.Height)
@@ -53,6 +53,10 @@ func TestNewStarsExtractor(t *testing.T) {
 
 	if s.Threshold != 0 {
 		t.Errorf("Threshold is %f, expected 0", s.Threshold)
+	}
+
+	if s.ADU != 255 {
+		t.Errorf("ADU is %d, expected 255", s.ADU)
 	}
 
 	if s.Stars == nil {
@@ -93,7 +97,7 @@ func TestNewGetBrightPixels(t *testing.T) {
 		}
 	}
 
-	s := NewStarsExtractor(data, 16, 16, 2.5)
+	s := NewStarsExtractor(data, xs, ys, 2.5, 255)
 
 	s.Threshold = 100
 

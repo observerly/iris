@@ -16,11 +16,12 @@ type StarsExtractor struct {
 	Sigma     float32
 	Radius    float32
 	Data      []float32
+	ADU       int32
 	Stars     []Star
 	HFR       float32
 }
 
-func NewStarsExtractor(data []float32, xs int, ys int, radius float32) *StarsExtractor {
+func NewStarsExtractor(data []float32, xs int, ys int, radius float32, adu int32) *StarsExtractor {
 	stars := make([]Star, 100)
 
 	return &StarsExtractor{
@@ -30,6 +31,7 @@ func NewStarsExtractor(data []float32, xs int, ys int, radius float32) *StarsExt
 		Sigma:     2.5,
 		Radius:    radius,
 		Data:      data,
+		ADU:       adu,
 		Stars:     stars,
 	}
 }
