@@ -1,5 +1,9 @@
 package photometry
 
+import (
+	stats "github.com/observerly/iris/pkg/statistics"
+)
+
 type Star struct {
 	Index     int32   // Index of the star in the data array. int32(x)+width*int32(y)
 	Value     float32 // Value of the star in the data array. data[index]
@@ -42,6 +46,33 @@ func (s *StarsExtractor) GetBrightPixels() []Star {
 	s.Stars = stars
 
 	return stars
+}
+
+/**
+	gatherNeighbourhoodAndCalcMedian()
+
+	Applies an element-wise Median filter to the sparse data points provided by the indices,
+	with the local neighborhood defined by the mask.
+
+	@returns the median of the masked neighborhood:
+**/
+func gatherNeighbourhoodAndCalcMedian(data []float32, index int32, mask []int32, buffer []float32, adu int32) float32 {
+	// Gather the neighborhood of each indexed data point into an array:
+	num := 0
+
+	for _, o := range mask {
+		// Source Offset:
+		so := index + o
+
+		if so >= 0 && so < int32(len(data)) {
+			buffer[num] = data[so]
+			num++
+		}
+	}
+
+	s := stats.NewStats(buffer, adu, num)
+
+	return s.FastMedian()
 }
 
 /**
