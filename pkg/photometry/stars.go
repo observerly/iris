@@ -22,7 +22,7 @@ type StarsExtractor struct {
 }
 
 func NewStarsExtractor(data []float32, xs int, ys int, radius float32, adu int32) *StarsExtractor {
-	stars := make([]Star, 100)
+	stars := make([]Star, 0)
 
 	return &StarsExtractor{
 		Width:     xs,
@@ -50,7 +50,7 @@ func (s *StarsExtractor) GetBrightPixels() []Star {
 **/
 func findBrightPixels(data []float32, width int32, threshold float32, radius int32) []Star {
 	// Roughly, we'll locate 100 bright stars []Star{}
-	stars := make([]Star, len(data)/100)[:0]
+	stars := make([]Star, 0)
 
 	for i, v := range data {
 		if v > threshold {
