@@ -13,6 +13,7 @@ type StarsExtractor struct {
 	Width     int
 	Height    int
 	Threshold float32
+	Sigma     float32
 	Radius    float32
 	Data      []float32
 	Stars     []Star
@@ -26,6 +27,7 @@ func NewStarsExtractor(data []float32, xs int, ys int, radius float32) *StarsExt
 		Width:     xs,
 		Height:    ys,
 		Threshold: 0,
+		Sigma:     2.5,
 		Radius:    radius,
 		Data:      data,
 		Stars:     stars,
