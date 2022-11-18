@@ -5,9 +5,55 @@ import (
 	"io/ioutil"
 	"math"
 	"testing"
-
-	"github.com/observerly/iris/pkg/iris"
 )
+
+type CameraExposure struct {
+	BayerXOffset int32      `json:"bayerXOffset"`
+	BayerYOffset int32      `json:"bayerYOffset"`
+	CCDXSize     int32      `json:"ccdXSize"`
+	CCDYSize     int32      `json:"ccdYSize"`
+	Image        [][]uint32 `json:"exposure"`
+	MaxADU       int32      `json:"maxADU"`
+	Rank         uint32     `json:"rank"`
+	SensorType   string     `json:"sensorType"`
+}
+
+func GetTestData(xs int, ys int) []float32 {
+	file, err := ioutil.ReadFile("../../data/m42-800x600-monochrome.json")
+
+	if err != nil {
+		panic(err)
+	}
+
+	exposure := CameraExposure{}
+
+	_ = json.Unmarshal([]byte(file), &exposure)
+
+	// Switch the columns and rows in the image:
+	ex := make([][]uint32, xs)
+
+	for y := 0; y < ys; y++ {
+		row := make([]uint32, xs)
+		ex[y] = row
+	}
+
+	for i := 0; i < xs; i++ {
+		for j := 0; j < ys; j++ {
+			ex[j][i] = exposure.Image[i][j]
+		}
+	}
+
+	data := make([]float32, 0)
+
+	// Flatten the 2D Colour Filter Array array into a 1D array:
+	for _, row := range ex {
+		for _, col := range row {
+			data = append(data, float32(col))
+		}
+	}
+
+	return data
+}
 
 func TestCalculateMinMeanMax(t *testing.T) {
 	data := []float32{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
@@ -128,36 +174,13 @@ func TestNewStats(t *testing.T) {
 }
 
 func TestNewStatsMonochromeExposure(t *testing.T) {
-	type CameraExposure struct {
-		BayerXOffset int32      `json:"bayerXOffset"`
-		BayerYOffset int32      `json:"bayerYOffset"`
-		CCDXSize     int32      `json:"ccdXSize"`
-		CCDYSize     int32      `json:"ccdYSize"`
-		Image        [][]uint32 `json:"exposure"`
-		MaxADU       int32      `json:"maxADU"`
-		Rank         uint32     `json:"rank"`
-		SensorType   string     `json:"sensorType"`
-	}
-
-	file, err := ioutil.ReadFile("../../data/m42-800x600-monochrome.json")
-
-	if err != nil {
-		t.Errorf("Error opening from JSON data: %s", err)
-	}
-
-	data := CameraExposure{}
-
-	_ = json.Unmarshal([]byte(file), &data)
-
 	xs := 800
 
 	ys := 600
 
-	mono := iris.NewMonochrome16Exposure(data.Image, 65535, xs, ys)
+	data := GetTestData(xs, ys)
 
-	mono.PreprocessImageArray(xs, ys)
-
-	stats := NewStats(mono.Data, mono.ADU, 10)
+	stats := NewStats(data, 65535, 10)
 
 	if stats.Min != 3453 {
 		t.Errorf("min should be 3453, but got %v", stats.Min)
@@ -189,36 +212,13 @@ func TestNewStatsFastMedianFloat32(t *testing.T) {
 }
 
 func TestFastApproxMedian(t *testing.T) {
-	type CameraExposure struct {
-		BayerXOffset int32      `json:"bayerXOffset"`
-		BayerYOffset int32      `json:"bayerYOffset"`
-		CCDXSize     int32      `json:"ccdXSize"`
-		CCDYSize     int32      `json:"ccdYSize"`
-		Image        [][]uint32 `json:"exposure"`
-		MaxADU       int32      `json:"maxADU"`
-		Rank         uint32     `json:"rank"`
-		SensorType   string     `json:"sensorType"`
-	}
-
-	file, err := ioutil.ReadFile("../../data/m42-800x600-monochrome.json")
-
-	if err != nil {
-		t.Errorf("Error opening from JSON data: %s", err)
-	}
-
-	data := CameraExposure{}
-
-	_ = json.Unmarshal([]byte(file), &data)
-
 	xs := 800
 
 	ys := 600
 
-	mono := iris.NewMonochrome16Exposure(data.Image, 65535, xs, ys)
+	data := GetTestData(xs, ys)
 
-	mono.PreprocessImageArray(xs, ys)
-
-	stats := NewStats(mono.Data, 65535, len(mono.Data))
+	stats := NewStats(data, 65535, len(data))
 
 	samples := make([]float32, 8)
 
@@ -236,36 +236,13 @@ func TestFastApproxMedian(t *testing.T) {
 }
 
 func TestFastApproxQn(t *testing.T) {
-	type CameraExposure struct {
-		BayerXOffset int32      `json:"bayerXOffset"`
-		BayerYOffset int32      `json:"bayerYOffset"`
-		CCDXSize     int32      `json:"ccdXSize"`
-		CCDYSize     int32      `json:"ccdYSize"`
-		Image        [][]uint32 `json:"exposure"`
-		MaxADU       int32      `json:"maxADU"`
-		Rank         uint32     `json:"rank"`
-		SensorType   string     `json:"sensorType"`
-	}
-
-	file, err := ioutil.ReadFile("../../data/m42-800x600-monochrome.json")
-
-	if err != nil {
-		t.Errorf("Error opening from JSON data: %s", err)
-	}
-
-	data := CameraExposure{}
-
-	_ = json.Unmarshal([]byte(file), &data)
-
 	xs := 800
 
 	ys := 600
 
-	mono := iris.NewMonochrome16Exposure(data.Image, 65535, xs, ys)
+	data := GetTestData(xs, ys)
 
-	mono.PreprocessImageArray(xs, ys)
-
-	stats := NewStats(mono.Data, mono.ADU, len(mono.Data))
+	stats := NewStats(data, 65535, len(data))
 
 	samples := make([]float32, 8)
 
@@ -279,36 +256,13 @@ func TestFastApproxQn(t *testing.T) {
 }
 
 func TestFastApproxBoundedMedian(t *testing.T) {
-	type CameraExposure struct {
-		BayerXOffset int32      `json:"bayerXOffset"`
-		BayerYOffset int32      `json:"bayerYOffset"`
-		CCDXSize     int32      `json:"ccdXSize"`
-		CCDYSize     int32      `json:"ccdYSize"`
-		Image        [][]uint32 `json:"exposure"`
-		MaxADU       int32      `json:"maxADU"`
-		Rank         uint32     `json:"rank"`
-		SensorType   string     `json:"sensorType"`
-	}
-
-	file, err := ioutil.ReadFile("../../data/m42-800x600-monochrome.json")
-
-	if err != nil {
-		t.Errorf("Error opening from JSON data: %s", err)
-	}
-
-	data := CameraExposure{}
-
-	_ = json.Unmarshal([]byte(file), &data)
-
 	xs := 800
 
 	ys := 600
 
-	mono := iris.NewMonochrome16Exposure(data.Image, 65535, xs, ys)
+	data := GetTestData(xs, ys)
 
-	mono.PreprocessImageArray(xs, ys)
-
-	stats := NewStats(mono.Data, mono.ADU, len(mono.Data))
+	stats := NewStats(data, 65535, len(data))
 
 	samples := make([]float32, 1000)
 
@@ -332,36 +286,13 @@ func TestFastApproxBoundedMedian(t *testing.T) {
 }
 
 func TestFastApproxBoundedQn(t *testing.T) {
-	type CameraExposure struct {
-		BayerXOffset int32      `json:"bayerXOffset"`
-		BayerYOffset int32      `json:"bayerYOffset"`
-		CCDXSize     int32      `json:"ccdXSize"`
-		CCDYSize     int32      `json:"ccdYSize"`
-		Image        [][]uint32 `json:"exposure"`
-		MaxADU       int32      `json:"maxADU"`
-		Rank         uint32     `json:"rank"`
-		SensorType   string     `json:"sensorType"`
-	}
-
-	file, err := ioutil.ReadFile("../../data/m42-800x600-monochrome.json")
-
-	if err != nil {
-		t.Errorf("Error opening from JSON data: %s", err)
-	}
-
-	data := CameraExposure{}
-
-	_ = json.Unmarshal([]byte(file), &data)
-
 	xs := 800
 
 	ys := 600
 
-	mono := iris.NewMonochrome16Exposure(data.Image, 65535, xs, ys)
+	data := GetTestData(xs, ys)
 
-	mono.PreprocessImageArray(xs, ys)
-
-	stats := NewStats(mono.Data, mono.ADU, len(mono.Data))
+	stats := NewStats(data, 65535, len(data))
 
 	samples := make([]float32, 1000)
 
@@ -385,36 +316,13 @@ func TestFastApproxBoundedQn(t *testing.T) {
 }
 
 func TestFastApproxSigmaClippedMedianAndQn(t *testing.T) {
-	type CameraExposure struct {
-		BayerXOffset int32      `json:"bayerXOffset"`
-		BayerYOffset int32      `json:"bayerYOffset"`
-		CCDXSize     int32      `json:"ccdXSize"`
-		CCDYSize     int32      `json:"ccdYSize"`
-		Image        [][]uint32 `json:"exposure"`
-		MaxADU       int32      `json:"maxADU"`
-		Rank         uint32     `json:"rank"`
-		SensorType   string     `json:"sensorType"`
-	}
-
-	file, err := ioutil.ReadFile("../../data/m42-800x600-monochrome.json")
-
-	if err != nil {
-		t.Errorf("Error opening from JSON data: %s", err)
-	}
-
-	data := CameraExposure{}
-
-	_ = json.Unmarshal([]byte(file), &data)
-
 	xs := 800
 
 	ys := 600
 
-	mono := iris.NewMonochrome16Exposure(data.Image, 65535, xs, ys)
+	data := GetTestData(xs, ys)
 
-	mono.PreprocessImageArray(xs, ys)
-
-	stats := NewStats(mono.Data, mono.ADU, len(mono.Data))
+	stats := NewStats(data, 65535, len(data))
 
 	flocation, fscale := stats.FastApproxSigmaClippedMedianAndQn()
 
@@ -432,5 +340,31 @@ func TestFastApproxSigmaClippedMedianAndQn(t *testing.T) {
 
 	if fscale != 8321.775 {
 		t.Errorf("The randomized Qn should be 8321.775, but got %v", flocation)
+	}
+}
+
+func TestNewStatsMonochrome16Exposure(t *testing.T) {
+	xs := 800
+
+	ys := 600
+
+	data := GetTestData(xs, ys)
+
+	stats := NewStats(data, 65535, len(data))
+
+	if stats.Min != 3453 {
+		t.Errorf("min should be 3453, but got %v", stats.Min)
+	}
+
+	if stats.Mean != 27448.309 {
+		t.Errorf("mean should be 27448.309, but got %v", stats.Mean)
+	}
+
+	if stats.Max != 65535 {
+		t.Errorf("max should be 65535, but got %v", stats.Max)
+	}
+
+	if stats.StdDev != 10592.966 {
+		t.Errorf("stddev should be 10592.966, but got %v", stats.StdDev)
 	}
 }
