@@ -21,11 +21,12 @@ type FITSImage struct {
 	Naxisn   []int32    // Axis dimensions. Most quickly varying dimension first (i.e. X,Y)
 	Pixels   int32      // Number of pixels in the image. Product of Naxisn[] or naxis1 and naxis2
 	Data     []float32  // The image data
+	ADU      int32      // The number of ADU (Analog to Digital Units) in the image.
 	Exposure float32    // Image exposure in seconds
 }
 
 // Creates a new instance of FITS image initialized with empty header
-func NewFITSImage(naxis int32, naxis1 int32, naxis2 int32) *FITSImage {
+func NewFITSImage(naxis int32, naxis1 int32, naxis2 int32, adu int32) *FITSImage {
 	h := NewFITSHeader(naxis, naxis1, naxis2)
 
 	return &FITSImage{
@@ -33,12 +34,13 @@ func NewFITSImage(naxis int32, naxis1 int32, naxis2 int32) *FITSImage {
 		Bitpix: -32,
 		Bzero:  0,
 		Bscale: 1,
+		ADU:    adu,
 	}
 }
 
 // Creates a new instance of FITS image from given naxisn:
 // (Data is not copied, allocated if nil. naxisn is deep copied)
-func NewFITSImageFromNaxisn(naxisn []int32, data []float32, bitpix int32, naxis int32, naxis1 int32, naxis2 int32) *FITSImage {
+func NewFITSImageFromNaxisn(naxisn []int32, data []float32, bitpix int32, naxis int32, naxis1 int32, naxis2 int32, adu int32) *FITSImage {
 	numPixels := int32(1)
 
 	for _, naxis := range naxisn {
@@ -51,6 +53,14 @@ func NewFITSImageFromNaxisn(naxisn []int32, data []float32, bitpix int32, naxis 
 
 	h := NewFITSHeader(naxis, naxis1, naxis2)
 
+	h.Ints["ADU"] = struct {
+		Value   int32
+		Comment string
+	}{
+		Value:   adu,
+		Comment: "Analog to Digital Units (ADU)",
+	}
+
 	return &FITSImage{
 		ID:       0,
 		Filename: "",
@@ -61,13 +71,14 @@ func NewFITSImageFromNaxisn(naxisn []int32, data []float32, bitpix int32, naxis 
 		Naxisn:   append([]int32(nil), naxisn...), // clone slice
 		Pixels:   numPixels,
 		Data:     data,
+		ADU:      adu,
 		Exposure: 0,
 	}
 }
 
 // Creates a new instance of FITS image from given 2D exposure array
 // (Data is not copied, allocated if nil. naxisn is deep copied)
-func NewFITSImageFrom2DData(ex [][]uint32, naxis int32, naxis1 int32, naxis2 int32) *FITSImage {
+func NewFITSImageFrom2DData(ex [][]uint32, naxis int32, naxis1 int32, naxis2 int32, adu int32) *FITSImage {
 	pixels := naxis1 * naxis2
 
 	data := make([]float32, 0)
@@ -83,7 +94,15 @@ func NewFITSImageFrom2DData(ex [][]uint32, naxis int32, naxis1 int32, naxis2 int
 		data = make([]float32, pixels)
 	}
 
-	f := NewFITSImage(naxis, naxis1, naxis2)
+	f := NewFITSImage(naxis, naxis1, naxis2, adu)
+
+	f.Header.Ints["ADU"] = struct {
+		Value   int32
+		Comment string
+	}{
+		Value:   f.ADU,
+		Comment: "Analog to Digital Units (ADU)",
+	}
 
 	return &FITSImage{
 		ID:       f.ID,
@@ -95,6 +114,7 @@ func NewFITSImageFrom2DData(ex [][]uint32, naxis int32, naxis1 int32, naxis2 int
 		Naxisn:   []int32{naxis1, naxis2},
 		Pixels:   pixels,
 		Data:     data,
+		ADU:      adu,
 		Exposure: 0,
 	}
 }
@@ -114,6 +134,7 @@ func NewFITSImageFromImage(img *FITSImage) *FITSImage {
 		Naxisn:   append([]int32(nil), img.Naxisn...), // clone slice
 		Pixels:   img.Pixels,
 		Data:     data,
+		ADU:      img.ADU,
 		Exposure: img.Exposure,
 	}
 }

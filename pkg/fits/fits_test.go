@@ -9,7 +9,7 @@ import (
 )
 
 func TestNewDefaultFITSImageHeaderEnd(t *testing.T) {
-	var img = NewFITSImage(2, 600, 800)
+	var img = NewFITSImage(2, 600, 800, 65535)
 
 	var got = img.Header.End
 
@@ -21,7 +21,7 @@ func TestNewDefaultFITSImageHeaderEnd(t *testing.T) {
 }
 
 func TestNewDefaultFITSImageBScale(t *testing.T) {
-	var img = NewFITSImage(2, 600, 800)
+	var img = NewFITSImage(2, 600, 800, 65535)
 
 	var got = img.Bscale
 
@@ -33,7 +33,7 @@ func TestNewDefaultFITSImageBScale(t *testing.T) {
 }
 
 func TestNewFromNaxisnFITSImageID(t *testing.T) {
-	var imgNaxisn = NewFITSImageFromNaxisn([]int32{8, 8}, nil, 16, 2, 600, 800)
+	var imgNaxisn = NewFITSImageFromNaxisn([]int32{8, 8}, nil, 16, 2, 600, 800, 65535)
 
 	var got = imgNaxisn.ID
 
@@ -45,7 +45,7 @@ func TestNewFromNaxisnFITSImageID(t *testing.T) {
 }
 
 func TestNewFromNaxisnFITSImageFilename(t *testing.T) {
-	var imgNaxisn = NewFITSImageFromNaxisn([]int32{8, 8}, nil, 16, 2, 600, 800)
+	var imgNaxisn = NewFITSImageFromNaxisn([]int32{8, 8}, nil, 16, 2, 600, 800, 65535)
 
 	var got = imgNaxisn.Filename
 
@@ -57,7 +57,7 @@ func TestNewFromNaxisnFITSImageFilename(t *testing.T) {
 }
 
 func TestNewFromNaxisnFITSImageBitpix(t *testing.T) {
-	var imgNaxisn = NewFITSImageFromNaxisn([]int32{8, 8}, nil, 16, 2, 600, 800)
+	var imgNaxisn = NewFITSImageFromNaxisn([]int32{8, 8}, nil, 16, 2, 600, 800, 65535)
 
 	var got = imgNaxisn.Bitpix
 
@@ -69,7 +69,7 @@ func TestNewFromNaxisnFITSImageBitpix(t *testing.T) {
 }
 
 func TestNewFromNaxisnFITSImageBzero(t *testing.T) {
-	var imgNaxisn = NewFITSImageFromNaxisn([]int32{8, 8}, nil, 16, 2, 600, 800)
+	var imgNaxisn = NewFITSImageFromNaxisn([]int32{8, 8}, nil, 16, 2, 600, 800, 65535)
 
 	var got = imgNaxisn.Bzero
 
@@ -81,7 +81,7 @@ func TestNewFromNaxisnFITSImageBzero(t *testing.T) {
 }
 
 func TestNewFromNaxisnFITSImageBscale(t *testing.T) {
-	var imgNaxisn = NewFITSImageFromNaxisn([]int32{8, 8}, nil, 16, 2, 600, 800)
+	var imgNaxisn = NewFITSImageFromNaxisn([]int32{8, 8}, nil, 16, 2, 600, 800, 65535)
 
 	var got = imgNaxisn.Bscale
 
@@ -93,7 +93,7 @@ func TestNewFromNaxisnFITSImageBscale(t *testing.T) {
 }
 
 func TestNewFromNaxisnFITSImagePixels(t *testing.T) {
-	var imgNaxisn = NewFITSImageFromNaxisn([]int32{8, 8}, nil, 16, 2, 600, 800)
+	var imgNaxisn = NewFITSImageFromNaxisn([]int32{8, 8}, nil, 16, 2, 600, 800, 65535)
 
 	var got = imgNaxisn.Pixels
 
@@ -124,7 +124,7 @@ func TestNewFITSImageFrom2DDataID(t *testing.T) {
 		{6, 7, 8, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 8, 7, 6},
 	}
 
-	var img2DData = NewFITSImageFrom2DData(ex, 2, 16, 16)
+	var img2DData = NewFITSImageFrom2DData(ex, 2, 16, 16, 255)
 
 	var got = img2DData.ID
 
@@ -155,7 +155,7 @@ func TestNewFITSImageFrom2DDataPixels(t *testing.T) {
 		{6, 7, 8, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 8, 7, 6},
 	}
 
-	var img2DData = NewFITSImageFrom2DData(ex, 2, 16, 16)
+	var img2DData = NewFITSImageFrom2DData(ex, 2, 16, 16, 255)
 
 	var got = img2DData.Data
 
@@ -186,7 +186,7 @@ func TestNewFITSImageFrom2DDataData(t *testing.T) {
 		{6, 7, 8, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 8, 7, 6},
 	}
 
-	var img2DData = NewFITSImageFrom2DData(ex, 2, 16, 16)
+	var img2DData = NewFITSImageFrom2DData(ex, 2, 16, 16, 255)
 
 	var got = img2DData.Data
 
@@ -198,7 +198,7 @@ func TestNewFITSImageFrom2DDataData(t *testing.T) {
 }
 
 func TestNewFromImageFITSImageID(t *testing.T) {
-	var imgNaxisn = NewFITSImageFromNaxisn([]int32{8, 8}, nil, 16, 2, 600, 800)
+	var imgNaxisn = NewFITSImageFromNaxisn([]int32{8, 8}, nil, 16, 2, 600, 800, 65535)
 
 	var imgImage = NewFITSImageFromImage(imgNaxisn)
 
@@ -212,7 +212,7 @@ func TestNewFromImageFITSImageID(t *testing.T) {
 }
 
 func TestNewFromImageFITSImageFilename(t *testing.T) {
-	var imgNaxisn = NewFITSImageFromNaxisn([]int32{8, 8}, nil, 16, 2, 600, 800)
+	var imgNaxisn = NewFITSImageFromNaxisn([]int32{8, 8}, nil, 16, 2, 600, 800, 65535)
 
 	var got = imgNaxisn.Filename
 
@@ -224,7 +224,7 @@ func TestNewFromImageFITSImageFilename(t *testing.T) {
 }
 
 func TestNewFromImageFITSImageBitpix(t *testing.T) {
-	var imgNaxisn = NewFITSImageFromNaxisn([]int32{8, 8}, nil, 16, 2, 600, 800)
+	var imgNaxisn = NewFITSImageFromNaxisn([]int32{8, 8}, nil, 16, 2, 600, 800, 65535)
 
 	var got = imgNaxisn.Bitpix
 
@@ -236,7 +236,7 @@ func TestNewFromImageFITSImageBitpix(t *testing.T) {
 }
 
 func TestNewFromImageFITSImageBzero(t *testing.T) {
-	var imgNaxisn = NewFITSImageFromNaxisn([]int32{8, 8}, nil, 16, 2, 600, 800)
+	var imgNaxisn = NewFITSImageFromNaxisn([]int32{8, 8}, nil, 16, 2, 600, 800, 65535)
 
 	var got = imgNaxisn.Bzero
 
@@ -248,7 +248,7 @@ func TestNewFromImageFITSImageBzero(t *testing.T) {
 }
 
 func TestNewFromImageFITSImageBscale(t *testing.T) {
-	var imgNaxisn = NewFITSImageFromNaxisn([]int32{8, 8}, nil, 16, 2, 600, 800)
+	var imgNaxisn = NewFITSImageFromNaxisn([]int32{8, 8}, nil, 16, 2, 600, 800, 65535)
 
 	var got = imgNaxisn.Bscale
 
@@ -260,7 +260,7 @@ func TestNewFromImageFITSImageBscale(t *testing.T) {
 }
 
 func TestNewFromImageFITSImagePixels(t *testing.T) {
-	var imgNaxisn = NewFITSImageFromNaxisn([]int32{8, 8}, nil, 16, 2, 600, 800)
+	var imgNaxisn = NewFITSImageFromNaxisn([]int32{8, 8}, nil, 16, 2, 600, 800, 65535)
 
 	var got = imgNaxisn.Pixels
 
@@ -303,7 +303,7 @@ func TestNewFITSImageFrom2DDataWriteFloatData(t *testing.T) {
 		}
 	}
 
-	var fit = NewFITSImageFrom2DData(ex, 2, int32(bounds.Dx()), int32(bounds.Dy()))
+	var fit = NewFITSImageFrom2DData(ex, 2, int32(bounds.Dx()), int32(bounds.Dy()), 65535)
 
 	var w io.Writer = os.Stdout
 
@@ -358,7 +358,7 @@ func TestNEWFITSImageFrom2DDataWrite(t *testing.T) {
 		}
 	}
 
-	var fit = NewFITSImageFrom2DData(ex, 2, int32(bounds.Dx()), int32(bounds.Dy()))
+	var fit = NewFITSImageFrom2DData(ex, 2, int32(bounds.Dx()), int32(bounds.Dy()), 65535)
 
 	f, err = os.OpenFile("noise16.fits", os.O_WRONLY|os.O_CREATE, 0644)
 

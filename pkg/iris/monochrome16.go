@@ -63,6 +63,7 @@ func (m *Monochrome16Exposure) GetFITSImage() *fits.FITSImage {
 		2,
 		int32(m.Width),
 		int32(m.Height),
+		m.ADU,
 	)
 
 	f.Header.Strings["SENSOR"] = struct {
