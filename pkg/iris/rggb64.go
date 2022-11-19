@@ -130,6 +130,7 @@ func (b *RGGB64Exposure) GetFITSImageForChannel(color RGGB64Color) *fits.FITSIma
 		2,
 		int32(b.Width),
 		int32(b.Height),
+		b.ADU,
 	)
 
 	f.Header.Strings["SENSOR"] = struct {
