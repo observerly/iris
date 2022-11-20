@@ -367,3 +367,39 @@ func TestNEWFITSImageFrom2DDataWrite(t *testing.T) {
 		t.Errorf("Error writing image: %s", err)
 	}
 }
+
+func TestNEWFITSImageFrom2DStats(t *testing.T) {
+	data, bounds := GetTestDataFromImage()
+
+	var fit = NewFITSImageFrom2DData(data, 2, int32(bounds.Dx()), int32(bounds.Dy()), 65535)
+
+	stats := fit.Stats
+
+	if stats.ADU != 65535 {
+		t.Errorf("Expected the ADU to be 65535, but got %d", stats.ADU)
+	}
+
+	if stats.Width != int(bounds.Dx()) {
+		t.Errorf("Expected the width to be %d, but got %d", bounds.Dx(), stats.Width)
+	}
+
+	if stats.Min < 0 {
+		t.Errorf("Expected the minimum pixel value to be greater than the minimum theoretical value")
+	}
+
+	if stats.Min != 0 {
+		t.Errorf("Expected the minimum pixel value to be 0, but got %f", stats.Min)
+	}
+
+	if stats.Max != 65534 {
+		t.Errorf("Expected the maximum pixel value to be 65534, but got %f", stats.Max)
+	}
+
+	if stats.Max > float32(stats.ADU) {
+		t.Errorf("Expected that the maximum pixel value to be less than or equal to the maximum theoretical value, ADU")
+	}
+
+	if stats.Mean != 18514.215 {
+		t.Errorf("Expected the mean pixel value to be 18514.215, but got %f", stats.Mean)
+	}
+}

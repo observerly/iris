@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"encoding/binary"
 	"strings"
+
+	stats "github.com/observerly/iris/pkg/statistics"
 )
 
 const FITS_STANDARD = "FITS Standard 4.0"
@@ -12,17 +14,18 @@ const FITS_STANDARD = "FITS Standard 4.0"
 // @see https://fits.gsfc.nasa.gov/fits_primer.html
 // @see https://fits.gsfc.nasa.gov/standard40/fits_standard40aa-le.pdf
 type FITSImage struct {
-	ID       int        // Sequential ID number, for log output. Counted upwards from 0 for light frames. By convention, dark is -1 and flat is -2
-	Filename string     // Original file name, if any, for log output.
-	Header   FITSHeader // The FITS Header with all keys, values, comments, history entries etc.
-	Bitpix   int32      // Bits per pixel value from the header. Positive values are integral, negative floating.
-	Bzero    float32    // Zero offset. (True pixel value is Bzero + Bscale * Data[i]).
-	Bscale   float32    // Value scaler. (True pixel value is Bzero + Bscale * Data[i]).
-	Naxisn   []int32    // Axis dimensions. Most quickly varying dimension first (i.e. X,Y)
-	Pixels   int32      // Number of pixels in the image. Product of Naxisn[] or naxis1 and naxis2
-	Data     []float32  // The image data
-	ADU      int32      // The number of ADU (Analog to Digital Units) in the image.
-	Exposure float32    // Image exposure in seconds
+	ID       int          // Sequential ID number, for log output. Counted upwards from 0 for light frames. By convention, dark is -1 and flat is -2
+	Filename string       // Original file name, if any, for log output.
+	Header   FITSHeader   // The FITS Header with all keys, values, comments, history entries etc.
+	Bitpix   int32        // Bits per pixel value from the header. Positive values are integral, negative floating.
+	Bzero    float32      // Zero offset. (True pixel value is Bzero + Bscale * Data[i]).
+	Bscale   float32      // Value scaler. (True pixel value is Bzero + Bscale * Data[i]).
+	Naxisn   []int32      // Axis dimensions. Most quickly varying dimension first (i.e. X,Y)
+	Pixels   int32        // Number of pixels in the image. Product of Naxisn[] or naxis1 and naxis2
+	Data     []float32    // The image data
+	ADU      int32        // The number of ADU (Analog to Digital Units) in the image.
+	Exposure float32      // Image exposure in seconds
+	Stats    *stats.Stats // Image statistics (mean, min, max, stdDev etc)
 }
 
 // Creates a new instance of FITS image initialized with empty header
@@ -41,19 +44,21 @@ func NewFITSImage(naxis int32, naxis1 int32, naxis2 int32, adu int32) *FITSImage
 // Creates a new instance of FITS image from given naxisn:
 // (Data is not copied, allocated if nil. naxisn is deep copied)
 func NewFITSImageFromNaxisn(naxisn []int32, data []float32, bitpix int32, naxis int32, naxis1 int32, naxis2 int32, adu int32) *FITSImage {
-	numPixels := int32(1)
+	pixels := int32(1)
 
 	for _, naxis := range naxisn {
-		numPixels *= naxis
+		pixels *= naxis
 	}
 
 	if data == nil {
-		data = make([]float32, numPixels)
+		data = make([]float32, pixels)
 	}
 
-	h := NewFITSHeader(naxis, naxis1, naxis2)
+	f := NewFITSImage(naxis, naxis1, naxis2, adu)
 
-	h.Ints["ADU"] = struct {
+	f.Stats = stats.NewStats(data, adu, int(naxis1))
+
+	f.Header.Ints["ADU"] = struct {
 		Value   int32
 		Comment string
 	}{
@@ -62,17 +67,18 @@ func NewFITSImageFromNaxisn(naxisn []int32, data []float32, bitpix int32, naxis 
 	}
 
 	return &FITSImage{
-		ID:       0,
-		Filename: "",
-		Header:   h,
+		ID:       f.ID,
+		Filename: f.Filename,
+		Header:   f.Header,
 		Bitpix:   -32,
-		Bzero:    0,
-		Bscale:   1,
-		Naxisn:   append([]int32(nil), naxisn...), // clone slice
-		Pixels:   numPixels,
+		Bzero:    f.Bzero,
+		Bscale:   f.Bscale,
+		Naxisn:   []int32{naxis1, naxis2},
+		Pixels:   pixels,
 		Data:     data,
 		ADU:      adu,
 		Exposure: 0,
+		Stats:    f.Stats,
 	}
 }
 
@@ -96,6 +102,8 @@ func NewFITSImageFrom2DData(ex [][]uint32, naxis int32, naxis1 int32, naxis2 int
 
 	f := NewFITSImage(naxis, naxis1, naxis2, adu)
 
+	f.Stats = stats.NewStats(data, adu, int(naxis1))
+
 	f.Header.Ints["ADU"] = struct {
 		Value   int32
 		Comment string
@@ -116,6 +124,7 @@ func NewFITSImageFrom2DData(ex [][]uint32, naxis int32, naxis1 int32, naxis2 int
 		Data:     data,
 		ADU:      adu,
 		Exposure: 0,
+		Stats:    f.Stats,
 	}
 }
 
@@ -136,6 +145,7 @@ func NewFITSImageFromImage(img *FITSImage) *FITSImage {
 		Data:     data,
 		ADU:      img.ADU,
 		Exposure: img.Exposure,
+		Stats:    img.Stats,
 	}
 }
 
