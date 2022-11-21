@@ -1,6 +1,9 @@
 package utils
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+)
 
 /**
   Subtract
@@ -46,4 +49,37 @@ func DivideFloat32Array(a, b []float32, bMax float32) ([]float32, error) {
 	}
 
 	return d, nil
+}
+
+/**
+	Mean
+
+	Computes the mean of array a and stores in array m "mean",
+	that is, m[i]=mean(a). If a is empty, m is nil.
+**/
+func MeanFloat32Arrays(a [][]float32) ([]float32, error) {
+	if len(a) == 0 {
+		return nil, errors.New("to divide arrays they must be of same length")
+	}
+
+	m := make([]float32, len(a[0]))
+
+	for i := range m {
+		for j := range a {
+			// Ensure that each sub-array has the same length as the first one:
+			if len(a[j]) != len(a[0]) {
+				return nil, fmt.Errorf("issue at array input %v: to compute the mean of multiple arrays the length of each array must be the same", i)
+			}
+
+			if a[j][i] == 0 {
+				continue
+			}
+
+			m[i] += a[j][i]
+		}
+
+		m[i] /= float32(len(a))
+	}
+
+	return m, nil
 }
