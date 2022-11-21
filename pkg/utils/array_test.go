@@ -7,7 +7,11 @@ func TestSubtractAB(t *testing.T) {
 
 	b := []float32{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
 
-	s := SubtractFloat32Array(a, b)
+	s, err := SubtractFloat32Array(a, b)
+
+	if err != nil {
+		t.Errorf("error should be nil, but got %v", err)
+	}
 
 	if len(s) != len(a) {
 		t.Errorf("result should be of same length as a")
@@ -21,17 +25,15 @@ func TestSubtractAB(t *testing.T) {
 }
 
 func TestSubtractABNotEqualLengthPanic(t *testing.T) {
-	defer func() {
-		if r := recover(); r == nil {
-			t.Errorf("The code did not panic")
-		}
-	}()
-
 	a := []float32{2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
 
 	b := []float32{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
 
-	SubtractFloat32Array(a, b)
+	_, err := SubtractFloat32Array(a, b)
+
+	if err == nil {
+		t.Errorf("error should not be nil for two arrays of unequal length")
+	}
 }
 
 func TestDivideAB(t *testing.T) {
@@ -39,7 +41,11 @@ func TestDivideAB(t *testing.T) {
 
 	b := []float32{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
 
-	d := DivideFloat32Array(a, b, 10)
+	d, err := DivideFloat32Array(a, b, 10)
+
+	if err != nil {
+		t.Errorf("error should be nil, but got %v", err)
+	}
 
 	if len(d) != len(a) {
 		t.Errorf("result should be of same length as a")
@@ -59,7 +65,11 @@ func TestDivideABDegenerate(t *testing.T) {
 
 	b := []float32{-1, -2, 3, 4, 5, -6, 7, 8, 9, 10}
 
-	d := DivideFloat32Array(a, b, 10)
+	d, err := DivideFloat32Array(a, b, 10)
+
+	if err != nil {
+		t.Errorf("error should be nil, but got %v", err)
+	}
 
 	if len(d) != len(a) {
 		t.Errorf("result should be of same length as a")
@@ -79,15 +89,14 @@ func TestDivideABDegenerate(t *testing.T) {
 }
 
 func TestDivideABNotEqualLengthPanic(t *testing.T) {
-	defer func() {
-		if r := recover(); r == nil {
-			t.Errorf("The code did not panic")
-		}
-	}()
 
 	a := []float32{2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
 
 	b := []float32{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
 
-	DivideFloat32Array(a, b, 10)
+	_, err := DivideFloat32Array(a, b, 10)
+
+	if err == nil {
+		t.Errorf("error should not be nil for two arrays of unequal length")
+	}
 }
