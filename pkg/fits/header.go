@@ -4,8 +4,12 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"regexp"
 	"strings"
 )
+
+// Regular expression parser for FITS header lines:
+var re *regexp.Regexp = compileFITSHeaderRegEx()
 
 // FITS Header struct:
 type FITSHeader struct {
@@ -225,4 +229,44 @@ func writeFloat(w io.Writer, key string, value float32, comment string) {
 func writeEnd(w io.Writer) bool {
 	n, _ := fmt.Fprintf(w, "END%s", strings.Repeat(" ", 80-3))
 	return n > 0
+}
+
+// Build regexp parser for FITS header lines
+func compileFITSHeaderRegEx() *regexp.Regexp {
+	white := "\\s+"
+	whiteOpt := "\\s*"
+	whiteLine := white
+
+	hist := "HISTORY"
+	rest := ".*"
+	histLine := hist + white + "(?P<H>" + rest + ")"
+
+	commKey := "COMMENT"
+	commLine := commKey + white + "(?P<C>" + rest + ")"
+
+	end := "(?P<E>END)"
+	endLine := end + whiteOpt
+
+	key := "(?P<k>[A-Z0-9_-]+)"
+	equals := "="
+
+	b := "(?P<b>[TF])"
+	i := "(?P<i>[+-]?[0-9]+)"
+	f := "(?P<f>[+-]?[0-9]*\\.[0-9]*(?:[ED][-+]?[0-9]+)?)"
+	s := "'(?P<s>[^']*)'"
+	// [TBI]: Ensure all ISO-8601 dates are parsed correctly:
+	d := "(?P<d>[0-9]{1,4}-?[012][0-9]-?[0123][0-9]T[012][0-9]:?[0-5][0-9]:?[0-5][0-9].?[0-9]*)"
+
+	val := "(?:" + b + "|" + i + "|" + f + "|" + s + "|" + d + ")"
+
+	// [TBI]: CONTINUE for strings
+	// [TBI]: Complex int: (nr, nr)
+	// [TBI]: Complex float: (nr, nr)
+
+	commOpt := "(?:/(?P<c>.*))?"
+	keyLine := key + whiteOpt + equals + whiteOpt + val + whiteOpt + commOpt
+
+	lineRe := "^(?:" + whiteLine + "|" + histLine + "|" + commLine + "|" + keyLine + "|" + endLine + ")$"
+
+	return regexp.MustCompile(lineRe)
 }
