@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"errors"
+	"fmt"
 	"io"
 	"strings"
 
@@ -149,6 +150,78 @@ func NewFITSImageFromImage(img *FITSImage) *FITSImage {
 		Exposure: img.Exposure,
 		Stats:    img.Stats,
 	}
+}
+
+// Read the FITS image from the given file.
+func (f *FITSImage) Read(r io.Reader) error {
+	// Read Header:
+	err := f.Header.Read(r)
+
+	if err != nil {
+		return err
+	}
+
+	// Check that the mandatory SIMPLE header value exists as per FITS standard:
+	if !f.Header.Bools["SIMPLE"].Value {
+		return fmt.Errorf("%d: not a valid FITS file; SIMPLE=T missing in header", f.ID)
+	}
+
+	bitpix, ok := f.Header.Ints["BITPIX"]
+
+	if !ok {
+		return fmt.Errorf("%d: not a valid FITS Image file; BITPIX missing in header", f.ID)
+	}
+
+	// Check that the BITPIX value is valid for the IRIS module (only -32 supported):
+	if bitpix.Value != -32 {
+		return fmt.Errorf("%d: not a valid float32 FITS Image file; BITPIX must be -32", f.ID)
+	}
+
+	f.Header.Bitpix = bitpix.Value
+
+	f.Bitpix = bitpix.Value
+
+	naxis, ok := f.Header.Ints["NAXIS"]
+
+	if !ok {
+		return fmt.Errorf("%d: not a valid FITS Image file; NAXIS missing in header", f.ID)
+	}
+
+	f.Header.Naxis = naxis.Value
+
+	naxis1, ok := f.Header.Ints["NAXIS1"]
+
+	if !ok {
+		return fmt.Errorf("%d: not a valid FITS Image file; NAXIS1 missing in header", f.ID)
+	}
+
+	// Set the NAXIS1 value:
+	f.Header.Naxis1 = naxis1.Value
+
+	naxis2, ok := f.Header.Ints["NAXIS2"]
+
+	if !ok {
+		return fmt.Errorf("%d: not a valid FITS Image file; NAXIS2 missing in header", f.ID)
+	}
+
+	// Set the NAXIS2 value:
+	f.Header.Naxis2 = naxis2.Value
+
+	// Set the NAXISn values:
+	f.Naxisn = []int32{naxis1.Value, naxis2.Value}
+
+	// Set the number of pixels:
+	f.Pixels = f.Header.Naxis1 * f.Header.Naxis2
+
+	data, err := readData(r, f.Bitpix, f.Pixels)
+
+	if err != nil {
+		return err
+	}
+
+	f.Data = data
+
+	return nil
 }
 
 // Writes an in-memory FITS image to an io.Writer output stream
