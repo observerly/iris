@@ -13,17 +13,19 @@ import (
 // Regular expression parser for FITS header lines:
 var re *regexp.Regexp = compileFITSHeaderRegEx()
 
+type FITSHeaderBool struct {
+	Value   bool
+	Comment string
+}
+
 // FITS Header struct:
 type FITSHeader struct {
 	Bitpix int32
 	Naxis  int32
 	Naxis1 int32
 	Naxis2 int32
-	Bools  map[string]struct {
-		Value   bool
-		Comment string
-	}
-	Ints map[string]struct {
+	Bools  map[string]FITSHeaderBool
+	Ints   map[string]struct {
 		Value   int32
 		Comment string
 	}
@@ -48,10 +50,7 @@ type FITSHeader struct {
 // Create a new instance of FITS header:
 func NewFITSHeader(naxis int32, naxis1 int32, naxis2 int32) FITSHeader {
 	h := FITSHeader{
-		Bools: make(map[string]struct {
-			Value   bool
-			Comment string
-		}),
+		Bools: make(map[string]FITSHeaderBool),
 		Ints: make(map[string]struct {
 			Value   int32
 			Comment string
