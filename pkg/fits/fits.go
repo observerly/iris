@@ -3,6 +3,8 @@ package fits
 import (
 	"bytes"
 	"encoding/binary"
+	"errors"
+	"io"
 	"strings"
 
 	stats "github.com/observerly/iris/pkg/statistics"
@@ -198,6 +200,59 @@ func writeFloat32ArrayToBuffer(buf *bytes.Buffer, data []float32) (*bytes.Buffer
 	}
 
 	return buf, nil
+}
+
+/**
+	Reads the FITS binary data from the given io.Reader stream and returns a
+	slice of float32 values, or error
+
+	Note: The data is read in network byte order and only supports 32-bitpix data
+**/
+func readData(r io.Reader, bitpix int32, pixels int32) ([]float32, error) {
+	data := make([]float32, pixels)
+
+	buf, err := io.ReadAll(r)
+
+	// Convert []byte to bytes.Buffer:
+	b := bytes.NewBuffer(buf)
+
+	if err != nil {
+		return nil, err
+	}
+
+	switch bitpix {
+
+	// 32-bit floating point:
+	case -32:
+		err = readFloat32ArrayFromBuffer(b, data)
+
+	// 64-bit floating point:
+	case -64:
+		// [TBI] Implement 64-bit floating point data type
+		err = errors.New("64-bit floating point data not supported")
+
+	// 8-bit unsigned integer:
+	case 8:
+		// [TBI] readUint8ArrayFromBuffer()
+		err = errors.New("8-bit unsigned int data not supported")
+
+	// 16-bit unsigned integer:
+	case 16:
+		// [TBI] readUint16ArrayFromBuffer()
+		err = errors.New("16-bit unsigned int data not supported")
+
+	// 32-bit unsigned integer:
+	case 32:
+		// [TBI] readUint32ArrayFromBuffer()
+		err = errors.New("32-bit unsigned int data not supported")
+
+		// 64-bit unsigned integer:
+	case 64:
+		// [TBI] readUint64ArrayFromBuffer()
+		err = errors.New("64-bit unsigned int data not supported")
+	}
+
+	return data, err
 }
 
 // Reads FITS binary body float32 data in network byte order from buffer
