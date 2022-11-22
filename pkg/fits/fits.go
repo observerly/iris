@@ -46,47 +46,6 @@ func NewFITSImage(naxis int32, naxis1 int32, naxis2 int32, adu int32) *FITSImage
 	}
 }
 
-// Creates a new instance of FITS image from given naxisn:
-// (Data is not copied, allocated if nil. naxisn is deep copied)
-func NewFITSImageFromNaxisn(naxisn []int32, data []float32, bitpix int32, naxis int32, naxis1 int32, naxis2 int32, adu int32) *FITSImage {
-	pixels := int32(1)
-
-	for _, naxis := range naxisn {
-		pixels *= naxis
-	}
-
-	if data == nil {
-		data = make([]float32, pixels)
-	}
-
-	f := NewFITSImage(naxis, naxis1, naxis2, adu)
-
-	f.Stats = stats.NewStats(data, adu, int(naxis1))
-
-	f.Header.Ints["ADU"] = struct {
-		Value   int32
-		Comment string
-	}{
-		Value:   adu,
-		Comment: "Analog to Digital Units (ADU)",
-	}
-
-	return &FITSImage{
-		ID:       f.ID,
-		Filename: f.Filename,
-		Header:   f.Header,
-		Bitpix:   -32,
-		Bzero:    f.Bzero,
-		Bscale:   f.Bscale,
-		Naxisn:   []int32{naxis1, naxis2},
-		Pixels:   pixels,
-		Data:     data,
-		ADU:      adu,
-		Exposure: 0,
-		Stats:    f.Stats,
-	}
-}
-
 // Creates a new instance of FITS image from given 2D exposure array
 // (Data is not copied, allocated if nil. naxisn is deep copied)
 func NewFITSImageFrom2DData(ex [][]uint32, naxis int32, naxis1 int32, naxis2 int32, adu int32) *FITSImage {
