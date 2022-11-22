@@ -18,6 +18,11 @@ type FITSHeaderBool struct {
 	Comment string
 }
 
+type FITSHeaderInt struct {
+	Value   int32
+	Comment string
+}
+
 // FITS Header struct:
 type FITSHeader struct {
 	Bitpix int32
@@ -25,10 +30,7 @@ type FITSHeader struct {
 	Naxis1 int32
 	Naxis2 int32
 	Bools  map[string]FITSHeaderBool
-	Ints   map[string]struct {
-		Value   int32
-		Comment string
-	}
+	Ints   map[string]FITSHeaderInt
 	Floats map[string]struct {
 		Value   float32
 		Comment string
@@ -51,10 +53,7 @@ type FITSHeader struct {
 func NewFITSHeader(naxis int32, naxis1 int32, naxis2 int32) FITSHeader {
 	h := FITSHeader{
 		Bools: make(map[string]FITSHeaderBool),
-		Ints: make(map[string]struct {
-			Value   int32
-			Comment string
-		}),
+		Ints:  make(map[string]FITSHeaderInt),
 		Floats: make(map[string]struct {
 			Value   float32
 			Comment string
