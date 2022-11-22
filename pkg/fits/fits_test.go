@@ -233,20 +233,6 @@ func TestNewFITSImageFrom2DDataData(t *testing.T) {
 	}
 }
 
-func TestNewFromImageFITSImageID(t *testing.T) {
-	var imgNaxisn = NewFITSImageFromNaxisn([]int32{8, 8}, nil, 16, 2, 600, 800, 65535)
-
-	var imgImage = NewFITSImageFromImage(imgNaxisn)
-
-	var got = imgImage.ID
-
-	var want int = 0
-
-	if got != want {
-		t.Errorf("NewFITSImageFromNaxisn() ID: got %v, want %v", got, want)
-	}
-}
-
 func TestNewFromImageFITSImageFilename(t *testing.T) {
 	var imgNaxisn = NewFITSImageFromNaxisn([]int32{8, 8}, nil, 16, 2, 600, 800, 65535)
 
