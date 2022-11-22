@@ -367,8 +367,7 @@ func TestNEWFITSImageFrom2DDataWrite(t *testing.T) {
 		t.Errorf("Error writing image: %s", err)
 	}
 }
-
-func TestNEWFITSImageFrom2DStats(t *testing.T) {
+func TestNewFITSImageFrom2DStats(t *testing.T) {
 	data, bounds := GetTestDataFromImage()
 
 	var fit = NewFITSImageFrom2DData(data, 2, int32(bounds.Dx()), int32(bounds.Dy()), 65535)
@@ -401,5 +400,53 @@ func TestNEWFITSImageFrom2DStats(t *testing.T) {
 
 	if stats.Mean != 18514.215 {
 		t.Errorf("Expected the mean pixel value to be 18514.215, but got %f", stats.Mean)
+	}
+}
+
+func TestNewFITSRead(t *testing.T) {
+	var fit = NewFITSImage(2, 1, 1, 65535)
+
+	if fit == nil {
+		t.Errorf("Expected the FITS image to be created, but got nil")
+	}
+
+	// Attempt to open the file from the given filepath:
+	file, err := os.Open("../../samples/noise16.fits")
+
+	if err != nil {
+		t.Errorf("Error opening image: %s", err)
+	}
+
+	// Defer closing the file:
+	defer file.Close()
+
+	err = fit.Read(file)
+
+	if err != nil {
+		t.Errorf("Error reading FITS image: %s", err)
+	}
+
+	if fit == nil {
+		t.Errorf("Expected the FITS image to be created, but got nil")
+	}
+
+	if fit.Bitpix != -32 {
+		t.Errorf("Expected the Bitpix to be -32, but got %d", fit.Bitpix)
+	}
+
+	if fit.Pixels != 1708784 {
+		t.Errorf("Expected the Pixels to be 1, but got %d", fit.Pixels)
+	}
+
+	if fit.ADU != 65535 {
+		t.Errorf("Expected the ADU to be 65535, but got %d", fit.ADU)
+	}
+
+	if fit.Header.Strings["PROGRAM"].Value != "@observerly/iris" {
+		t.Errorf("Expected the PROGRAM to be @observerly/iris")
+	}
+
+	if !fit.Header.End {
+		t.Errorf("Expected the End to be false, but got %t", fit.Header.End)
 	}
 }
