@@ -419,3 +419,113 @@ func TestCompileFITSHeaderRegExpEND(t *testing.T) {
 		t.Errorf("CompileFITSHeaderRegExp() expected key to be END: got %v, want %v", got, want)
 	}
 }
+
+func TestCompileFITSHeaderParseLineBool(t *testing.T) {
+	var header = NewFITSHeader(2, 600, 800)
+
+	values, names := GetRegexSubValuesAndSubNames([]byte("SIMPLE  =                    T / Standard FITS format"))
+
+	err := header.ParseLine(names, values)
+
+	if err != nil {
+		t.Errorf("CompileFITSHeaderParseDate() expected err to be nil: got %v, want %v", err, nil)
+	}
+
+	simple := header.Bools["SIMPLE"]
+
+	if !simple.Value {
+		t.Errorf("CompileFITSHeaderParseLine() expected SIMPLE to be true: got %v, want %v", simple.Value, true)
+	}
+
+	if simple.Comment != "Standard FITS format" {
+		t.Errorf("CompileFITSHeaderParseLine() expected SIMPLE comment to be Standard FITS format: but got %v", simple.Comment)
+	}
+}
+
+func TestCompileFITSHeaderParseLineInt32(t *testing.T) {
+	var header = NewFITSHeader(2, 600, 800)
+
+	values, names := GetRegexSubValuesAndSubNames([]byte("NAXIS1  =                  600 / [1] Length of data axis 1"))
+
+	err := header.ParseLine(names, values)
+
+	if err != nil {
+		t.Errorf("CompileFITSHeaderParseDate() expected err to be nil: got %v, want %v", err, nil)
+	}
+
+	naxis1 := header.Ints["NAXIS1"]
+
+	if naxis1.Value != 600 {
+		t.Errorf("CompileFITSHeaderParseLine() expected NAXIS1 to be 600: but got %v", naxis1.Value)
+	}
+
+	if naxis1.Comment != "[1] Length of data axis 1" {
+		t.Errorf("CompileFITSHeaderParseLine() expected NAXIS1 comment to be [1] Length of data axis 1: but got %v", naxis1.Comment)
+	}
+}
+
+func TestCompileFITSHeaderParseLineFloat32(t *testing.T) {
+	var header = NewFITSHeader(2, 600, 800)
+
+	values, names := GetRegexSubValuesAndSubNames([]byte("EXPOSURE=                0.001 / [s] Exposure time"))
+
+	err := header.ParseLine(names, values)
+
+	if err != nil {
+		t.Errorf("CompileFITSHeaderParseDate() expected err to be nil: got %v, want %v", err, nil)
+	}
+
+	exposure := header.Floats["EXPOSURE"]
+
+	if exposure.Value != 0.001 {
+		t.Errorf("CompileFITSHeaderParseLine() expected EXPOSURE to be 0.001: but got %v", exposure.Value)
+	}
+
+	if exposure.Comment != "[s] Exposure time" {
+		t.Errorf("CompileFITSHeaderParseLine() expected EXPOSURE comment to be [s] Exposure time: but got %v", exposure.Comment)
+	}
+}
+
+func TestCompileFITSHeaderParseLineString(t *testing.T) {
+	var header = NewFITSHeader(2, 600, 800)
+
+	values, names := GetRegexSubValuesAndSubNames([]byte("SENSOR  = 'Monochrome'         / ASCOM Alpaca Sensor Type"))
+
+	err := header.ParseLine(names, values)
+
+	if err != nil {
+		t.Errorf("CompileFITSHeaderParseDate() expected err to be nil: got %v, want %v", err, nil)
+	}
+
+	sensor := header.Strings["SENSOR"]
+
+	if sensor.Value != "Monochrome" {
+		t.Errorf("CompileFITSHeaderParseLine() expected SENSOR to be true: got %v, want %v", sensor.Value, true)
+	}
+
+	if sensor.Comment != "ASCOM Alpaca Sensor Type" {
+		t.Errorf("CompileFITSHeaderParseLine() expected SENSOR comment to be ASCOM Alpaca Sensor Type: but got %v", sensor.Comment)
+	}
+}
+
+func TestCompileFITSHeaderParseDate(t *testing.T) {
+	var header = NewFITSHeader(2, 600, 800)
+
+	values, names := GetRegexSubValuesAndSubNames([]byte("DATE-OBS= '2020-01-01T00:00:00.000' / Observation Start Time UTC"))
+
+	err := header.ParseLine(names, values)
+
+	if err != nil {
+		t.Errorf("CompileFITSHeaderParseDate() expected err to be nil: got %v, want %v", err, nil)
+	}
+
+	date := header.Strings["DATE-OBS"]
+
+	if date.Value != "2020-01-01T00:00:00.000" {
+		t.Errorf("CompileFITSHeaderParseLine() expected DATE-OBS to be true: but got %v", date.Value)
+	}
+
+	if date.Comment != "Observation Start Time UTC" {
+		t.Errorf("CompileFITSHeaderParseLine() expected DATE-OBS comment to be Observation Start Time UTC: but got %v", date.Comment)
+	}
+}

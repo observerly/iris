@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"io"
 	"regexp"
+	"strconv"
 	"strings"
+	"time"
 )
 
 // Regular expression parser for FITS header lines:
@@ -148,6 +150,141 @@ func (h *FITSHeader) WriteToBuffer(buf *bytes.Buffer) (*bytes.Buffer, error) {
 	}
 
 	return buf, nil
+}
+
+// Reads a FITS header line by line and returns a FITSHeader struct
+func (h *FITSHeader) ParseLine(subNames []string, subValues [][]byte) error {
+	// The KEY will always be a string of maximum 8 characters:
+	key := ""
+
+	// The COMMENT will always be a string of maximum 47 characters:
+	comment := ""
+
+	value := interface{}(nil)
+
+	// Ignore index 0 which is the whole line:
+	for i := 1; i < len(subNames); i++ {
+		if subValues[i] != nil && len(subNames[i]) == 1 {
+			switch c := subNames[i][0]; c {
+
+			// End of header line:
+			case byte('E'):
+				h.End = true
+
+			// Comment line:
+			case byte('C'):
+				h.Comments = append(h.Comments, string(subValues[i]))
+
+			// History line:
+			case byte('H'):
+				h.History = append(h.History, string(subValues[i]))
+
+			// Keyword line:
+			case byte('k'): // Keyword line
+				key = strings.TrimSpace(string(subValues[i]))
+
+			// Boolean value line:
+			case byte('b'):
+				if len(subValues[i]) > 0 {
+					v := subValues[i][0]
+					value = v == byte('t') || v == byte('T')
+				}
+
+			// Integer value line:
+			case byte('i'):
+				v, err := strconv.ParseInt(string(subValues[i]), 10, 64)
+				if err != nil {
+					return err
+				}
+				value = v
+
+			// Float value line:
+			case byte('f'):
+				v, err := strconv.ParseFloat(string(subValues[i]), 64)
+				if err != nil {
+					return err
+				}
+				value = v
+
+			// String value line:
+			case byte('s'):
+				value = strings.TrimSpace(string(subValues[i]))
+
+			// Date-like string value line:
+			case byte('d'): // date
+				d, err := time.Parse(time.RFC3339, strings.TrimSpace(string(subValues[i])))
+
+				if err == nil {
+					value = d
+				}
+
+			// Comment
+			case byte('c'):
+				comment = strings.TrimSpace(strings.TrimSpace(string(subValues[i])))
+
+			// The defauly case where we can't parse the line:
+			default:
+				return fmt.Errorf("FITSHeader.ParseLine: unknown line type: %s", string(subNames[i]))
+			}
+		}
+	}
+
+	// Check if value is a boolean:
+	if v, ok := value.(bool); ok {
+		h.Bools[key] = struct {
+			Value   bool
+			Comment string
+		}{
+			Value:   v,
+			Comment: comment,
+		}
+	}
+
+	// Check if value is an integer:
+	if v, ok := value.(int64); ok {
+		h.Ints[key] = struct {
+			Value   int32
+			Comment string
+		}{
+			Value:   int32(v),
+			Comment: comment,
+		}
+	}
+
+	// Check if value is a float:
+	if v, ok := value.(float64); ok {
+		h.Floats[key] = struct {
+			Value   float32
+			Comment string
+		}{
+			Value:   float32(v),
+			Comment: comment,
+		}
+	}
+
+	// Check if value is a string:
+	if v, ok := value.(string); ok {
+		h.Strings[key] = struct {
+			Value   string
+			Comment string
+		}{
+			Value:   v,
+			Comment: comment,
+		}
+	}
+
+	// Check if value is a date:
+	if v, ok := value.(time.Time); ok {
+		h.Dates[key] = struct {
+			Value   string
+			Comment string
+		}{
+			Value:   v.Format(time.RFC3339),
+			Comment: comment,
+		}
+	}
+
+	return nil
 }
 
 // Writes a FITS header boolean T/F value
