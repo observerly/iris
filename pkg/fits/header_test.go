@@ -2,6 +2,7 @@ package fits
 
 import (
 	"bytes"
+	"os"
 	"strconv"
 	"strings"
 	"testing"
@@ -527,5 +528,62 @@ func TestCompileFITSHeaderParseDate(t *testing.T) {
 
 	if date.Comment != "Observation Start Time UTC" {
 		t.Errorf("CompileFITSHeaderParseLine() expected DATE-OBS comment to be Observation Start Time UTC: but got %v", date.Comment)
+	}
+}
+
+func TestReadHeaderFromFile(t *testing.T) {
+	// Attempt to open the file from the given filename:
+	file, err := os.Open("../../samples/noise16.fits")
+
+	if err != nil {
+		t.Errorf("ReadHeaderFromFile() expected err to be nil: got %v, want %v", err, nil)
+	}
+
+	// Defer closing the file:
+	defer file.Close()
+
+	// Create a new FITS header:
+	h := NewFITSHeader(2, 1, 1)
+
+	// Read Header:
+	err = h.Read(file)
+
+	if err != nil {
+		t.Errorf("ReadHeaderFromFile() expected err to be nil: got %v, want %v", err, nil)
+	}
+
+	// Check that the mandatory SIMPLE header value exists as per FITS standard:
+	if !h.Bools["SIMPLE"].Value {
+		t.Errorf("ReadHeaderFromFile() expected SIMPLE to be true: got %v, want %v", h.Bools["SIMPLE"].Value, true)
+	}
+
+	// Check that the mandatory BITPIX header value exists as per FITS standard:
+	if h.Ints["BITPIX"].Value != -32 {
+		t.Errorf("ReadHeaderFromFile() expected BITPIX to be -32: got %v, want %v", h.Ints["BITPIX"].Value, -32)
+	}
+
+	// Check that the mandatory NAXIS header value exists as per FITS standard:
+	if h.Ints["NAXIS"].Value != 2 {
+		t.Errorf("ReadHeaderFromFile() expected NAXIS to be 2: got %v, want %v", h.Ints["NAXIS"].Value, 2)
+	}
+
+	// Check that the mandatory NAXIS1 header value exists as per FITS standard:
+	if h.Ints["NAXIS1"].Value != 1463 {
+		t.Errorf("ReadHeaderFromFile() expected NAXIS1 to be 600: got %v, want %v", h.Ints["NAXIS1"].Value, 600)
+	}
+
+	// Check that the mandatory NAXIS2 header value exists as per FITS standard:
+	if h.Ints["NAXIS2"].Value != 1168 {
+		t.Errorf("ReadHeaderFromFile() expected NAXIS2 to be 800: got %v, want %v", h.Ints["NAXIS2"].Value, 800)
+	}
+
+	// Check that we have parsed to the END of the header:
+	if !h.End {
+		t.Errorf("ReadHeaderFromFile() expected END to be true: but got %v", h.End)
+	}
+
+	// Check that what we have parsed is divisble by 2880 bytes:
+	if h.Length%2880 != 0 {
+		t.Errorf("ReadHeaderFromFile() expected Length to be divisible by 2880: but got %v", h.Length)
 	}
 }

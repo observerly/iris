@@ -119,6 +119,39 @@ func NewFITSHeader(naxis int32, naxis1 int32, naxis2 int32) FITSHeader {
 	return h
 }
 
+func (h *FITSHeader) Read(r io.Reader) error {
+	block := make([]byte, 2880)
+
+	for h.Length = 0; !h.End; {
+		// Read the next 2880 byte block:
+		bytesRead, err := io.ReadFull(r, block)
+
+		if err != nil || bytesRead != 2880 {
+			return err
+		}
+
+		// Increment the header length by the bytes block size:
+		h.Length += int32(bytesRead)
+
+		// Parse the header block by block:
+		for n := 0; n < 2880/80 && !h.End; n++ {
+			line := block[n*80 : (n+1)*80]
+
+			values := re.FindSubmatch(line)
+
+			if len(values) == 0 || values == nil {
+				return fmt.Errorf("invalid FITS header line: %s", line)
+			}
+
+			names := re.SubexpNames()
+
+			h.ParseLine(names, values)
+		}
+	}
+
+	return nil
+}
+
 /*
   Writes a FITS header according to the FITS standard to output bytes buffer
   @see https://fits.gsfc.nasa.gov/standard40/fits_standard40aa-le.pdf
