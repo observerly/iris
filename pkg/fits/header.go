@@ -28,23 +28,22 @@ type FITSHeaderFloat struct {
 	Comment string
 }
 
+type FITSHeaderString struct {
+	Value   string
+	Comment string
+}
+
 // FITS Header struct:
 type FITSHeader struct {
-	Bitpix  int32
-	Naxis   int32
-	Naxis1  int32
-	Naxis2  int32
-	Bools   map[string]FITSHeaderBool
-	Ints    map[string]FITSHeaderInt
-	Floats  map[string]FITSHeaderFloat
-	Strings map[string]struct {
-		Value   string
-		Comment string
-	}
-	Dates map[string]struct {
-		Value   string
-		Comment string
-	}
+	Bitpix   int32
+	Naxis    int32
+	Naxis1   int32
+	Naxis2   int32
+	Bools    map[string]FITSHeaderBool
+	Ints     map[string]FITSHeaderInt
+	Floats   map[string]FITSHeaderFloat
+	Strings  map[string]FITSHeaderString
+	Dates    map[string]FITSHeaderString
 	Comments []string
 	History  []string
 	End      bool
@@ -54,17 +53,11 @@ type FITSHeader struct {
 // Create a new instance of FITS header:
 func NewFITSHeader(naxis int32, naxis1 int32, naxis2 int32) FITSHeader {
 	h := FITSHeader{
-		Bools:  make(map[string]FITSHeaderBool),
-		Ints:   make(map[string]FITSHeaderInt),
-		Floats: make(map[string]FITSHeaderFloat),
-		Strings: make(map[string]struct {
-			Value   string
-			Comment string
-		}),
-		Dates: make(map[string]struct {
-			Value   string
-			Comment string
-		}),
+		Bools:    make(map[string]FITSHeaderBool),
+		Ints:     make(map[string]FITSHeaderInt),
+		Floats:   make(map[string]FITSHeaderFloat),
+		Strings:  make(map[string]FITSHeaderString),
+		Dates:    make(map[string]FITSHeaderString),
 		Comments: make([]string, 0),
 		History:  make([]string, 0),
 		End:      false,
