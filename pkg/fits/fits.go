@@ -199,3 +199,8 @@ func writeFloat32ArrayToBuffer(buf *bytes.Buffer, data []float32) (*bytes.Buffer
 
 	return buf, nil
 }
+
+// Reads FITS binary body float32 data in network byte order from buffer
+func readFloat32ArrayFromBuffer(buf *bytes.Buffer, data []float32) error {
+	return binary.Read(buf, binary.BigEndian, data)
+}
