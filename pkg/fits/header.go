@@ -81,6 +81,38 @@ func NewFITSHeader(naxis int32, naxis1 int32, naxis2 int32) FITSHeader {
 
 	h.Naxis2 = naxis2
 
+	h.Ints["BITPIX"] = struct {
+		Value   int32
+		Comment string
+	}{
+		Value:   h.Bitpix,
+		Comment: "Number of bits per data pixel",
+	}
+
+	h.Ints["NAXIS"] = struct {
+		Value   int32
+		Comment string
+	}{
+		Value:   h.Naxis,
+		Comment: "[1] Number of array dimensions",
+	}
+
+	h.Ints["NAXIS1"] = struct {
+		Value   int32
+		Comment string
+	}{
+		Value:   h.Naxis1,
+		Comment: "[1] Length of data axis 1",
+	}
+
+	h.Ints["NAXIS2"] = struct {
+		Value   int32
+		Comment string
+	}{
+		Value:   h.Naxis2,
+		Comment: "[1] Length of data axis 2",
+	}
+
 	h.Strings["XTENSION"] = struct {
 		Value   string
 		Comment string
