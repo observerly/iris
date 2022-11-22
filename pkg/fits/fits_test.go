@@ -333,7 +333,7 @@ func TestNewFITSImageFrom2DDataWriteFloatData(t *testing.T) {
 	}
 }
 
-func TestNEWFITSImageFrom2DDataWrite(t *testing.T) {
+func TestNewFITSImageFrom2DDataWrite(t *testing.T) {
 	data, bounds := GetTestDataFromImage()
 
 	var fit = NewFITSImageFrom2DData(data, 2, int32(bounds.Dx()), int32(bounds.Dy()), 65535)
@@ -448,5 +448,48 @@ func TestNewFITSRead(t *testing.T) {
 
 	if !fit.Header.End {
 		t.Errorf("Expected the End to be false, but got %t", fit.Header.End)
+	}
+}
+
+func TestNewFITSFromFile(t *testing.T) {
+	var fit = NewFITSImage(2, 1, 1, 65535)
+
+	if fit == nil {
+		t.Errorf("Expected the FITS image to be created, but got nil")
+	}
+
+	err := fit.ReadFromFile("../../samples/noise16.fits")
+
+	if err != nil {
+		t.Errorf("Error reading image: %s", err)
+	}
+
+	f, err := os.OpenFile("noise16.fits", os.O_WRONLY|os.O_CREATE, 0644)
+
+	if err != nil {
+		t.Errorf("Error opening image: %s", err)
+	}
+
+	defer f.Close()
+
+	defer func() {
+		if err := f.Close(); err != nil {
+			t.Errorf("Expected the image buffer to be saved successfully, but got %q", err)
+		}
+
+		// Clean up the file after we have finished with the test:
+		os.Remove("noise16.fits")
+	}()
+
+	buf, err := fit.WriteToBuffer()
+
+	if err != nil {
+		t.Errorf("Error writing image: %s", err)
+	}
+
+	_, err = f.Write(buf.Bytes())
+
+	if err != nil {
+		t.Errorf("Error writing image: %s", err)
 	}
 }

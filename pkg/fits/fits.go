@@ -6,6 +6,8 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"os"
+	"path"
 	"strings"
 
 	stats "github.com/observerly/iris/pkg/statistics"
@@ -150,6 +152,28 @@ func NewFITSImageFromImage(img *FITSImage) *FITSImage {
 		Exposure: img.Exposure,
 		Stats:    img.Stats,
 	}
+}
+
+func (f *FITSImage) ReadFromFile(fp string) error {
+	// Check that the filename is not empty:
+	if fp == "" {
+		return fmt.Errorf("the filepath provided is empty")
+	}
+
+	// Attempt to open the file from the given filepath:
+	file, err := os.Open(fp)
+
+	if err != nil {
+		return err
+	}
+
+	// Defer closing the file:
+	defer file.Close()
+
+	// Set the filename:
+	f.Filename = path.Base(fp)
+
+	return f.Read(file)
 }
 
 // Read the FITS image from the given file.
