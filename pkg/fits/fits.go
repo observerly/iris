@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	stats "github.com/observerly/iris/pkg/statistics"
+	"github.com/observerly/iris/pkg/utils"
 )
 
 const FITS_STANDARD = "FITS Standard 4.0"
@@ -51,14 +52,8 @@ func NewFITSImage(naxis int32, naxis1 int32, naxis2 int32, adu int32) *FITSImage
 func NewFITSImageFrom2DData(ex [][]uint32, naxis int32, naxis1 int32, naxis2 int32, adu int32) *FITSImage {
 	pixels := naxis1 * naxis2
 
-	data := make([]float32, 0)
-
 	// Flatten the 2D Colour Filter Array array into a 1D array:
-	for _, row := range ex {
-		for _, col := range row {
-			data = append(data, float32(col))
-		}
-	}
+	data := utils.Flatten2DUInt32Array(ex)
 
 	if len(data) == 0 {
 		data = make([]float32, pixels)
