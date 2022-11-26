@@ -282,6 +282,7 @@ func TestNewFITSRead(t *testing.T) {
 
 	if fit == nil {
 		t.Errorf("Expected the FITS image to be created, but got nil")
+		return
 	}
 
 	if fit.Bitpix != -32 {
