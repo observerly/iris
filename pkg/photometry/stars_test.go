@@ -1,8 +1,49 @@
 package photometry
 
 import (
+	"image"
+	"image/jpeg"
+	"os"
 	"testing"
+
+	stats "github.com/observerly/iris/pkg/statistics"
+	"github.com/observerly/iris/pkg/utils"
 )
+
+func GetTestDataFromImage() ([][]uint32, image.Rectangle) {
+	f, err := os.Open("../../images/noise16.jpeg")
+
+	if err != nil {
+		panic(err)
+	}
+
+	defer f.Close()
+
+	img, err := jpeg.Decode(f)
+
+	if err != nil {
+		panic(err)
+	}
+
+	bounds := img.Bounds()
+
+	data := make([][]uint32, bounds.Dx())
+
+	for y := 0; y < bounds.Dy(); y++ {
+		row := make([]uint32, bounds.Dx())
+		data[y] = row
+	}
+
+	for j := 0; j < bounds.Dy(); j++ {
+		for i := 0; i < bounds.Dx(); i++ {
+			r, g, b, _ := img.At(i, j).RGBA()
+			lum := 0.299*float64(r) + 0.587*float64(g) + 0.114*float64(b)
+			data[j][i] = uint32(lum)
+		}
+	}
+
+	return data, bounds
+}
 
 func TestNewStarsExtractor(t *testing.T) {
 	var ex = [][]uint32{
@@ -105,5 +146,69 @@ func TestNewGetBrightPixels(t *testing.T) {
 
 	if len(stars) != 24 {
 		t.Error("Expected 24 bright pixels, got ", len(stars))
+	}
+}
+
+func TestNewGetBrightPixelsFrom2DData(t *testing.T) {
+	data, bounds := GetTestDataFromImage()
+
+	xs := bounds.Dx()
+
+	ys := bounds.Dy()
+
+	d := utils.Flatten2DUInt32Array(data)
+
+	radius := float32(16.0)
+
+	sigma := float32(8.0)
+
+	s := NewStarsExtractor(d, xs, ys, radius, 65535)
+
+	st := stats.NewStats(d, 65535, xs)
+
+	location, scale := st.FastApproxSigmaClippedMedianAndQn()
+
+	s.Threshold = location + scale*sigma
+
+	stars := s.GetBrightPixels()
+
+	if len(stars) != 2084 {
+		t.Error("Expected 2084 bright pixels, got ", len(stars))
+	}
+}
+
+func TestNewRejectBadPixelsFrom2DData(t *testing.T) {
+	data, bounds := GetTestDataFromImage()
+
+	xs := bounds.Dx()
+
+	ys := bounds.Dy()
+
+	d := utils.Flatten2DUInt32Array(data)
+
+	radius := float32(16.0)
+
+	sigma := float32(8.0)
+
+	s := NewStarsExtractor(d, xs, ys, radius, 65535)
+
+	s.Sigma = sigma
+
+	st := stats.NewStats(d, 65535, xs)
+
+	location, scale := st.FastApproxSigmaClippedMedianAndQn()
+
+	s.Threshold = location + scale*sigma
+
+	s.Stars = s.GetBrightPixels()
+
+	stars := s.RejectBadPixels()
+
+	if len(stars) > 2084 {
+		t.Error("Expected less than 2084 bright pixels, got ", len(stars))
+	}
+
+	if len(stars) < 2030 || len(stars) > 2035 {
+		t.Error("Expected to reject about 50 bad pixels, got ", len(stars))
 	}
 }
