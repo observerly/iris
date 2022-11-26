@@ -49,6 +49,10 @@ func (s *StarsExtractor) GetBrightPixels() []Star {
 	return stars
 }
 
+func (s *StarsExtractor) RejectBadPixels() []Star {
+	return rejectBadPixels(s.Stars, s.Data, int32(s.Width), s.Sigma, s.ADU)
+}
+
 /**
 	gatherNeighbourhoodAndCalcMedian()
 
