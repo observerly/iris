@@ -2,6 +2,7 @@ package photometry
 
 import (
 	stats "github.com/observerly/iris/pkg/statistics"
+	"github.com/observerly/iris/pkg/utils"
 )
 
 type Star struct {
@@ -114,4 +115,55 @@ func findBrightPixels(data []float32, width int32, threshold float32, radius int
 	}
 
 	return stars
+}
+
+/**
+	rejectBadPixels()
+
+	Reject bad pixels which differ from the local median by more than sigma times the
+	estimated standard deviation.
+
+	Modifies the given stars array values, and returns shortened slice.
+**/
+func rejectBadPixels(stars []Star, data []float32, width int32, sigma float32, adu int32) []Star {
+	// Create a radial mask for local 9-pixel neighborhood:
+	mask := utils.CreateRadialPixelMask(int32(width), 1.5)
+
+	buffer := make([]float32, len(mask))
+
+	// Estimate standard deviation of pixels from local neighborhood median based on random 1% of pixels
+	numSamples := len(data) / 100
+
+	sample := make([]float32, numSamples)
+
+	rng := utils.RNG{}
+
+	for i := 0; i < numSamples; i++ {
+		index := int32(rng.Uint32n(uint32(len(data))))
+
+		median := gatherNeighbourhoodAndCalcMedian(data, index, mask, buffer, adu)
+
+		sample[i] = data[index] - median
+	}
+
+	s := stats.NewStats(sample, adu, numSamples)
+
+	// Filter out star candidates more than sigma standard deviations away from the estimated local median
+	threshold := s.StdDev * sigma
+
+	remainingStars := 0
+
+	for _, star := range stars {
+		median := gatherNeighbourhoodAndCalcMedian(data, star.Index, mask, buffer, adu)
+
+		diff := data[star.Index] - median
+
+		// Accept star if it is less than sigma standard deviations away from the local median:
+		if diff < threshold && -diff < threshold {
+			stars[remainingStars] = star
+			remainingStars++
+		}
+	}
+
+	return stars[:remainingStars]
 }
