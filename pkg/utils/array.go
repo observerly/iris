@@ -83,3 +83,20 @@ func MeanFloat32Arrays(a [][]float32) ([]float32, error) {
 
 	return m, nil
 }
+
+/**
+	Flatten2DUInt32Array
+
+	Flattens a 2D array of uint32 into a 1D array of float32.
+**/
+func Flatten2DUInt32Array(a [][]uint32) []float32 {
+	f := make([]float32, 0)
+
+	for _, j := range a {
+		for _, i := range j {
+			f = append(f, float32(i))
+		}
+	}
+
+	return f
+}
