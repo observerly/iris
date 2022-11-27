@@ -54,6 +54,10 @@ func (s *StarsExtractor) RejectBadPixels() []Star {
 	return rejectBadPixels(s.Stars, s.Data, int32(s.Width), s.Sigma, s.ADU)
 }
 
+func (s *StarsExtractor) FilterOverlappingPixels() []Star {
+	return filterOverlappingPixels(s.Stars, int32(s.Width), int32(s.Height), int32(s.Radius))
+}
+
 /**
 	gatherNeighbourhoodAndCalcMedian()
 
