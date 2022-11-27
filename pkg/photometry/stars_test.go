@@ -212,3 +212,45 @@ func TestNewRejectBadPixelsFrom2DData(t *testing.T) {
 		t.Error("Expected to reject about 50 bad pixels, got ", len(stars))
 	}
 }
+
+func TestNewFilterOverlappingStarsFrom2DData(t *testing.T) {
+	data, bounds := GetTestDataFromImage()
+
+	xs := bounds.Dx()
+
+	ys := bounds.Dy()
+
+	d := utils.Flatten2DUInt32Array(data)
+
+	radius := float32(16.0)
+
+	sigma := float32(8.0)
+
+	s := NewStarsExtractor(d, xs, ys, radius, 65535)
+
+	s.Sigma = sigma
+
+	st := stats.NewStats(d, 65535, xs)
+
+	location, scale := st.FastApproxSigmaClippedMedianAndQn()
+
+	s.Threshold = location + scale*sigma
+
+	s.Stars = s.GetBrightPixels()
+
+	s.Stars = s.RejectBadPixels()
+
+	stars := s.FilterOverlappingPixels()
+
+	if len(stars) > 2084 {
+		t.Error("Expected less than 2084 bright pixels, got ", len(stars))
+	}
+
+	if len(stars) > 2035 {
+		t.Error("Expected to filter out a number of overlapping stars", len(stars))
+	}
+
+	if len(stars) >= 230 {
+		t.Error("Expected to filter out ~1860 number of overlapping stars, but filtered out ", 2084-len(stars))
+	}
+}
