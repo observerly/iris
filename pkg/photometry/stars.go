@@ -1,6 +1,8 @@
 package photometry
 
 import (
+	"math"
+
 	stats "github.com/observerly/iris/pkg/statistics"
 	"github.com/observerly/iris/pkg/utils"
 )
@@ -255,4 +257,83 @@ forAllStars:
 	slis = nil
 
 	return stars[:remainingStars]
+}
+
+/**
+	shiftToCenterOfMass
+
+	Shift the star positions to the center of mass of the star.
+
+	Modifies the given stars array values in place.
+**/
+func shiftToCenterOfMass(stars []Star, data []float32, xs int32, threshold float32, radius int32) []Star {
+	// For all stars, shift to center of mass:
+	for i, s := range stars {
+		// until the shifts are below 0.01 pixel (i.e. 0.0001 squared error), or max rounds reached
+		shiftSquared := float32(math.MaxFloat32)
+		for round := int32(0); shiftSquared > 0.0001 && round < 10; round++ {
+			// calculate star mass and first moments from current x,y
+			xMoment, yMoment := float32(0), float32(0)
+
+			mass := float32(0)
+
+			for y := -radius; y <= radius; y++ {
+				for x := -radius; x <= radius; x++ {
+					index := s.Index + y*int32(xs) + x
+
+					value := float32(0)
+
+					if index >= 0 && int(index) < len(data) {
+						value = data[index] - threshold
+						if value < 0 {
+							value = 0
+						}
+					}
+
+					xMoment += float32(x) * value
+					yMoment += float32(y) * value
+					mass += value
+				}
+			}
+
+			// Update x and y from moments over mass
+			x := s.Index % int32(xs)
+			y := s.Index / int32(xs)
+
+			if mass == 0.0 {
+				mass = 1e-8
+			}
+
+			deltaX := (xMoment) / mass
+			deltaY := (yMoment) / mass
+
+			newX := float32(x) + deltaX
+			newY := float32(y) + deltaY
+
+			preciseDeltaX := newX - s.X
+			preciseDeltaY := newY - s.Y
+
+			shiftSquared = preciseDeltaX*preciseDeltaX + preciseDeltaY*preciseDeltaY
+
+			index := s.Index + xs*int32(deltaY+0.5) + int32(deltaX+0.5)
+
+			value := float32(0)
+
+			if index >= 0 && int(index) < len(data) {
+				value = float32(data[index])
+			}
+
+			s = Star{
+				Index:     index,
+				Value:     value,
+				X:         float32(newX),
+				Y:         float32(newY),
+				Intensity: float32(mass),
+			}
+
+			stars[i] = s
+		}
+	}
+
+	return stars
 }
