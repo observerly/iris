@@ -172,3 +172,83 @@ func rejectBadPixels(stars []Star, data []float32, xs int32, sigma float32, adu 
 
 	return stars[:remainingStars]
 }
+
+func filterOverlappingPixels(stars []Star, xs int32, ys int32, radius int32) []Star {
+	// To avoid quadratic search effort, we bin the stars into a 2D grid.
+	binSize := int32(256)
+
+	xBins := (xs + binSize - 1) / binSize
+	yBins := (ys + binSize - 1) / binSize
+
+	// Each bin is a linked list of stars, sorted by descending mass
+	bins := make([]*StarLink, int(xBins*yBins))
+	slis := make([]StarLink, ((len(stars)+1023)/1024)*1024) // use tiered sizing to help the allocator
+
+	r2 := radius * radius
+
+	remainingStars := 0
+
+	// For all stars, filter list in place
+forAllStars:
+	for _, s := range stars {
+		// Find grid cell of this star
+		xCell, yCell := int32(s.X+0.5)/binSize, int32(s.Y+0.5)/binSize
+
+		// For this grid cell and all adjacent cells
+		for dy := int32(-1); dy <= 1; dy++ {
+			if yCell+dy < 0 || yCell+dy >= yBins {
+				continue
+			}
+
+			for dx := int32(-1); dx <= 1; dx++ {
+				if xCell+dx < 0 || xCell+dx >= xBins {
+					continue
+				}
+
+				// Cell index:
+				ci := (xCell + dx) + (yCell+dy)*xBins
+
+				// For all prior stars in that cell
+				for ptr := bins[ci]; ptr != nil; ptr = ptr.Next {
+					s2 := ptr.Star
+					xDist := s.X - s2.X
+					yDist := s.Y - s2.Y
+					sqDist := int32(xDist*xDist + yDist*yDist + 0.5)
+
+					// Skip current star if it's close to a prior star
+					if sqDist <= r2 {
+						continue forAllStars
+					}
+				}
+			}
+		}
+
+		// Retain star for output
+		stars[remainingStars] = s
+
+		// Insert star into grid cell
+		slis[remainingStars] = StarLink{&(stars[remainingStars]), nil}
+
+		// Cell index:
+		ci := xCell + yCell*xBins
+
+		ptr := bins[ci]
+
+		if ptr == nil {
+			bins[ci] = &(slis[remainingStars])
+		} else {
+			for ptr.Next != nil {
+				ptr = ptr.Next
+			}
+
+			ptr.Next = &(slis[remainingStars])
+		}
+
+		remainingStars++
+	}
+
+	bins = nil
+	slis = nil
+
+	return stars[:remainingStars]
+}
