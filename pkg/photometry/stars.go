@@ -84,7 +84,7 @@ func gatherNeighbourhoodAndCalcMedian(data []float32, index int32, mask []int32,
 
 	Uses central pixel value as initial mass, 1 as initial HFR.
 **/
-func findBrightPixels(data []float32, width int32, threshold float32, radius int32) []Star {
+func findBrightPixels(data []float32, xs int32, threshold float32, radius int32) []Star {
 	// Roughly, we'll locate 100 bright stars []Star{}
 	stars := make([]Star, 0)
 
@@ -93,8 +93,8 @@ func findBrightPixels(data []float32, width int32, threshold float32, radius int
 			is := Star{
 				Index:     int32(i),
 				Value:     v,
-				X:         float32(int32(i) % width),
-				Y:         float32(int32(i) / width),
+				X:         float32(int32(i) % xs),
+				Y:         float32(int32(i) / xs),
 				Intensity: v,
 				HFR:       1,
 			}
@@ -125,9 +125,9 @@ func findBrightPixels(data []float32, width int32, threshold float32, radius int
 
 	Modifies the given stars array values, and returns shortened slice.
 **/
-func rejectBadPixels(stars []Star, data []float32, width int32, sigma float32, adu int32) []Star {
+func rejectBadPixels(stars []Star, data []float32, xs int32, sigma float32, adu int32) []Star {
 	// Create a radial mask for local 9-pixel neighborhood:
-	mask := utils.CreateRadialPixelMask(int32(width), 1.5)
+	mask := utils.CreateRadialPixelMask(int32(xs), 1.5)
 
 	buffer := make([]float32, len(mask))
 
