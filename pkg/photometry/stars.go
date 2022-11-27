@@ -14,6 +14,11 @@ type Star struct {
 	HFR       float32 // Half-Flux Radius of the star, in pixels
 }
 
+type StarLink struct {
+	Star *Star
+	Next *StarLink
+}
+
 type StarsExtractor struct {
 	Width     int
 	Height    int
