@@ -60,6 +60,10 @@ func (s *StarsExtractor) FilterOverlappingPixels() []Star {
 	return filterOverlappingPixels(s.Stars, int32(s.Width), int32(s.Height), int32(s.Radius))
 }
 
+func (s *StarsExtractor) ShiftToCenterOfMass() []Star {
+	return shiftToCenterOfMass(s.Stars, s.Data, int32(s.Width), s.Threshold, int32(s.Radius))
+}
+
 /**
 	gatherNeighbourhoodAndCalcMedian()
 
