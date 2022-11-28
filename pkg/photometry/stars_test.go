@@ -302,3 +302,59 @@ func TestNewShiftToBrightestPixelStarsFrom2DData(t *testing.T) {
 		t.Error("Expected to shift all stars, but shifted ", len(stars))
 	}
 }
+
+func TestNewExtractAndFilterHalfFluxRadiusStarsFrom2DData(t *testing.T) {
+	data, bounds := GetTestDataFromImage()
+
+	xs := bounds.Dx()
+
+	ys := bounds.Dy()
+
+	d := utils.Flatten2DUInt32Array(data)
+
+	radius := float32(16.0)
+
+	sigma := float32(8.0)
+
+	s := NewStarsExtractor(d, xs, ys, radius, 65535)
+
+	s.Sigma = sigma
+
+	st := stats.NewStats(d, 65535, xs)
+
+	location, scale := st.FastApproxSigmaClippedMedianAndQn()
+
+	s.Threshold = location + scale*sigma
+
+	s.Stars = s.GetBrightPixels()
+
+	s.Stars = s.RejectBadPixels()
+
+	s.Stars = s.FilterOverlappingPixels()
+
+	s.Stars = s.ShiftToCenterOfMass()
+
+	s.Stars = s.FilterOverlappingPixels()
+
+	stars := s.ExtractAndFilterHalfFluxRadius(location, 2.0)
+
+	if len(stars) > 2084 {
+		t.Error("Expected less than 2084 bright pixels, got ", len(stars))
+	}
+
+	if len(stars) > 2035 {
+		t.Error("Expected to filter out a number of overlapping stars", len(stars))
+	}
+
+	if len(stars) >= 230 {
+		t.Error("Expected to filter out ~1860 number of overlapping stars, but filtered out ", 2084-len(stars))
+	}
+
+	if s.HFR == 0 {
+		t.Error("Expected to calculate HFR, but got ", s.HFR)
+	}
+
+	if s.HFR > 8.0 {
+		t.Error("Expected to calculate HFR less than 2.0, but got ", s.HFR)
+	}
+}
