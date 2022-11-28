@@ -341,3 +341,116 @@ func shiftToCenterOfMass(stars []Star, data []float32, xs int32, threshold float
 
 	return stars
 }
+
+/**
+	extractAndFilterHalfFluxRadius
+
+	Extract the half-flux radius (HFR) of each star, and filter out implausible candidates.
+
+	Returns a new list of stars, each enriched with the HFR field and updated mass.
+**/
+func extractAndFilterHalfFluxRadius(stars []Star, data []float32, xs int32, radius, location, starInOut float32) (res []Star, avgHFR float32) {
+	remainingStars := 0
+
+	avgHFR = float32(0)
+
+	for _, s := range stars {
+		// Calculate mass, moment and HFR for star:
+		moment, mass, pixels := float32(0), float32(0), int32(0)
+
+		rad := int32(math.Ceil(float64(radius)))
+
+		distSqLimit := int32(math.Ceil(float64(radius+1e-8) * float64(radius+1e-8)))
+
+		for y := -rad; y <= rad; y++ {
+			for x := -rad; x <= rad; x++ {
+				distSq := x*x + y*y
+				if distSq > distSqLimit {
+					continue
+				}
+				distance := float32(math.Sqrt(float64(distSq)))
+
+				index := s.Index + y*xs + x
+
+				value := float32(0.0)
+
+				if index >= 0 && index < int32(len(data)) {
+					v := data[index] - location
+					if v > 0 {
+						value = v
+					}
+				}
+				moment += distance * value
+				mass += value
+				pixels++
+			}
+		}
+
+		if mass == 0.0 {
+			mass = 1e-8
+		}
+
+		hfr := float32(moment / mass)
+
+		// Sanity check results to avoid long lockups:
+		if hfr > radius {
+			continue
+		}
+
+		// Calculate mass inside HFR and number of inner pixels:
+		innerMass, innerPixels := float32(0), int32(0)
+
+		innerRad := int32(math.Ceil(float64(hfr)))
+
+		distSqLimit = int32(math.Ceil(float64(hfr * hfr)))
+
+		for y := -innerRad; y <= innerRad; y++ {
+			for x := -innerRad; x <= innerRad; x++ {
+				distSq := x*x + y*y
+
+				if distSq > distSqLimit {
+					continue
+				}
+
+				index := s.Index + y*xs + x
+
+				value := float32(0.0)
+
+				if index >= 0 && index < int32(len(data)) {
+					v := data[index] - location
+					if v > 0 {
+						value = v
+					}
+				}
+				innerMass += value
+				innerPixels++
+			}
+		}
+
+		// Plausibility check i.e., is the average inner brightness significantly higher than outside?
+		outerMass := mass - innerMass
+
+		outerPixels := pixels - innerPixels
+
+		if innerMass*float32(outerPixels) <= starInOut*outerMass*float32(innerPixels) {
+			continue
+		}
+
+		// Enrich star with HFR and mass information:
+		s.HFR = hfr
+
+		s.Intensity = mass
+
+		stars[remainingStars] = s
+
+		remainingStars++
+
+		// Add to the average HFR:
+		avgHFR += float32(hfr)
+	}
+
+	// Calculate the average HFR:
+	avgHFR /= float32(remainingStars)
+	// Return the remaining stars and the average HFR:
+	return stars[:remainingStars], avgHFR
+}
