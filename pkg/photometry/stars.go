@@ -64,6 +64,14 @@ func (s *StarsExtractor) ShiftToCenterOfMass() []Star {
 	return shiftToCenterOfMass(s.Stars, s.Data, int32(s.Width), s.Threshold, int32(s.Radius))
 }
 
+func (s *StarsExtractor) ExtractAndFilterHalfFluxRadius(location float32, starInOut float32) []Star {
+	stars, HFR := extractAndFilterHalfFluxRadius(s.Stars, s.Data, int32(s.Width), s.Radius, location, starInOut)
+
+	s.HFR = HFR
+
+	return stars
+}
+
 /**
 	gatherNeighbourhoodAndCalcMedian()
 
