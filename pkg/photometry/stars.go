@@ -73,6 +73,44 @@ func (s *StarsExtractor) ExtractAndFilterHalfFluxRadius(location float32, starIn
 }
 
 /**
+	FindStars
+
+	Find stars in the data array, using the given threshold. sigma and radius.
+**/
+func (s *StarsExtractor) FindStars(stats *stats.Stats, sigma float32, starInOut float32) []Star {
+	// Set the global sigma:
+	s.Sigma = sigma
+
+	// Find the location and scale:
+	location, scale := stats.FastApproxSigmaClippedMedianAndQn()
+
+	s.Threshold = location + scale*sigma
+
+	s.Stars = s.GetBrightPixels()
+
+	s.Stars = s.RejectBadPixels()
+
+	s.Stars = s.FilterOverlappingPixels()
+
+	// Shift stars to their nearest center of mass (centroid position):
+	s.Stars = s.ShiftToCenterOfMass()
+
+	s.Stars = s.FilterOverlappingPixels()
+
+	// Remove implausible stars based on HFR, and return stars (updates s.HFR):
+	stars := s.ExtractAndFilterHalfFluxRadius(location, starInOut)
+
+	// Return a clone of the final shortlist of stars, so the longer original object can be reclaimed:
+	result := make([]Star, len(stars))
+
+	copy(result, stars)
+
+	stars = nil
+
+	return result
+}
+
+/**
 	gatherNeighbourhoodAndCalcMedian()
 
 	Applies an element-wise Median filter to the sparse data points provided by the indices,

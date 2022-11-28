@@ -3,6 +3,7 @@ package photometry
 import (
 	"image"
 	"image/jpeg"
+	"math"
 	"os"
 	"testing"
 
@@ -356,5 +357,49 @@ func TestNewExtractAndFilterHalfFluxRadiusStarsFrom2DData(t *testing.T) {
 
 	if s.HFR > 8.0 {
 		t.Error("Expected to calculate HFR less than 2.0, but got ", s.HFR)
+	}
+}
+
+func TestNewFindStarsFrom2DData(t *testing.T) {
+	data, bounds := GetTestDataFromImage()
+
+	xs := bounds.Dx()
+
+	ys := bounds.Dy()
+
+	d := utils.Flatten2DUInt32Array(data)
+
+	radius := float32(16.0)
+
+	sigma := float32(8.0)
+
+	s := NewStarsExtractor(d, xs, ys, radius, 65535)
+
+	st := stats.NewStats(d, 65535, xs)
+
+	stars := s.FindStars(st, sigma, 2.0)
+
+	if len(stars) > 2084 {
+		t.Error("Expected less than 2084 bright pixels, got ", len(stars))
+	}
+
+	if len(stars) > 2035 {
+		t.Error("Expected to filter out a number of overlapping stars", len(stars))
+	}
+
+	if len(stars) >= 230 {
+		t.Error("Expected to filter out ~1860 number of overlapping stars, but filtered out ", 2084-len(stars))
+	}
+
+	if s.HFR == 0 {
+		t.Error("Expected to calculate HFR, but got ", s.HFR)
+	}
+
+	if s.HFR > 8.0 {
+		t.Error("Expected to calculate HFR less than 2.0, but got ", s.HFR)
+	}
+
+	if math.Abs(float64(s.HFR-6.601836)) > 0.000001 {
+		t.Error("Expected to calculate HFR to an accuracy of 0.000001, but got ", s.HFR)
 	}
 }
