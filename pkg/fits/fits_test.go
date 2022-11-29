@@ -5,6 +5,7 @@ import (
 	"image"
 	"image/jpeg"
 	"io"
+	"math"
 	"os"
 	"testing"
 )
@@ -346,5 +347,33 @@ func TestNewFITSFromFile(t *testing.T) {
 
 	if err != nil {
 		t.Errorf("Error writing image: %s", err)
+	}
+}
+
+func TestNewFindStarsFrom2DData(t *testing.T) {
+	data, bounds := GetTestDataFromImage()
+
+	xs := bounds.Dx()
+
+	ys := bounds.Dy()
+
+	var fit = NewFITSImageFrom2DData(data, 2, int32(xs), int32(ys), 65535)
+
+	radius := float32(16.0)
+
+	sigma := float32(8.0)
+
+	hfr := fit.ExtractHFR(radius, sigma, 2.0)
+
+	if hfr == 0 {
+		t.Error("Expected to calculate HFR, but got ", hfr)
+	}
+
+	if hfr > 8.0 {
+		t.Error("Expected to calculate HFR less than 2.0, but got ", hfr)
+	}
+
+	if math.Abs(float64(hfr-6.601836)) > 0.000001 {
+		t.Error("Expected to calculate HFR to an accuracy of 0.000001, but got ", hfr)
 	}
 }

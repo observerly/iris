@@ -10,6 +10,7 @@ import (
 	"path"
 	"strings"
 
+	"github.com/observerly/iris/pkg/photometry"
 	stats "github.com/observerly/iris/pkg/statistics"
 	"github.com/observerly/iris/pkg/utils"
 )
@@ -85,6 +86,16 @@ func NewFITSImageFrom2DData(ex [][]uint32, naxis int32, naxis1 int32, naxis2 int
 		Exposure: 0,
 		Stats:    f.Stats,
 	}
+}
+
+func (f *FITSImage) ExtractHFR(radius float32, sigma float32, starInOut float32) float32 {
+	se := photometry.NewStarsExtractor(f.Data, int(f.Naxisn[0]), int(f.Naxisn[1]), radius, f.ADU)
+
+	se.FindStars(f.Stats, sigma, starInOut)
+
+	se.Stars = nil
+
+	return se.HFR
 }
 
 func (f *FITSImage) ReadFromFile(fp string) error {
