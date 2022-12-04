@@ -2,6 +2,7 @@ package palette
 
 import (
 	"fmt"
+	"sync"
 
 	"github.com/observerly/iris/pkg/utils"
 )
@@ -16,6 +17,85 @@ type Palette struct {
 	R    []PaletteChannel
 	G    []PaletteChannel
 	B    []PaletteChannel
+}
+
+/**
+	FromPalette takes a colour palette and returns the red, green and blue
+	channels as a slice of float32, which can be constructed into an image
+	or into FITS data.
+
+	@param p *Palette - the colour palette to construct the channels from
+	@returns []float32, []float32, []float32, error - the red, green and blue channels, and any error
+**/
+func FromPalette(p *Palette) (r, g, b []float32, err error) {
+	var wg sync.WaitGroup
+
+	var mu sync.Mutex
+
+	wg.Add(3)
+
+	R := make(chan []float32, 1)
+
+	G := make(chan []float32, 1)
+
+	B := make(chan []float32, 1)
+
+	errors := make(chan error, 3)
+
+	// Perform Combination of the Red Channel:
+	go func() {
+		mu.Lock()
+		defer mu.Unlock()
+		defer wg.Done()
+		// Combine the red channel:
+		r, err = combinePaletteChannel(p.R)
+
+		if err != nil {
+			errors <- err
+		}
+
+		R <- r
+	}()
+
+	// Perform Combination of the Green Channel:
+	go func() {
+		mu.Lock()
+		defer mu.Unlock()
+		defer wg.Done()
+		// Combine the green channel:
+		g, err = combinePaletteChannel(p.G)
+
+		if err != nil {
+			errors <- err
+		}
+
+		G <- g
+	}()
+
+	// Perform Combination of the Blue Channel:
+	go func() {
+		mu.Lock()
+		defer mu.Unlock()
+		defer wg.Done()
+		// Combine the blue channel:
+		b, err = combinePaletteChannel(p.B)
+
+		if err != nil {
+			errors <- err
+		}
+
+		B <- b
+	}()
+
+	go func() {
+		wg.Wait()
+		close(R)
+		close(G)
+		close(B)
+		close(errors)
+	}()
+
+	return <-R, <-G, <-B, <-errors
 }
 
 /**
