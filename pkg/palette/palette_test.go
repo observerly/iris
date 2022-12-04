@@ -106,3 +106,65 @@ func TestCombineBlueChannelSimple(t *testing.T) {
 		t.Errorf("expected 70 in red channel, got %v", b[2])
 	}
 }
+
+func TestFromPaletteSimple(t *testing.T) {
+	red := []PaletteChannel{
+		{
+			Data:     []float32{200, 200, 200},
+			Fraction: 0.6,
+		},
+		{
+			Data:     []float32{100, 100, 100},
+			Fraction: 0.4,
+		},
+	}
+
+	green := []PaletteChannel{
+		{
+			Data:     []float32{200, 200, 200},
+			Fraction: 0.6,
+		},
+		{
+			Data:     []float32{100, 100, 100},
+			Fraction: 0.4,
+		},
+	}
+
+	blue := []PaletteChannel{
+		{
+			Data:     []float32{200, 200, 200},
+			Fraction: 0.6,
+		},
+		{
+			Data:     []float32{100, 100, 100},
+			Fraction: 0.4,
+		},
+	}
+
+	r, _, _, err := FromPalette(&Palette{
+		Name: "Test Palette",
+		R:    red,
+		G:    green,
+		B:    blue,
+	})
+
+	if err != nil {
+		t.Errorf("error in constructing palette: %v", err)
+	}
+
+	if len(r) != 3 {
+		t.Errorf("expected 3 values in red channel, got %v", len(r))
+	}
+
+	if r[0] != 80 {
+		t.Errorf("expected 80 in red channel, got %v", r[0])
+	}
+
+	if r[1] != 80 {
+		t.Errorf("expected 80 in red channel, got %v", r[1])
+	}
+
+	if r[2] != 80 {
+		t.Errorf("expected 80 in red channel, got %v", r[2])
+	}
+}
