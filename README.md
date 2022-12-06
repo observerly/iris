@@ -5,7 +5,7 @@
 ![GitHub go.mod Go version (branch & subdirectory of monorepo)](https://img.shields.io/github/go-mod/go-version/observerly/iris/main?filename=go.mod&label=Go)
 [![PkgGoDev](https://pkg.go.dev/badge/github.com/observerly/iris)](https://pkg.go.dev/github.com/observerly/iris)
 [![Go Report Card](https://goreportcard.com/badge/github.com/observerly/iris)](https://goreportcard.com/report/github.com/observerly/iris)
-[![IRIS Actions Status](https://github.com/observerly/alpacago/actions/workflows/ci.yml/badge.svg)](https://github.com/observerly/iris/actions/workflows/ci.yml)
+[![IRIS Actions Status](https://github.com/observerly/iris/actions/workflows/ci.yml/badge.svg)](https://github.com/observerly/iris/actions/workflows/ci.yml)
 
 Iris is observerly's zero-dependency, pure Go library for interoperating with ASCOM Alpaca exposure data structures and the FITS astronomical image format.
 
