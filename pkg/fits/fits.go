@@ -48,6 +48,21 @@ func NewFITSImage(naxis int32, naxis1 int32, naxis2 int32, adu int32) *FITSImage
 	}
 }
 
+// Creates a new instance of FITS image initialized from an io.Reader:
+func NewFITSImageFromReader(r io.Reader) *FITSImage {
+	// Construct a blank FITS Image:
+	f := NewFITSImage(0, 0, 0, 0)
+
+	// Read appropriate data from the io.Reader:
+	err := f.Read(r)
+
+	if err != nil {
+		return nil
+	}
+
+	return f
+}
+
 // Creates a new instance of FITS image from given 2D exposure array
 // (Data is not copied, allocated if nil. naxisn is deep copied)
 func NewFITSImageFrom2DData(ex [][]uint32, naxis int32, naxis1 int32, naxis2 int32, adu int32) *FITSImage {
@@ -180,6 +195,14 @@ func (f *FITSImage) Read(r io.Reader) error {
 
 	// Set the number of pixels:
 	f.Pixels = f.Header.Naxis1 * f.Header.Naxis2
+
+	adu, ok := f.Header.Ints["ADU"]
+
+	if !ok {
+		return fmt.Errorf("%d: not a valid FITS Image file; ADU missing in header", f.ID)
+	}
+
+	f.ADU = adu.Value
 
 	data, err := readData(r, f.Bitpix, f.Pixels)
 

@@ -69,6 +69,50 @@ func TestNewDefaultFITSImageBScale(t *testing.T) {
 	}
 }
 
+func TestNewFITSImageFromReader(t *testing.T) {
+	// Attempt to open the file from the given filepath:
+	file, err := os.Open("../../samples/noise16.fits")
+
+	if err != nil {
+		t.Errorf("NewFITSImageFromReader() os.Open(): %v", err)
+	}
+
+	// Defer closing the file:
+	defer file.Close()
+
+	// Attempt to read the file:
+	fit := NewFITSImageFromReader(file)
+
+	if fit.ADU != 65535 {
+		t.Errorf("NewFITSImageFromReader() ADU: got %v, want %v", fit.ADU, 65535)
+	}
+
+	if fit.Bscale != 1 {
+		t.Errorf("NewFITSImageFromReader() Bscale: got %v, want %v", fit.Bscale, 1)
+	}
+
+	if fit.Bzero != 0 {
+		t.Errorf("NewFITSImageFromReader() Bzero: got %v, want %v", fit.Bzero, 32768)
+	}
+
+	if fit.Bitpix != -32 {
+		t.Errorf("NewFITSImageFromReader() Bitpix: got %v, want %v", fit.Bzero, 32768)
+	}
+
+	// Check the header:
+	if fit.Header.Naxis != 2 {
+		t.Errorf("NewFITSImageFromReader() Header.Naxis: got %v, want %v", fit.Header.Naxis, 2)
+	}
+
+	if fit.Header.Naxis1 != 1463 {
+		t.Errorf("NewFITSImageFromReader() Header.Naxis1: got %v, want %v", fit.Header.Naxis1, 600)
+	}
+
+	if fit.Header.Naxis2 != 1168 {
+		t.Errorf("NewFITSImageFromReader() Header.Naxis2: got %v, want %v", fit.Header.Naxis2, 800)
+	}
+}
+
 func TestNewFITSImageFrom2DDataID(t *testing.T) {
 	var ex = [][]uint32{
 		{1, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6},
