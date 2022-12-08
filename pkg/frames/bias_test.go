@@ -59,7 +59,7 @@ func TestNewMasterBiasFrame(t *testing.T) {
 	}
 }
 
-func TestApplyFrameToMasterFrame(t *testing.T) {
+func TestApplyFrameToMasterBiasFrame(t *testing.T) {
 	var bias = [][]uint32{
 		{1, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6},
 		{6, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 7, 6},
