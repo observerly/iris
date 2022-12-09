@@ -7,14 +7,6 @@ import (
 	"github.com/observerly/iris/pkg/utils"
 )
 
-type MasterBiasFrame struct {
-	Count            int              // The number of bias frames used to create the master bias frame
-	Pixels           int32            // The number of pixels in the master bias frame
-	Frames           []fits.FITSImage // The individual bias frames used to create the master bias frame
-	Combined         *fits.FITSImage  // The combined master bias frame
-	CreatedTimestamp int64
-}
-
 /*
 NewMasterBiasFrame()
 
@@ -29,7 +21,7 @@ The master bias frame is then created by taking the mean of all the bias frames.
 @retuns a new FITSImage containing the master bias frame.
 @see Image Calibration & Stack Woodhouse, C. (2017). The Astrophotography Manual. Taylor & Francis. p.203
 */
-func NewMasterBiasFrame(frames []fits.FITSImage, naxis int32, naxis1 int32, naxis2 int32, adu int32, resolution float32) (*MasterBiasFrame, error) {
+func NewMasterBiasFrame(frames []fits.FITSImage, naxis int32, naxis1 int32, naxis2 int32, adu int32, resolution float32) (*MasterFrame, error) {
 	pixels := naxis1 * naxis2
 
 	// Create a slice of 2D data arrays from the slice of FITSImages
@@ -91,31 +83,12 @@ func NewMasterBiasFrame(frames []fits.FITSImage, naxis int32, naxis1 int32, naxi
 		Comment: "ASCOM Alpaca Sensor Type",
 	}
 
-	return &MasterBiasFrame{
+	return &MasterFrame{
+		Type:             "bias",
 		Count:            len(frames),
 		Pixels:           pixels,
 		Frames:           frames,
 		Combined:         f,
 		CreatedTimestamp: time.Now().Unix(),
-	}, nil
-}
-
-func (m *MasterBiasFrame) ApplyFrame(frame *fits.FITSImage) (*MasterBiasFrame, error) {
-	// Take the current combined master bias frame and apply the new frame to it:
-	combined, err := utils.MeanFloat32Arrays([][]float32{m.Combined.Data, frame.Data})
-
-	if err != nil {
-		return nil, err
-	}
-
-	// Create a new FITSImage from the master bias data
-	m.Combined.Data = combined
-
-	return &MasterBiasFrame{
-		Count:            m.Count + 1,
-		Pixels:           m.Pixels,
-		Frames:           append(m.Frames, *frame),
-		Combined:         m.Combined,
-		CreatedTimestamp: m.CreatedTimestamp,
 	}, nil
 }
