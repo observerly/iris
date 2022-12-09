@@ -103,3 +103,23 @@ func NewMasterFlatFrame(frames []fits.FITSImage, naxis int32, naxis1 int32, naxi
 		CreatedTimestamp: time.Now().Unix(),
 	}, nil
 }
+
+func (m *MasterFlatFrame) ApplyFrame(frame *fits.FITSImage) (*MasterFlatFrame, error) {
+	// Take the current combined master dark frame and apply the new frame to it:
+	combined, err := utils.MeanFloat32Arrays([][]float32{m.Combined.Data, frame.Data})
+
+	if err != nil {
+		return nil, err
+	}
+
+	// Create a new FITSImage from the master dark data
+	m.Combined.Data = combined
+
+	return &MasterFlatFrame{
+		Count:            m.Count + 1,
+		Pixels:           m.Pixels,
+		Frames:           append(m.Frames, *frame),
+		Combined:         m.Combined,
+		CreatedTimestamp: m.CreatedTimestamp,
+	}, nil
+}
