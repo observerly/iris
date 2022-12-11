@@ -26,7 +26,28 @@ func TestNewMasterFlatFrame(t *testing.T) {
 		{255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255},
 	}
 
+	var bias = [][]uint32{
+		{1, 1, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6},
+		{1, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 7, 6},
+		{7, 8, 9, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 9, 8, 7},
+		{6, 7, 8, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 8, 7, 6},
+		{6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6},
+		{6, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 7, 6},
+		{7, 8, 9, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 9, 8, 7},
+		{6, 7, 8, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 8, 7, 6},
+		{6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6},
+		{6, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 7, 6},
+		{7, 8, 9, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 9, 8, 7},
+		{6, 7, 8, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 8, 7, 6},
+		{6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6},
+		{6, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 7, 6},
+		{7, 8, 9, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 9, 8, 7},
+		{6, 7, 8, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 8, 7, 6},
+	}
+
 	var flatFrame = fits.NewFITSImageFrom2DData(flat, 2, 16, 16, 255)
+
+	var biasFrame = fits.NewFITSImageFrom2DData(bias, 2, 16, 16, 255)
 
 	var frames = []fits.FITSImage{
 		*flatFrame,
@@ -36,7 +57,13 @@ func TestNewMasterFlatFrame(t *testing.T) {
 		*flatFrame,
 	}
 
-	masterFlat, err := NewMasterFlatFrame(frames, 2, 16, 16, 255, 130)
+	masterBias, err := NewMasterBiasFrame([]fits.FITSImage{*biasFrame}, 2, 16, 16, 255, 130)
+
+	if err != nil {
+		t.Errorf("NewMasterBiasFrame() failed: %s", err)
+	}
+
+	masterFlat, err := NewMasterFlatFrame(frames, masterBias, 2, 16, 16, 255, 130)
 
 	if err != nil {
 		t.Errorf("NewMasterDarkFrame() failed: %s", err)
@@ -54,8 +81,8 @@ func TestNewMasterFlatFrame(t *testing.T) {
 		t.Errorf("NewMasterFlatFrame() failed: expected ADU of 255, got %d", masterFlat.Combined.ADU)
 	}
 
-	if masterFlat.Combined.Data[1] != 254 {
-		t.Errorf("NewMasterFlatFrame() failed: expected data[0] of 254, got %f", masterFlat.Combined.Data[0])
+	if masterFlat.Combined.Data[1] != 253 {
+		t.Errorf("NewMasterFlatFrame() failed: expected data[0] of 253, got %f", masterFlat.Combined.Data[1])
 	}
 
 	if masterFlat.Combined.Exposure != 130 {
@@ -83,7 +110,28 @@ func TestApplyFrameToNewMasterFlatFrame(t *testing.T) {
 		{255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255},
 	}
 
+	var bias = [][]uint32{
+		{1, 1, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6},
+		{1, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 7, 6},
+		{7, 8, 9, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 9, 8, 7},
+		{6, 7, 8, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 8, 7, 6},
+		{6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6},
+		{6, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 7, 6},
+		{7, 8, 9, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 9, 8, 7},
+		{6, 7, 8, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 8, 7, 6},
+		{6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6},
+		{6, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 7, 6},
+		{7, 8, 9, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 9, 8, 7},
+		{6, 7, 8, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 8, 7, 6},
+		{6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6},
+		{6, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 7, 6},
+		{7, 8, 9, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 9, 8, 7},
+		{6, 7, 8, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 8, 7, 6},
+	}
+
 	var flatFrame = fits.NewFITSImageFrom2DData(flat, 2, 16, 16, 255)
+
+	var biasFrame = fits.NewFITSImageFrom2DData(bias, 2, 16, 16, 255)
 
 	var frames = []fits.FITSImage{
 		*flatFrame,
@@ -93,7 +141,13 @@ func TestApplyFrameToNewMasterFlatFrame(t *testing.T) {
 		*flatFrame,
 	}
 
-	masterFlat, err := NewMasterFlatFrame(frames, 2, 16, 16, 255, 130)
+	masterBias, err := NewMasterBiasFrame([]fits.FITSImage{*biasFrame}, 2, 16, 16, 255, 130)
+
+	if err != nil {
+		t.Errorf("NewMasterBiasFrame() failed: %s", err)
+	}
+
+	masterFlat, err := NewMasterFlatFrame(frames, masterBias, 2, 16, 16, 255, 130)
 
 	if err != nil {
 		t.Errorf("NewMasterDarkFrame() failed: %s", err)
@@ -111,8 +165,8 @@ func TestApplyFrameToNewMasterFlatFrame(t *testing.T) {
 		t.Errorf("NewMasterFlatFrame() failed: expected ADU of 255, got %d", masterFlat.Combined.ADU)
 	}
 
-	if masterFlat.Combined.Data[1] != 254 {
-		t.Errorf("NewMasterFlatFrame() failed: expected data[0] of 254, got %f", masterFlat.Combined.Data[0])
+	if masterFlat.Combined.Data[1] != 253 {
+		t.Errorf("NewMasterFlatFrame() failed: expected data[0] of 253, got %f", masterFlat.Combined.Data[1])
 	}
 
 	if masterFlat.Combined.Exposure != 130 {
@@ -140,10 +194,10 @@ func TestApplyFrameToNewMasterFlatFrame(t *testing.T) {
 
 	flatFrame = fits.NewFITSImageFrom2DData(flat, 2, 16, 16, 255)
 
-	masterFlat, err = masterFlat.ApplyFrame(flatFrame)
+	masterFlat, err = masterFlat.ApplyFlatFrame(flatFrame)
 
 	if err != nil {
-		t.Errorf("NewMasterBiasFrame() failed: %s", err)
+		t.Errorf("NewMasterFlatFrame() failed: %s", err)
 	}
 
 	if masterFlat.Count != 6 {
@@ -158,7 +212,7 @@ func TestApplyFrameToNewMasterFlatFrame(t *testing.T) {
 		t.Errorf("NewmasterFlatFrame() failed: expected ADU of 255, got %d", masterFlat.Combined.ADU)
 	}
 
-	if masterFlat.Combined.Data[1] != 252 {
-		t.Errorf("NewmasterFlatFrame() failed: expected data[0] of 6, got %f", masterFlat.Combined.Data[0])
+	if masterFlat.Combined.Data[1] != 251 {
+		t.Errorf("NewmasterFlatFrame() failed: expected data[0] of 251, got %f", masterFlat.Combined.Data[1])
 	}
 }
