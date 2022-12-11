@@ -26,7 +26,28 @@ func TestNewMasterDarkFrame(t *testing.T) {
 		{6, 7, 8, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 8, 7, 6},
 	}
 
+	var bias = [][]uint32{
+		{1, 1, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6},
+		{1, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 7, 6},
+		{7, 8, 9, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 9, 8, 7},
+		{6, 7, 8, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 8, 7, 6},
+		{6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6},
+		{6, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 7, 6},
+		{7, 8, 9, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 9, 8, 7},
+		{6, 7, 8, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 8, 7, 6},
+		{6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6},
+		{6, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 7, 6},
+		{7, 8, 9, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 9, 8, 7},
+		{6, 7, 8, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 8, 7, 6},
+		{6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6},
+		{6, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 7, 6},
+		{7, 8, 9, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 9, 8, 7},
+		{6, 7, 8, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 8, 7, 6},
+	}
+
 	var darkFrame = fits.NewFITSImageFrom2DData(dark, 2, 16, 16, 255)
+
+	var biasFrame = fits.NewFITSImageFrom2DData(bias, 2, 16, 16, 255)
 
 	var frames = []fits.FITSImage{
 		*darkFrame,
@@ -36,7 +57,13 @@ func TestNewMasterDarkFrame(t *testing.T) {
 		*darkFrame,
 	}
 
-	masterDark, err := NewMasterDarkFrame(frames, 2, 16, 16, 255, 130)
+	masterBias, err := NewMasterBiasFrame([]fits.FITSImage{*biasFrame}, 2, 16, 16, 255, 130)
+
+	if err != nil {
+		t.Errorf("NewMasterBiasFrame() failed: %s", err)
+	}
+
+	masterDark, err := NewMasterDarkFrame(frames, masterBias, 2, 16, 16, 255, 130)
 
 	if err != nil {
 		t.Errorf("NewMasterDarkFrame() failed: %s", err)
@@ -54,8 +81,8 @@ func TestNewMasterDarkFrame(t *testing.T) {
 		t.Errorf("NewMasterDarkFrame() failed: expected ADU of 255, got %d", masterDark.Combined.ADU)
 	}
 
-	if masterDark.Combined.Data[1] != 6 {
-		t.Errorf("NewMasterDarkFrame() failed: expected data[0] of 6, got %f", masterDark.Combined.Data[0])
+	if masterDark.Combined.Data[1] != 5 {
+		t.Errorf("NewMasterDarkFrame() failed: expected data[0] of 5, got %f", masterDark.Combined.Data[1])
 	}
 
 	if masterDark.Combined.Exposure != 130 {
@@ -83,7 +110,28 @@ func TestApplyFrameToMasterDarkFrame(t *testing.T) {
 		{6, 7, 8, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 8, 7, 6},
 	}
 
+	var bias = [][]uint32{
+		{1, 1, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6},
+		{1, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 7, 6},
+		{7, 8, 9, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 9, 8, 7},
+		{6, 7, 8, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 8, 7, 6},
+		{6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6},
+		{6, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 7, 6},
+		{7, 8, 9, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 9, 8, 7},
+		{6, 7, 8, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 8, 7, 6},
+		{6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6},
+		{6, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 7, 6},
+		{7, 8, 9, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 9, 8, 7},
+		{6, 7, 8, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 8, 7, 6},
+		{6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6},
+		{6, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 7, 6},
+		{7, 8, 9, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 9, 8, 7},
+		{6, 7, 8, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 8, 7, 6},
+	}
+
 	var darkFrame = fits.NewFITSImageFrom2DData(dark, 2, 16, 16, 255)
+
+	var biasFrame = fits.NewFITSImageFrom2DData(bias, 2, 16, 16, 255)
 
 	var frames = []fits.FITSImage{
 		*darkFrame,
@@ -93,7 +141,13 @@ func TestApplyFrameToMasterDarkFrame(t *testing.T) {
 		*darkFrame,
 	}
 
-	masterDark, err := NewMasterDarkFrame(frames, 2, 16, 16, 255, 130)
+	masterBias, err := NewMasterBiasFrame([]fits.FITSImage{*biasFrame}, 2, 16, 16, 255, 130)
+
+	if err != nil {
+		t.Errorf("NewMasterBiasFrame() failed: %s", err)
+	}
+
+	masterDark, err := NewMasterDarkFrame(frames, masterBias, 2, 16, 16, 255, 130)
 
 	if err != nil {
 		t.Errorf("NewMasterDarkFrame() failed: %s", err)
@@ -111,8 +165,8 @@ func TestApplyFrameToMasterDarkFrame(t *testing.T) {
 		t.Errorf("NewMasterDarkFrame() failed: expected ADU of 255, got %d", masterDark.Combined.ADU)
 	}
 
-	if masterDark.Combined.Data[1] != 6 {
-		t.Errorf("NewMasterDarkFrame() failed: expected data[0] of 6, got %f", masterDark.Combined.Data[0])
+	if masterDark.Combined.Data[1] != 5 {
+		t.Errorf("NewMasterDarkFrame() failed: expected data[0] of 6, got %f", masterDark.Combined.Data[1])
 	}
 
 	if masterDark.Combined.Exposure != 130 {
@@ -120,7 +174,7 @@ func TestApplyFrameToMasterDarkFrame(t *testing.T) {
 	}
 
 	dark = [][]uint32{
-		{1, 2, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6},
+		{1, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6},
 		{6, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 7, 6},
 		{7, 8, 9, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 9, 8, 7},
 		{6, 7, 8, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 8, 7, 6},
@@ -140,7 +194,7 @@ func TestApplyFrameToMasterDarkFrame(t *testing.T) {
 
 	darkFrame = fits.NewFITSImageFrom2DData(dark, 2, 16, 16, 255)
 
-	masterDark, err = masterDark.ApplyFrame(darkFrame)
+	masterDark, err = masterDark.ApplyDarkFrame(darkFrame)
 
 	if err != nil {
 		t.Errorf("NewMasterBiasFrame() failed: %s", err)
@@ -158,7 +212,7 @@ func TestApplyFrameToMasterDarkFrame(t *testing.T) {
 		t.Errorf("NewMasterDarkFrame() failed: expected ADU of 255, got %d", masterDark.Combined.ADU)
 	}
 
-	if masterDark.Combined.Data[1] != 4 {
-		t.Errorf("NewMasterDarkFrame() failed: expected data[0] of 6, got %f", masterDark.Combined.Data[0])
+	if masterDark.Combined.Data[1] != 5 {
+		t.Errorf("NewMasterDarkFrame() failed: expected data[0] of 5, got %f", masterDark.Combined.Data[1])
 	}
 }

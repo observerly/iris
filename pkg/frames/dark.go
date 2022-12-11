@@ -33,7 +33,7 @@ The master dark frame is then created by taking the mean of all the dark frames.
 @retuns a new FITSImage containing the master dark frame.
 @see Image Calibration & Stack Woodhouse, C. (2017). The Astrophotography Manual. Taylor & Francis. p.203
 */
-func NewMasterDarkFrame(frames []fits.FITSImage, naxis int32, naxis1 int32, naxis2 int32, adu int32, exposureTime float32) (*MasterFrame, error) {
+func NewMasterDarkFrame(frames []fits.FITSImage, masterBias *MasterFrame, naxis int32, naxis1 int32, naxis2 int32, adu int32, exposureTime float32) (*MasterDarkFrame, error) {
 	pixels := naxis1 * naxis2
 
 	// Create a slice of 2D data arrays from the slice of FITSImages
@@ -60,11 +60,23 @@ func NewMasterDarkFrame(frames []fits.FITSImage, naxis int32, naxis1 int32, naxi
 			return nil, err
 		}
 
-		f.Data = combined
+		f.Data, err = utils.SubtractFloat32Array(combined, masterBias.Combined.Data)
+
+		if err != nil {
+			return nil, err
+		}
 	} else {
+		var err error = nil
+
 		combined := frames[0].Data
 
 		f.Data = combined
+
+		f.Data, err = utils.SubtractFloat32Array(combined, masterBias.Combined.Data)
+
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	f.Exposure = exposureTime
@@ -95,12 +107,49 @@ func NewMasterDarkFrame(frames []fits.FITSImage, naxis int32, naxis1 int32, naxi
 		Comment: "ASCOM Alpaca Sensor Type",
 	}
 
-	return &MasterFrame{
+	return &MasterDarkFrame{
 		Type:             "dark",
 		Count:            len(frames),
 		Pixels:           pixels,
 		Frames:           frames,
 		Combined:         f,
+		MaterBias:        masterBias,
 		CreatedTimestamp: time.Now().Unix(),
+	}, nil
+}
+
+func (m *MasterDarkFrame) ApplyDarkFrame(frame *fits.FITSImage) (*MasterDarkFrame, error) {
+	// Add the current combined master frame to the master bias before averaging:
+	combined, err := utils.AddFloat32Array(m.Combined.Data, m.MaterBias.Combined.Data)
+
+	if err != nil {
+		return nil, err
+	}
+
+	// Take the current combined master frame and apply the new frame to it:
+	combined, err = utils.MeanFloat32Arrays([][]float32{combined, frame.Data})
+
+	if err != nil {
+		return nil, err
+	}
+
+	// Subtract the master bias from the combined master frame:
+	combined, err = utils.SubtractFloat32Array(combined, m.MaterBias.Combined.Data)
+
+	if err != nil {
+		return nil, err
+	}
+
+	// Create a new FITSImage from the master data
+	m.Combined.Data = combined
+
+	return &MasterDarkFrame{
+		Type:             m.Type,
+		Count:            m.Count + 1,
+		Pixels:           m.Pixels,
+		Frames:           append(m.Frames, *frame),
+		Combined:         m.Combined,
+		MaterBias:        m.MaterBias,
+		CreatedTimestamp: m.CreatedTimestamp,
 	}, nil
 }
