@@ -2,6 +2,40 @@ package utils
 
 import "testing"
 
+func TestAddAB(t *testing.T) {
+	a := []float32{1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+
+	b := []float32{1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+
+	s, err := AddFloat32Array(a, b)
+
+	if err != nil {
+		t.Errorf("error should be nil, but got %v", err)
+	}
+
+	if len(s) != len(a) {
+		t.Errorf("result should be of same length as a")
+	}
+
+	for i := range s {
+		if s[i] != 2 {
+			t.Errorf("result should be %v, but got %v", a[i]+b[i], s[i])
+		}
+	}
+}
+
+func TestAddABNotEqualLengthPanic(t *testing.T) {
+	a := []float32{1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+
+	b := []float32{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+
+	_, err := AddFloat32Array(a, b)
+
+	if err == nil {
+		t.Errorf("error should not be nil for two arrays of unequal length")
+	}
+}
+
 func TestSubtractAB(t *testing.T) {
 	a := []float32{2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
 

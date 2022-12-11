@@ -5,12 +5,32 @@ import (
 	"fmt"
 )
 
-/**
-  Subtract
+/*
+Add
 
-  Computes the element-wise difference of arrays a and b
-  and stores in array d "divide", that is, d[i]=a[i]-b[i].
-**/
+Computes the element-wise sum of arrays a and b and stores in array s "sum",
+that is, s[i]=a[i]+b[i].
+*/
+func AddFloat32Array(a, b []float32) ([]float32, error) {
+	if len(a) != len(b) {
+		return nil, errors.New("to add arrays they must be of same length")
+	}
+
+	s := make([]float32, len(a))
+
+	for i := range s {
+		s[i] = a[i] + b[i]
+	}
+
+	return s, nil
+}
+
+/*
+Subtract
+
+Computes the element-wise difference of arrays a and b
+and stores in array d "divide", that is, d[i]=a[i]-b[i].
+*/
 func SubtractFloat32Array(a, b []float32) ([]float32, error) {
 	if len(a) != len(b) {
 		return nil, errors.New("to subtract arrays they must be of same length")
@@ -25,12 +45,12 @@ func SubtractFloat32Array(a, b []float32) ([]float32, error) {
 	return s, nil
 }
 
-/**
-  Divide
+/*
+Divide
 
-  Computes the element-wise division of arrays a and b, scaled
-  with bMean and stores in array d "divide", that is, d[i]=a[i]*bMax/b[i].
-**/
+Computes the element-wise division of arrays a and b, scaled
+with bMean and stores in array d "divide", that is, d[i]=a[i]*bMax/b[i].
+*/
 func DivideFloat32Array(a, b []float32, bMax float32) ([]float32, error) {
 	if len(a) != len(b) {
 		return nil, errors.New("to divide arrays they must be of same length")
@@ -51,12 +71,12 @@ func DivideFloat32Array(a, b []float32, bMax float32) ([]float32, error) {
 	return d, nil
 }
 
-/**
-	Mean
+/*
+Mean
 
-	Computes the mean of array a and stores in array m "mean",
-	that is, m[i]=mean(a). If a is empty, m is nil.
-**/
+Computes the mean of array a and stores in array m "mean",
+that is, m[i]=mean(a). If a is empty, m is nil.
+*/
 func MeanFloat32Arrays(a [][]float32) ([]float32, error) {
 	if len(a) == 0 {
 		return nil, errors.New("to divide arrays they must be of same length")
@@ -84,11 +104,11 @@ func MeanFloat32Arrays(a [][]float32) ([]float32, error) {
 	return m, nil
 }
 
-/**
-	Flatten2DUInt32Array
+/*
+Flatten2DUInt32Array
 
-	Flattens a 2D array of uint32 into a 1D array of float32.
-**/
+Flattens a 2D array of uint32 into a 1D array of float32.
+*/
 func Flatten2DUInt32Array(a [][]uint32) []float32 {
 	f := make([]float32, 0)
 
