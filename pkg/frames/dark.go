@@ -13,7 +13,7 @@ type MasterDarkFrame struct {
 	Pixels           int32            // The number of pixels in the master frame
 	Frames           []fits.FITSImage // The individual frames used to create the master frame
 	Combined         *fits.FITSImage  // The combined master frame
-	MaterBias        *MasterFrame     // The master bias frame used to create the master dark frame
+	MasterBias       *MasterFrame     // The master bias frame used to create the master dark frame
 	CreatedTimestamp int64
 }
 
@@ -113,14 +113,14 @@ func NewMasterDarkFrame(frames []fits.FITSImage, masterBias *MasterFrame, naxis 
 		Pixels:           pixels,
 		Frames:           frames,
 		Combined:         f,
-		MaterBias:        masterBias,
+		MasterBias:       masterBias,
 		CreatedTimestamp: time.Now().Unix(),
 	}, nil
 }
 
 func (m *MasterDarkFrame) ApplyDarkFrame(frame *fits.FITSImage) (*MasterDarkFrame, error) {
 	// Add the current combined master frame to the master bias before averaging:
-	combined, err := utils.AddFloat32Array(m.Combined.Data, m.MaterBias.Combined.Data)
+	combined, err := utils.AddFloat32Array(m.Combined.Data, m.MasterBias.Combined.Data)
 
 	if err != nil {
 		return nil, err
@@ -134,7 +134,7 @@ func (m *MasterDarkFrame) ApplyDarkFrame(frame *fits.FITSImage) (*MasterDarkFram
 	}
 
 	// Subtract the master bias from the combined master frame:
-	combined, err = utils.SubtractFloat32Array(combined, m.MaterBias.Combined.Data)
+	combined, err = utils.SubtractFloat32Array(combined, m.MasterBias.Combined.Data)
 
 	if err != nil {
 		return nil, err
@@ -149,7 +149,7 @@ func (m *MasterDarkFrame) ApplyDarkFrame(frame *fits.FITSImage) (*MasterDarkFram
 		Pixels:           m.Pixels,
 		Frames:           append(m.Frames, *frame),
 		Combined:         m.Combined,
-		MaterBias:        m.MaterBias,
+		MasterBias:       m.MasterBias,
 		CreatedTimestamp: m.CreatedTimestamp,
 	}, nil
 }
