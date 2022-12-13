@@ -9,6 +9,7 @@ import (
 	"os"
 	"path"
 	"strings"
+	"time"
 
 	"github.com/observerly/iris/pkg/photometry"
 	stats "github.com/observerly/iris/pkg/statistics"
@@ -33,6 +34,21 @@ type FITSImage struct {
 	ADU      int32        // The number of ADU (Analog to Digital Units) in the image.
 	Exposure float32      // Image exposure in seconds
 	Stats    *stats.Stats // Image statistics (mean, min, max, stdDev etc)
+}
+
+// FITS Observation struct:
+// @see https://fits.gsfc.nasa.gov/standard40/fits_standard40aa-le.pdf
+type FITSObservation struct {
+	DateObs    time.Time `json:"dateObs"`    // Date of observation e.g., 2022-05-15
+	MJDObs     float32   `json:"mjdObs"`     // Modified Julian Date (JD − 2,400,000.5) of the observation
+	Equinox    string    `json:"equinox"`    // Equinox of observation e.g., J2000
+	Epoch      string    `json:"epoch"`      // Epoch of observation e.g., Julian
+	RA         float32   `json:"ra"`         // Right Ascension of observation
+	Dec        float32   `json:"dec"`        // Declination of observation
+	Object     string    `json:"object"`     // The name for the object observed
+	Telescope  string    `json:"telescope"`  // The telescope used to acquire the data
+	Instrument string    `json:"instrument"` // The instrument used to acquire the data
+	Observer   string    `json:"observer"`   // Who acquired the data
 }
 
 // Creates a new instance of FITS image initialized with empty header
