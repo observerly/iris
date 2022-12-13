@@ -159,6 +159,92 @@ func NewFITSImageFrom2DData(ex [][]uint32, naxis int32, naxis1 int32, naxis2 int
 	}
 }
 
+func (f *FITSImage) AddObservationEntry(observation *FITSObservation) *FITSImage {
+	f.Header.Dates["DATE-OBS"] = struct {
+		Value   string
+		Comment string
+	}{
+		Value:   observation.DateObs.Format("2006-01-02"),
+		Comment: "Date of observation",
+	}
+
+	f.Header.Floats["MJD-OBS"] = struct {
+		Value   float32
+		Comment string
+	}{
+		Value:   observation.MJDObs,
+		Comment: "Modified Julian Date (JD − 2,400,000.5) of the observation",
+	}
+
+	f.Header.Strings["EQUINOX"] = struct {
+		Value   string
+		Comment string
+	}{
+		Value:   observation.Equinox,
+		Comment: "Equinox of observation e.g., J2000",
+	}
+
+	f.Header.Strings["EPOCH"] = struct {
+		Value   string
+		Comment string
+	}{
+		Value:   observation.Epoch,
+		Comment: "Epoch of observation e.g., J2000",
+	}
+
+	// Necessary for Twirl API Plate Solving
+	f.Header.Floats["RA"] = struct {
+		Value   float32
+		Comment string
+	}{
+		Value:   observation.RA,
+		Comment: "Right Ascension (in degrees) of the observation",
+	}
+
+	// Necessary for Twirl API Plate Solving
+	f.Header.Floats["DEC"] = struct {
+		Value   float32
+		Comment string
+	}{
+		Value:   observation.Dec,
+		Comment: "Declination (in degrees) of the observation",
+	}
+
+	f.Header.Strings["OBJECT"] = struct {
+		Value   string
+		Comment string
+	}{
+		Value:   observation.Object,
+		Comment: "The name for the object observed",
+	}
+
+	f.Header.Strings["TELESCOP"] = struct {
+		Value   string
+		Comment string
+	}{
+		Value:   observation.Telescope,
+		Comment: "The name of the telescope used to observe the object",
+	}
+
+	f.Header.Strings["INSTRUME"] = struct {
+		Value   string
+		Comment string
+	}{
+		Value:   observation.Instrument,
+		Comment: "The name of the instrument used to observe the object",
+	}
+
+	f.Header.Strings["OBSERVER"] = struct {
+		Value   string
+		Comment string
+	}{
+		Value:   observation.Observer,
+		Comment: "Who owns the observation data",
+	}
+
+	return f
+}
+
 func (f *FITSImage) ExtractHFR(radius float32, sigma float32, starInOut float32) float32 {
 	se := photometry.NewStarsExtractor(f.Data, int(f.Naxisn[0]), int(f.Naxisn[1]), radius, f.ADU)
 

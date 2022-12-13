@@ -8,6 +8,7 @@ import (
 	"math"
 	"os"
 	"testing"
+	"time"
 )
 
 func GetTestDataFromImage() ([][]uint32, image.Rectangle) {
@@ -437,5 +438,81 @@ func TestNewFindStarsFrom2DData(t *testing.T) {
 
 	if math.Abs(float64(hfr-6.601836)) > 0.000001 {
 		t.Error("Expected to calculate HFR to an accuracy of 0.000001, but got ", hfr)
+	}
+}
+
+func TestNewAddObservationEntry(t *testing.T) {
+	var ex = [][]uint32{
+		{1, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6},
+		{6, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 7, 6},
+		{7, 8, 9, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 9, 8, 7},
+		{6, 7, 8, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 8, 7, 6},
+		{6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6},
+		{6, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 7, 6},
+		{7, 8, 9, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 9, 8, 7},
+		{6, 7, 8, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 8, 7, 6},
+		{6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6},
+		{6, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 7, 6},
+		{7, 8, 9, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 9, 8, 7},
+		{6, 7, 8, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 8, 7, 6},
+		{6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6},
+		{6, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 7, 6},
+		{7, 8, 9, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 9, 8, 7},
+		{6, 7, 8, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 8, 7, 6},
+	}
+
+	fit := NewFITSImageFrom2DData(ex, 2, 16, 16, 255)
+
+	fit.AddObservationEntry(&FITSObservation{
+		DateObs:    time.Date(2022, 5, 14, 0, 0, 0, 0, time.UTC),
+		MJDObs:     59713,
+		Equinox:    "2000.0 TT",
+		Epoch:      "J2000",
+		RA:         24.7122222,
+		Dec:        41.2691667,
+		Object:     "M31",
+		Telescope:  "Namibiascope 1",
+		Instrument: "20\" AG Optical iDK Planewave L-500s",
+		Observer:   "Michael Roberts",
+	})
+
+	if fit.Header.Dates["DATE-OBS"].Value != "2022-05-14" {
+		t.Errorf("Expected the DATE-OBS to be 2022-05-14, but got %s", fit.Header.Strings["DATE-OBS"].Value)
+	}
+
+	if fit.Header.Floats["MJD-OBS"].Value != 59713 {
+		t.Errorf("Expected the MJD-OBS to be 59713, but got %f", fit.Header.Floats["MJD-OBS"].Value)
+	}
+
+	if fit.Header.Strings["EQUINOX"].Value != "2000.0 TT" {
+		t.Errorf("Expected the EQUINOX to be 2000.0 TT, but got %s", fit.Header.Strings["EQUINOX"].Value)
+	}
+
+	if fit.Header.Strings["EPOCH"].Value != "J2000" {
+		t.Errorf("Expected the EPOCH to be J2000, but got %s", fit.Header.Strings["EPOCH"].Value)
+	}
+
+	if fit.Header.Floats["RA"].Value != 24.7122222 {
+		t.Errorf("Expected the RA to be 0.0, but got %f", fit.Header.Floats["RA"].Value)
+	}
+
+	if fit.Header.Floats["DEC"].Value != 41.2691667 {
+		t.Errorf("Expected the DEC to be 41.2691667, but got %f", fit.Header.Floats["DEC"].Value)
+	}
+
+	if fit.Header.Strings["OBJECT"].Value != "M31" {
+		t.Errorf("Expected the OBJECT to be M31, but got %s", fit.Header.Strings["OBJECT"].Value)
+	}
+
+	if fit.Header.Strings["TELESCOP"].Value != "Namibiascope 1" {
+		t.Errorf("Expected the TELESCOP to be Namibiascope 1, but got %s", fit.Header.Strings["TELESCOP"].Value)
+	}
+
+	if fit.Header.Strings["INSTRUME"].Value != "20\" AG Optical iDK Planewave L-500s" {
+		t.Errorf("Expected the INSTRUME to be 20\" AG Optical iDK Planewave L-500s, but got %s", fit.Header.Strings["INSTRUME"].Value)
+	}
+
+	if fit.Header.Strings["OBSERVER"].Value != "Michael Roberts" {
+		t.Errorf("Expected the OBSERVER to be Michael Roberts, but got %s", fit.Header.Strings["OBSERVER"].Value)
 	}
 }
