@@ -39,6 +39,30 @@ type FITSImage struct {
 func NewFITSImage(naxis int32, naxis1 int32, naxis2 int32, adu int32) *FITSImage {
 	h := NewFITSHeader(naxis, naxis1, naxis2)
 
+	h.Ints["ADU"] = struct {
+		Value   int32
+		Comment string
+	}{
+		Value:   adu,
+		Comment: "Analog to Digital Units (ADU)",
+	}
+
+	h.Ints["DATAMIN"] = struct {
+		Value   int32
+		Comment string
+	}{
+		Value:   0,
+		Comment: "The minimum valid physical value represented by the array",
+	}
+
+	h.Ints["DATAMAX"] = struct {
+		Value   int32
+		Comment string
+	}{
+		Value:   adu,
+		Comment: "The maximum valid physical value represented by the array",
+	}
+
 	return &FITSImage{
 		Header: h,
 		Bitpix: -32,
@@ -85,6 +109,22 @@ func NewFITSImageFrom2DData(ex [][]uint32, naxis int32, naxis1 int32, naxis2 int
 	}{
 		Value:   f.ADU,
 		Comment: "Analog to Digital Units (ADU)",
+	}
+
+	f.Header.Ints["DATAMIN"] = struct {
+		Value   int32
+		Comment string
+	}{
+		Value:   0,
+		Comment: "The minimum valid physical value represented by the array",
+	}
+
+	f.Header.Ints["DATAMAX"] = struct {
+		Value   int32
+		Comment string
+	}{
+		Value:   f.ADU,
+		Comment: "The maximum valid physical value represented by the array",
 	}
 
 	return &FITSImage{
