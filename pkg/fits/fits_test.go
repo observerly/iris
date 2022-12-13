@@ -342,6 +342,24 @@ func TestNewFITSRead(t *testing.T) {
 		t.Errorf("Expected the ADU to be 65535, but got %d", fit.ADU)
 	}
 
+	// Check that the mandatory DATAMIN header value exists and is set correctly as per FITS standard:
+	if _, ok := fit.Header.Ints["DATAMIN"]; !ok {
+		t.Errorf("Expected the DATAMIN header value to exist, but it does not")
+	}
+
+	if fit.Header.Ints["DATAMIN"].Value != 0 {
+		t.Errorf("Expected the DATAMIN header value to be 0, but got %d", fit.Header.Ints["DATAMIN"].Value)
+	}
+
+	// Check that the mandatory DATAMAX header value exists as per FITS standard:
+	if _, ok := fit.Header.Ints["DATAMAX"]; !ok {
+		t.Errorf("Expected the DATAMAX header value to exist, but it does not")
+	}
+
+	if fit.Header.Ints["DATAMAX"].Value != fit.ADU {
+		t.Errorf("Expected the DATAMAX header value to be %d, but got %d", fit.ADU, fit.Header.Ints["DATAMAX"].Value)
+	}
+
 	if fit.Header.Strings["PROGRAM"].Value != "@observerly/iris" {
 		t.Errorf("Expected the PROGRAM to be @observerly/iris")
 	}
