@@ -173,7 +173,7 @@ func (f *FITSImage) AddObservationEntry(observation *FITSObservation) *FITSImage
 		Comment string
 	}{
 		Value:   observation.MJDObs,
-		Comment: "Modified Julian Date (JD − 2,400,000.5) of the observation",
+		Comment: "Modified Julian Date of the observation",
 	}
 
 	f.Header.Strings["EQUINOX"] = struct {
@@ -223,7 +223,7 @@ func (f *FITSImage) AddObservationEntry(observation *FITSObservation) *FITSImage
 		Comment string
 	}{
 		Value:   observation.Telescope,
-		Comment: "The name of the telescope used to observe the object",
+		Comment: "The name of the telescope",
 	}
 
 	f.Header.Strings["INSTRUME"] = struct {
@@ -231,7 +231,7 @@ func (f *FITSImage) AddObservationEntry(observation *FITSObservation) *FITSImage
 		Comment string
 	}{
 		Value:   observation.Instrument,
-		Comment: "The name of the instrument used to observe the object",
+		Comment: "The name of the instrument",
 	}
 
 	f.Header.Strings["OBSERVER"] = struct {
