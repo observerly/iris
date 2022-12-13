@@ -577,6 +577,21 @@ func TestReadHeaderFromFile(t *testing.T) {
 		t.Errorf("ReadHeaderFromFile() expected NAXIS2 to be 800: got %v, want %v", h.Ints["NAXIS2"].Value, 800)
 	}
 
+	// Check that the conforming DATE header value exists as per FITS standard:
+	if len(h.Dates["DATE"].Value) == 0 {
+		t.Errorf("ReadHeaderFromFile() expected DATE to be non-zero length: got %v, want %v", len(h.Strings["DATE"].Value), 0)
+	}
+
+	// Check that the conforming TIMESYS header value exists as per FITS standard:
+	if h.Strings["TIMESYS"].Value != "UTC" {
+		t.Errorf("ReadHeaderFromFile() expected TIMESYS to be UTC: got %v, want %v", h.Strings["SYSTIME"].Value, "UTC")
+	}
+
+	// Check that the conforming ORIGIN header value exists as per FITS standard:
+	if h.Strings["ORIGIN"].Value != "observerly" {
+		t.Errorf("ReadHeaderFromFile() expected ORIGIN to be observerly: got %v, want %v", h.Strings["ORIGIN"].Value, "ASCOM Alpaca")
+	}
+
 	// Check that we have parsed to the END of the header:
 	if !h.End {
 		t.Errorf("ReadHeaderFromFile() expected END to be true: but got %v", h.End)

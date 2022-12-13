@@ -111,6 +111,30 @@ func NewFITSHeader(naxis int32, naxis1 int32, naxis2 int32) FITSHeader {
 		Comment: "FITS Image Extension",
 	}
 
+	h.Strings["TIMESYS"] = struct {
+		Value   string
+		Comment string
+	}{
+		Value:   "UTC",
+		Comment: "The temporal reference frame",
+	}
+
+	h.Dates["DATE"] = struct {
+		Value   string
+		Comment string
+	}{
+		Value:   time.Now().Format("2006-01-02T15:04:05"),
+		Comment: "Created Timestamp FITS file was generated",
+	}
+
+	h.Strings["ORIGIN"] = struct {
+		Value   string
+		Comment string
+	}{
+		Value:   "observerly",
+		Comment: "The organization or institution responsible for creating the FITS file",
+	}
+
 	h.Strings["PROGRAM"] = struct {
 		Value   string
 		Comment string
@@ -153,8 +177,8 @@ func (h *FITSHeader) Read(r io.Reader) error {
 }
 
 /*
-  Writes a FITS header according to the FITS standard to output bytes buffer
-  @see https://fits.gsfc.nasa.gov/standard40/fits_standard40aa-le.pdf
+Writes a FITS header according to the FITS standard to output bytes buffer
+@see https://fits.gsfc.nasa.gov/standard40/fits_standard40aa-le.pdf
 */
 func (h *FITSHeader) WriteToBuffer(buf *bytes.Buffer) (*bytes.Buffer, error) {
 	// SIMPLE needs to be the leading HDR value:
