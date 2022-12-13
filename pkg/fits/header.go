@@ -164,7 +164,7 @@ func (h *FITSHeader) Read(r io.Reader) error {
 			values := re.FindSubmatch(line)
 
 			if len(values) == 0 || values == nil {
-				return fmt.Errorf("invalid FITS header line: %s", line)
+				continue
 			}
 
 			names := re.SubexpNames()
