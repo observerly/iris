@@ -1,7 +1,6 @@
 package photometry
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -37,8 +36,6 @@ func TestNewNoiseExtractor(t *testing.T) {
 			data = append(data, float32(col))
 		}
 	}
-
-	fmt.Println(data)
 
 	s := NewNoiseExtractor(data, 16, 16)
 
@@ -83,8 +80,6 @@ func TestNewNoiseExtractorGaussianNoise(t *testing.T) {
 			data = append(data, float32(col))
 		}
 	}
-
-	fmt.Println(data)
 
 	s := NewNoiseExtractor(data, 16, 16)
 
