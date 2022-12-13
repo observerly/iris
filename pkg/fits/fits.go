@@ -266,12 +266,16 @@ func writeFloat32ArrayToBuffer(buf *bytes.Buffer, data []float32) (*bytes.Buffer
 	return buf, nil
 }
 
-/**
+/*
+*
+
 	Reads the FITS binary data from the given io.Reader stream and returns a
 	slice of float32 values, or error
 
 	Note: The data is read in network byte order and only supports 32-bitpix data
-**/
+
+*
+*/
 func readData(r io.Reader, bitpix int32, pixels int32) ([]float32, error) {
 	data := make([]float32, pixels)
 
