@@ -46,6 +46,26 @@ func SubtractFloat32Array(a, b []float32) ([]float32, error) {
 }
 
 /*
+Multiply
+
+Computes the element-wise product of arrays a and b and stores
+in array p "product", that is, m[i]=a[i]*b[i].
+*/
+func MultiplyFloat32Array(a, b []float32) ([]float32, error) {
+	if len(a) != len(b) {
+		return nil, errors.New("to multiply arrays they must be of same length")
+	}
+
+	p := make([]float32, len(a))
+
+	for i := range p {
+		p[i] = a[i] * b[i]
+	}
+
+	return p, nil
+}
+
+/*
 Divide
 
 Computes the element-wise division of arrays a and b, scaled

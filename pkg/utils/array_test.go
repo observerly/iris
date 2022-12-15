@@ -70,6 +70,40 @@ func TestSubtractABNotEqualLengthPanic(t *testing.T) {
 	}
 }
 
+func TestMultiplyAB(t *testing.T) {
+	a := []float32{2, 2, 2, 2, 2, 2, 2, 2, 2, 2}
+
+	b := []float32{2, 2, 2, 2, 2, 2, 2, 2, 2, 2}
+
+	s, err := MultiplyFloat32Array(a, b)
+
+	if err != nil {
+		t.Errorf("error should be nil, but got %v", err)
+	}
+
+	if len(s) != len(a) {
+		t.Errorf("result should be of same length as a")
+	}
+
+	for i := range s {
+		if s[i] != 4 {
+			t.Errorf("result should be %v, but got %v", a[i]*b[i], s[i])
+		}
+	}
+}
+
+func TestMultiplyABNotEqualLengthPanic(t *testing.T) {
+	a := []float32{2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2}
+
+	b := []float32{2, 2, 2, 2, 2, 2, 2, 2, 2, 2}
+
+	_, err := MultiplyFloat32Array(a, b)
+
+	if err == nil {
+		t.Errorf("error should not be nil for two arrays of unequal length")
+	}
+}
+
 func TestDivideAB(t *testing.T) {
 	a := []float32{2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
 
