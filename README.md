@@ -7,7 +7,9 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/observerly/iris)](https://goreportcard.com/report/github.com/observerly/iris)
 [![IRIS Actions Status](https://github.com/observerly/iris/actions/workflows/ci.yml/badge.svg)](https://github.com/observerly/iris/actions/workflows/ci.yml)
 
-Iris is observerly's zero-dependency, pure Go library for interoperating with ASCOM Alpaca exposure data structures and the FITS astronomical image format.
+Iris is observerly's zero-dependency, multi-thread, thread-safe pure Go library for interoperating with ASCOM Alpaca API exposure data structures and the FITS astronomical image format, providing a repeatable pipeline for astrophotographic image processing.
+
+Iris automatically normalizes, composaites, aligns and stacks your FITS images. The in-memory architecture with randomized batching is designed to touch each file exactly once and requires no temporary files, scaling to use all available CPU cores efficiently.
 
 ---
 
