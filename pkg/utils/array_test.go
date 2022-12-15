@@ -169,6 +169,20 @@ func TestDivideABNotEqualLengthPanic(t *testing.T) {
 	}
 }
 
+func TestAverageA(t *testing.T) {
+	a := []float32{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+
+	s, err := AverageFloat32Array(a)
+
+	if err != nil {
+		t.Errorf("error should be nil, but got %v", err)
+	}
+
+	if s != 5.5 {
+		t.Errorf("result should be 5.5, but got %v", s)
+	}
+}
+
 func TestMeanABC(t *testing.T) {
 	a := []float32{10, 9, 8, 7, 6, 5, 4, 3, 2, 1}
 

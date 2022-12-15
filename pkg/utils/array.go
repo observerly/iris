@@ -92,6 +92,26 @@ func DivideFloat32Array(a, b []float32, bMax float32) ([]float32, error) {
 }
 
 /*
+Average
+
+Computes the average of array a and stores in array m "mean",
+that is, m[i]=mean(a). If a is empty, m is nil.
+*/
+func AverageFloat32Array(a []float32) (float32, error) {
+	if len(a) == 0 {
+		return 0, errors.New("cannot compute the average of an empty array")
+	}
+
+	var sum float32
+
+	for _, i := range a {
+		sum += i
+	}
+
+	return sum / float32(len(a)), nil
+}
+
+/*
 Mean
 
 Computes the mean of array a and stores in array m "mean",
