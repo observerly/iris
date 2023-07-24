@@ -3,7 +3,6 @@ package iris
 import (
 	"encoding/json"
 	"image/jpeg"
-	"io/ioutil"
 	"os"
 	"testing"
 
@@ -595,7 +594,7 @@ func TestNewMonochromeExposureFromASCOMGetFITSImage(t *testing.T) {
 		SensorType   string     `json:"sensorType"`
 	}
 
-	file, err := ioutil.ReadFile("../../data/m42-800x600-monochrome.json")
+	file, err := os.ReadFile("../../data/m42-800x600-monochrome.json")
 
 	if err != nil {
 		t.Errorf("Error opening from JSON data: %s", err)

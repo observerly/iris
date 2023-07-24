@@ -3,7 +3,6 @@ package iris
 import (
 	"encoding/json"
 	"image/jpeg"
-	"io/ioutil"
 	"os"
 	"testing"
 )
@@ -207,7 +206,7 @@ func TestNewRGGBExposureRGBChannelDebayered(t *testing.T) {
 		SensorType   string     `json:"sensorType"`
 	}
 
-	file, err := ioutil.ReadFile("../../data/m42-800x600-rggb.json")
+	file, err := os.ReadFile("../../data/m42-800x600-rggb.json")
 
 	if err != nil {
 		t.Errorf("Error opening from JSON data: %s", err)
@@ -253,7 +252,7 @@ func TestNewRGGBExposureDebayerBilinearInterpolation(t *testing.T) {
 		SensorType   string     `json:"sensorType"`
 	}
 
-	file, err := ioutil.ReadFile("../../data/m42-800x600-rggb.json")
+	file, err := os.ReadFile("../../data/m42-800x600-rggb.json")
 
 	if err != nil {
 		t.Errorf("Error opening from JSON data: %s", err)
@@ -308,7 +307,7 @@ func TestNewRGGBExposurePreprocessImageArray(t *testing.T) {
 		SensorType   string     `json:"sensorType"`
 	}
 
-	file, err := ioutil.ReadFile("../../data/m42-800x600-rggb.json")
+	file, err := os.ReadFile("../../data/m42-800x600-rggb.json")
 
 	if err != nil {
 		t.Errorf("Error opening from JSON data: %s", err)
@@ -370,7 +369,7 @@ func TestNewRGGBExposureGetFITSImageForRedChannel(t *testing.T) {
 		SensorType   string     `json:"sensorType"`
 	}
 
-	file, err := ioutil.ReadFile("../../data/m42-800x600-rggb.json")
+	file, err := os.ReadFile("../../data/m42-800x600-rggb.json")
 
 	if err != nil {
 		t.Errorf("Error opening from JSON data: %s", err)
@@ -461,7 +460,7 @@ func TestNewRGGBExposureGetFITSImageForGreenChannel(t *testing.T) {
 		SensorType   string     `json:"sensorType"`
 	}
 
-	file, err := ioutil.ReadFile("../../data/m42-800x600-rggb.json")
+	file, err := os.ReadFile("../../data/m42-800x600-rggb.json")
 
 	if err != nil {
 		t.Errorf("Error opening from JSON data: %s", err)
@@ -552,7 +551,7 @@ func TestNewRGGBExposureGetFITSImageForBlueChannel(t *testing.T) {
 		SensorType   string     `json:"sensorType"`
 	}
 
-	file, err := ioutil.ReadFile("../../data/m42-800x600-rggb.json")
+	file, err := os.ReadFile("../../data/m42-800x600-rggb.json")
 
 	if err != nil {
 		t.Errorf("Error opening from JSON data: %s", err)
@@ -643,7 +642,7 @@ func TestNewRGGBExposureGetFITSImages(t *testing.T) {
 		SensorType   string     `json:"sensorType"`
 	}
 
-	file, err := ioutil.ReadFile("../../data/m42-800x600-rggb.json")
+	file, err := os.ReadFile("../../data/m42-800x600-rggb.json")
 
 	if err != nil {
 		t.Errorf("Error opening from JSON data: %s", err)
@@ -736,7 +735,7 @@ func TestNewRGGBExposureGetMonochromeFromColorChannel(t *testing.T) {
 		SensorType   string     `json:"sensorType"`
 	}
 
-	file, err := ioutil.ReadFile("../../data/m42-800x600-rggb.json")
+	file, err := os.ReadFile("../../data/m42-800x600-rggb.json")
 
 	if err != nil {
 		t.Errorf("Error opening from JSON data: %s", err)

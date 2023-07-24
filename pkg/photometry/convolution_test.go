@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"image"
 	"image/color"
-	"io/ioutil"
+	"os"
 	"testing"
 )
 
@@ -20,7 +20,7 @@ func TestBiLinearConvolveRedChannel(t *testing.T) {
 		SensorType   string     `json:"sensorType"`
 	}
 
-	file, err := ioutil.ReadFile("../../data/m42-800x600-rggb.json")
+	file, err := os.ReadFile("../../data/m42-800x600-rggb.json")
 
 	if err != nil {
 		t.Errorf("Error opening from JSON data: %s", err)
@@ -78,7 +78,7 @@ func TestBiLinearConvolveGreenChannel(t *testing.T) {
 		SensorType   string     `json:"sensorType"`
 	}
 
-	file, err := ioutil.ReadFile("../../data/m42-800x600-rggb.json")
+	file, err := os.ReadFile("../../data/m42-800x600-rggb.json")
 
 	if err != nil {
 		t.Errorf("Error opening from JSON data: %s", err)
@@ -136,7 +136,7 @@ func TestBiLinearConvolveBlueChannel(t *testing.T) {
 		SensorType   string     `json:"sensorType"`
 	}
 
-	file, err := ioutil.ReadFile("../../data/m42-800x600-rggb.json")
+	file, err := os.ReadFile("../../data/m42-800x600-rggb.json")
 
 	if err != nil {
 		t.Errorf("Error opening from JSON data: %s", err)

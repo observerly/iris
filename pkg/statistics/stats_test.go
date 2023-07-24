@@ -2,8 +2,8 @@ package stats
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"math"
+	"os"
 	"testing"
 )
 
@@ -19,7 +19,7 @@ type CameraExposure struct {
 }
 
 func GetTestData(xs int, ys int) []float32 {
-	file, err := ioutil.ReadFile("../../data/m42-800x600-monochrome.json")
+	file, err := os.ReadFile("../../data/m42-800x600-monochrome.json")
 
 	if err != nil {
 		panic(err)
