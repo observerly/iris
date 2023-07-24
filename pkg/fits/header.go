@@ -75,7 +75,7 @@ func NewFITSHeader(naxis int32, naxis1 int32, naxis2 int32) FITSHeader {
 		Value   string
 		Comment string
 	}{
-		Value:   "IMAGE␣␣␣",
+		Value:   "IMAGE   ",
 		Comment: "FITS Image Extension",
 	}
 
