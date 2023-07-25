@@ -71,14 +71,6 @@ func NewFITSHeader(naxis int32, naxis1 int32, naxis2 int32) FITSHeader {
 
 	h.Naxis2 = naxis2
 
-	h.Strings["XTENSION"] = struct {
-		Value   string
-		Comment string
-	}{
-		Value:   "IMAGE   ",
-		Comment: "FITS Image Extension",
-	}
-
 	h.Strings["TIMESYS"] = struct {
 		Value   string
 		Comment string
@@ -149,8 +141,8 @@ Writes a FITS header according to the FITS standard to output bytes buffer
 @see https://fits.gsfc.nasa.gov/standard40/fits_standard40aa-le.pdf
 */
 func (h *FITSHeader) WriteToBuffer(buf *bytes.Buffer) (*bytes.Buffer, error) {
-	// SIMPLE needs to be the leading HDR value:
-	writeBool(buf, "SIMPLE", true, FITS_STANDARD)
+	// XTENSION = "IMAGE   " needs to be the leading HDR value for a FITS image:
+	writeString(buf, "XTENSION", "IMAGE   ", "FITS Image Extension")
 	// BITPIX needs to be the seconda leading HDR value:
 	writeInt(buf, "BITPIX", -32, "Number of bits per data pixel")
 	// NAXIS header:
