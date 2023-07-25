@@ -141,8 +141,8 @@ Writes a FITS header according to the FITS standard to output bytes buffer
 @see https://fits.gsfc.nasa.gov/standard40/fits_standard40aa-le.pdf
 */
 func (h *FITSHeader) WriteToBuffer(buf *bytes.Buffer) (*bytes.Buffer, error) {
-	// XTENSION = "IMAGE   " needs to be the leading HDR value for a FITS image:
-	writeString(buf, "XTENSION", "IMAGE   ", "FITS Image Extension")
+	// SIMPLE needs to be the leading HDR value:
+	writeBool(buf, "SIMPLE", true, FITS_STANDARD)
 	// BITPIX needs to be the seconda leading HDR value:
 	writeInt(buf, "BITPIX", -32, "Number of bits per data pixel")
 	// NAXIS header:
