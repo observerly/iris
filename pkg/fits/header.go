@@ -83,7 +83,7 @@ func NewFITSHeader(naxis int32, naxis1 int32, naxis2 int32) FITSHeader {
 		Value   string
 		Comment string
 	}{
-		Value:   time.Now().Format("2006-01-02T15:04:05"),
+		Value:   time.Now().Format("2006-01-02"),
 		Comment: "Created Timestamp FITS file was generated",
 	}
 
@@ -98,7 +98,10 @@ func NewFITSHeader(naxis int32, naxis1 int32, naxis2 int32) FITSHeader {
 	h.Strings["PROGRAM"] = struct {
 		Value   string
 		Comment string
-	}{Value: "@observerly/iris", Comment: "@observerly/iris FITS Exposure Generator"}
+	}{
+		Value:   "@observerly/iris",
+		Comment: "@observerly/iris FITS Exposure Generator",
+	}
 
 	return h
 }
