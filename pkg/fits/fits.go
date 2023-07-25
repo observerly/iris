@@ -286,9 +286,9 @@ func (f *FITSImage) Read(r io.Reader) error {
 		return err
 	}
 
-	// Check that the mandatory SIMPLE header value exists as per FITS standard:
-	if !f.Header.Bools["SIMPLE"].Value {
-		return fmt.Errorf("%d: not a valid FITS file; SIMPLE=T missing in header", f.ID)
+	// Check that the mandatory SIMPLE header OR XTENSION header value exists as per FITS standard:
+	if !f.Header.Bools["SIMPLE"].Value && strings.TrimSpace(f.Header.Strings["XTENSION"].Value) != "IMAGE" {
+		return fmt.Errorf("%d: not a valid FITS file; SIMPLE=T or XTENSION missing in header", f.ID)
 	}
 
 	bitpix, ok := f.Header.Ints["BITPIX"]
