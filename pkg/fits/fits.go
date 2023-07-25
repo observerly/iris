@@ -41,8 +41,7 @@ type FITSImage struct {
 type FITSObservation struct {
 	DateObs    time.Time `json:"dateObs"`    // Date of observation e.g., 2022-05-15
 	MJDObs     float32   `json:"mjdObs"`     // Modified Julian Date (JD − 2,400,000.5) of the observation
-	Equinox    string    `json:"equinox"`    // Equinox of observation e.g., J2000
-	Epoch      string    `json:"epoch"`      // Epoch of observation e.g., Julian
+	Equinox    float32   `json:"equinox"`    // Equinox of observation e.g., J2000
 	RA         float32   `json:"ra"`         // Right Ascension of observation
 	Dec        float32   `json:"dec"`        // Declination of observation
 	Object     string    `json:"object"`     // The name for the object observed
@@ -176,20 +175,12 @@ func (f *FITSImage) AddObservationEntry(observation *FITSObservation) *FITSImage
 		Comment: "Modified Julian Date of the observation",
 	}
 
-	f.Header.Strings["EQUINOX"] = struct {
-		Value   string
+	f.Header.Floats["EQUINOX"] = struct {
+		Value   float32
 		Comment string
 	}{
 		Value:   observation.Equinox,
-		Comment: "Equinox of observation e.g., J2000",
-	}
-
-	f.Header.Strings["EPOCH"] = struct {
-		Value   string
-		Comment string
-	}{
-		Value:   observation.Epoch,
-		Comment: "Epoch of observation e.g., J2000",
+		Comment: "Equinox of observation e.g., Julian 2000.0",
 	}
 
 	// Necessary for Twirl API Plate Solving
