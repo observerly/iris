@@ -453,8 +453,7 @@ func TestNewAddObservationEntry(t *testing.T) {
 	fit.AddObservationEntry(&FITSObservation{
 		DateObs:    time.Date(2022, 5, 14, 0, 0, 0, 0, time.UTC),
 		MJDObs:     59713,
-		Equinox:    "2000.0 TT",
-		Epoch:      "J2000",
+		Equinox:    2023.7,
 		RA:         24.7122222,
 		Dec:        41.2691667,
 		Object:     "M31",
@@ -471,12 +470,8 @@ func TestNewAddObservationEntry(t *testing.T) {
 		t.Errorf("Expected the MJD-OBS to be 59713, but got %f", fit.Header.Floats["MJD-OBS"].Value)
 	}
 
-	if fit.Header.Strings["EQUINOX"].Value != "2000.0 TT" {
-		t.Errorf("Expected the EQUINOX to be 2000.0 TT, but got %s", fit.Header.Strings["EQUINOX"].Value)
-	}
-
-	if fit.Header.Strings["EPOCH"].Value != "J2000" {
-		t.Errorf("Expected the EPOCH to be J2000, but got %s", fit.Header.Strings["EPOCH"].Value)
+	if fit.Header.Floats["EQUINOX"].Value != 2023.7 {
+		t.Errorf("Expected the EQUINOX to be 2023.7, but got %f", fit.Header.Floats["EQUINOX"].Value)
 	}
 
 	if fit.Header.Floats["RA"].Value != 24.7122222 {
