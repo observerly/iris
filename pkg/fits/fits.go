@@ -386,7 +386,7 @@ func writeFloat32ArrayToBuffer(buf *bytes.Buffer, data []float32) (*bytes.Buffer
 		sb := strings.Builder{}
 
 		for i := partial; i < 2880; i++ {
-			sb.WriteRune(' ')
+			sb.WriteRune(rune(0x00))
 		}
 
 		err := binary.Write(buf, binary.BigEndian, []byte(sb.String()))
