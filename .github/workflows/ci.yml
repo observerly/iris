@@ -15,7 +15,7 @@ jobs:
     name: CI/CD Build
     strategy:
       matrix:
-        go: [ '1.17.x', '1.18.x', '1.19.x' ]
+        go: [ '1.17.x', '1.18.x', '1.19.x', '1.20.x', '1.21.x' ]
         os: [ ubuntu-latest ]
 
     runs-on: ${{ matrix.os }}
@@ -25,7 +25,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Go Setup
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v4
         with:
           go-version: ${{ matrix.go }}
 
