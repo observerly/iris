@@ -10,3 +10,13 @@ type Point struct {
 type VCurve struct {
 	Points []Point
 }
+
+// VCurveParams is a struct that holds the parameters for the V-curve model optisation and the data points.
+type VCurveParams struct {
+	A float64
+	B float64
+	C float64
+	D float64
+	x []float64
+	y []float64
+}
