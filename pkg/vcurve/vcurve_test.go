@@ -58,3 +58,41 @@ func TestNewHyperbolicVCurve(t *testing.T) {
 		t.Errorf("D should be 0, but got %v", d)
 	}
 }
+
+// Test for V-curve fitting with hyperbolic model
+func TestHyperbolicVCurveLevenbergMarquardtOptimisation(t *testing.T) {
+	v := NewHyperbolicVCurve(VCurve{
+		Points: points,
+	})
+
+	optimisedParams, err := v.LevenbergMarquardtOptimisation()
+
+	// Expect no error!
+	if err != nil {
+		t.Errorf("expected no error, but got %v", err)
+	}
+
+	// Deconstruct the VCurveParams struct
+	a, b, c, d := optimisedParams.A, optimisedParams.B, optimisedParams.C, optimisedParams.D
+
+	// Expect the optimised parameters to be close to the actual parameters:
+	// a = 106.8247
+	if a-106.8247 > 0.0001 {
+		t.Errorf("A should be close to %v, but got %v", 106.8247, a)
+	}
+
+	// b = 4.4771
+	if b-4.4771 > 0.0001 {
+		t.Errorf("B should be close to %v, but got %v", 4.4771, b)
+	}
+
+	// c = 30008.5444
+	if c-30008.5444 > 0.0001 {
+		t.Errorf("C should be close to %v, but got %v", 30008.5444, c)
+	}
+
+	// d = -1.7965
+	if d+1.7965 > 0.0001 {
+		t.Errorf("D should be close to %v, but got %v", -1.7965, d)
+	}
+}
