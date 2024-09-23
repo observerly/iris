@@ -10,8 +10,8 @@ import (
 
 // Point is a data point with x and y coordinates.
 type Point struct {
-	x float64
-	y float64
+	X float64
+	Y float64
 }
 
 // VCurve is a struct that holds the data points for the V-curve.
@@ -25,8 +25,8 @@ type VCurveParams struct {
 	B float64
 	C float64
 	D float64
-	x []float64
-	y []float64
+	X []float64
+	Y []float64
 }
 
 /*
@@ -43,8 +43,8 @@ func NewHyperbolicVCurve(data VCurve) *VCurveParams {
 
 	// A single loop to populate the slices
 	for _, point := range data.Points {
-		dataX = append(dataX, point.x)
-		dataY = append(dataY, point.y)
+		dataX = append(dataX, point.X)
+		dataY = append(dataY, point.Y)
 	}
 
 	// Get the initial guess for the parameter, for A, we take the mean value of the yData:
@@ -61,8 +61,8 @@ func NewHyperbolicVCurve(data VCurve) *VCurveParams {
 		B: B,
 		C: C,
 		D: 0,
-		x: dataX,
-		y: dataY,
+		X: dataX,
+		Y: dataY,
 	}
 }
 
@@ -108,7 +108,7 @@ LevenbergMarquardtOptimisation optimizes the hyperbolic function using the Leven
 func (p *VCurveParams) LevenbergMarquardtOptimisation() (VCurveParams, error) {
 	// Setting up the optimizer:
 	problem := optimize.Problem{
-		Func: objectiveFunc(p.x, p.y),
+		Func: objectiveFunc(p.X, p.Y),
 	}
 
 	// Create custom settings for the optimization:
