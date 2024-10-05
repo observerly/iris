@@ -1,6 +1,18 @@
+/*****************************************************************************************************************/
+
+//	@author		Michael Roberts <michael@observerly.com>
+//	@package	@observerly/iris
+//	@license	Copyright © 2021-2024 observerly
+
+/*****************************************************************************************************************/
+
 package utils
 
+/*****************************************************************************************************************/
+
 import "testing"
+
+/*****************************************************************************************************************/
 
 func TestAddAB(t *testing.T) {
 	a := []float32{1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
@@ -24,6 +36,8 @@ func TestAddAB(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func TestAddABNotEqualLengthPanic(t *testing.T) {
 	a := []float32{1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
 
@@ -35,6 +49,8 @@ func TestAddABNotEqualLengthPanic(t *testing.T) {
 		t.Errorf("error should not be nil for two arrays of unequal length")
 	}
 }
+
+/*****************************************************************************************************************/
 
 func TestSubtractAB(t *testing.T) {
 	a := []float32{2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
@@ -58,6 +74,8 @@ func TestSubtractAB(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func TestSubtractABNotEqualLengthPanic(t *testing.T) {
 	a := []float32{2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
 
@@ -69,6 +87,8 @@ func TestSubtractABNotEqualLengthPanic(t *testing.T) {
 		t.Errorf("error should not be nil for two arrays of unequal length")
 	}
 }
+
+/*****************************************************************************************************************/
 
 func TestMultiplyAB(t *testing.T) {
 	a := []float32{2, 2, 2, 2, 2, 2, 2, 2, 2, 2}
@@ -92,6 +112,8 @@ func TestMultiplyAB(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func TestMultiplyABNotEqualLengthPanic(t *testing.T) {
 	a := []float32{2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2}
 
@@ -103,6 +125,8 @@ func TestMultiplyABNotEqualLengthPanic(t *testing.T) {
 		t.Errorf("error should not be nil for two arrays of unequal length")
 	}
 }
+
+/*****************************************************************************************************************/
 
 func TestDivideAB(t *testing.T) {
 	a := []float32{2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
@@ -127,6 +151,8 @@ func TestDivideAB(t *testing.T) {
 		t.Errorf("result should be %v, but got %v", a[5]*10/b[5], d[5])
 	}
 }
+
+/*****************************************************************************************************************/
 
 func TestDivideABDegenerate(t *testing.T) {
 	a := []float32{2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
@@ -156,6 +182,8 @@ func TestDivideABDegenerate(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func TestDivideABNotEqualLengthPanic(t *testing.T) {
 
 	a := []float32{2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
@@ -168,6 +196,8 @@ func TestDivideABNotEqualLengthPanic(t *testing.T) {
 		t.Errorf("error should not be nil for two arrays of unequal length")
 	}
 }
+
+/*****************************************************************************************************************/
 
 func TestAverageA(t *testing.T) {
 	a := []float32{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
@@ -182,6 +212,8 @@ func TestAverageA(t *testing.T) {
 		t.Errorf("result should be 5.5, but got %v", s)
 	}
 }
+
+/*****************************************************************************************************************/
 
 func TestMeanABC(t *testing.T) {
 	a := []float32{10, 9, 8, 7, 6, 5, 4, 3, 2, 1}
@@ -226,6 +258,8 @@ func TestMeanABC(t *testing.T) {
 
 	//... Assume here that the mean calculation is correct for all other elements
 }
+
+/*****************************************************************************************************************/
 
 func TestMeanABCD(t *testing.T) {
 	a := []float32{10, 9, 8, 7, 6, 5, 4, 3, 2, 1}
@@ -273,6 +307,8 @@ func TestMeanABCD(t *testing.T) {
 	//... Assume here that the mean calculation is correct for all other elements
 }
 
+/*****************************************************************************************************************/
+
 func TestMeanABNotEqualLengthPanic(t *testing.T) {
 	a := []float32{2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
 
@@ -284,6 +320,8 @@ func TestMeanABNotEqualLengthPanic(t *testing.T) {
 		t.Errorf("error should not be nil for two arrays of unequal length")
 	}
 }
+
+/*****************************************************************************************************************/
 
 func TestFlatten2DUInt32Array2Rows5Columns(t *testing.T) {
 	a := [][]uint32{
@@ -338,6 +376,8 @@ func TestFlatten2DUInt32Array2Rows5Columns(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func TestFlatten2DUInt32Array1Rows5Columns(t *testing.T) {
 	a := [][]uint32{
 		{1, 2, 3, 4, 5},
@@ -369,3 +409,21 @@ func TestFlatten2DUInt32Array1Rows5Columns(t *testing.T) {
 		t.Errorf("result should be 5, but got %v", f[4])
 	}
 }
+
+/*****************************************************************************************************************/
+
+func TestBoundsFloat32Array(t *testing.T) {
+	a := []float32{5, 1, 3, 1, 2, 7, 8, 10, 2, 4, 6, 9}
+
+	min, max := BoundsFloat32Array(a)
+
+	if min != 1 {
+		t.Errorf("result should be 1, but got %v", min)
+	}
+
+	if max != 10 {
+		t.Errorf("result should be 10, but got %v", max)
+	}
+}
+
+/*****************************************************************************************************************/
