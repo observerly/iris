@@ -449,3 +449,28 @@ func compileFITSHeaderRegEx() *regexp.Regexp {
 
 	return regexp.MustCompile(lineRe)
 }
+
+// This function adds a line feed character to the end of each 80-byte chunk in the data array.
+func (h *FITSHeader) AddLineFeedCharacteToHeaderRow(data []byte, lineEnding string) []byte {
+	// Create a new buffer:
+	b := new(bytes.Buffer)
+
+	lineEndingAsBytes := []byte(lineEnding)
+
+	// Iterate over the byte array in chunks of 80 bytes
+	for i := 0; i < len(data); i += 80 {
+		// Calculate the end index for slicing
+		end := i + 80
+		if end > len(data) {
+			end = len(data)
+		}
+
+		// Write the chunk of 80 bytes (or less for the last chunk) to the buffer:
+		b.Write(data[i:end])
+
+		// Add a line feed (LF) after each 80-byte chunk:
+		b.Write(lineEndingAsBytes)
+	}
+
+	return b.Bytes()
+}
