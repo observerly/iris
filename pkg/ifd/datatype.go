@@ -35,3 +35,43 @@ const (
 )
 
 /*****************************************************************************************************************/
+
+func (d DataType) ByteSize() int {
+	switch d {
+	case DataTypeByte:
+		return 1
+	case DataTypeASCII:
+		return 1
+	case DataTypeShort:
+		return 2
+	case DataTypeLong:
+		return 4
+	case DataTypeRational:
+		return 8
+	case DataTypeSByte:
+		return 1
+	case DataTypeUndefined:
+		return 1
+	case DataTypeSShort:
+		return 2
+	case DataTypeSLong:
+		return 4
+	case DataTypeSRational:
+		return 8
+	case DataTypeFloat:
+		return 4
+	case DataTypeDouble:
+		return 8
+	case DataTypeIFD:
+		return 4 // LONG
+	case DataTypeLong8:
+		return 8
+	case DataTypeSLong8:
+		return 8
+	case DataTypeIFD8:
+		return 8 // LONG8
+	}
+	return 0
+}
+
+/*****************************************************************************************************************/
