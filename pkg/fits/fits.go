@@ -54,6 +54,12 @@ type FITSObservation struct {
 	Observer   string    `json:"observer"`   // Who acquired the data
 }
 
+type FITSObserver struct {
+	Latitude  float32 `json:"latitude"`  // Latitude of the observer
+	Longitude float32 `json:"longitude"` // Longitude of the observer
+	Elevetion float32 `json:"elevation"` // Elevation of the observer
+}
+
 // Creates a new instance of FITS image initialized with empty header
 func NewFITSImage(naxis int32, naxis1 int32, naxis2 int32, adu int32) *FITSImage {
 	h := NewFITSHeader(naxis, naxis1, naxis2)
@@ -284,6 +290,34 @@ func (f *FITSImage) AddObservationEntry(observation *FITSObservation) *FITSImage
 	}{
 		Value:   observation.Observer,
 		Comment: "Who owns the observation data",
+	}
+
+	return f
+}
+
+func (f *FITSImage) AddObserverEntry(observer *FITSObserver) *FITSImage {
+	f.Header.Floats["LATITUDE"] = struct {
+		Value   float32
+		Comment string
+	}{
+		Value:   observer.Latitude,
+		Comment: "Latitude of the observer (in degrees)",
+	}
+
+	f.Header.Floats["LONGITUD"] = struct {
+		Value   float32
+		Comment string
+	}{
+		Value:   observer.Longitude,
+		Comment: "Longitude of the observer (in degrees)",
+	}
+
+	f.Header.Floats["ELEVATIO"] = struct {
+		Value   float32
+		Comment string
+	}{
+		Value:   observer.Elevetion,
+		Comment: "Elevation of the observer (in meters)",
 	}
 
 	return f
