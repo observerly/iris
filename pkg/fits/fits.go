@@ -167,6 +167,14 @@ func (f *FITSImage) AddObservationEntry(observation *FITSObservation) *FITSImage
 		Comment: "Date of observation",
 	}
 
+	f.Header.Floats["JD-OBS"] = struct {
+		Value   float32
+		Comment string
+	}{
+		Value:   observation.MJDObs + 2400000.5,
+		Comment: "Julian Date of the observation",
+	}
+
 	f.Header.Floats["MJD-OBS"] = struct {
 		Value   float32
 		Comment string
