@@ -44,6 +44,10 @@ type FITSObservation struct {
 	Equinox    float32   `json:"equinox"`    // Equinox of observation e.g., J2000
 	RA         float32   `json:"ra"`         // Right Ascension of observation
 	Dec        float32   `json:"dec"`        // Declination of observation
+	Altitude   float32   `json:"altitude"`   // Altitude of the observation
+	Azimuth    float32   `json:"azimuth"`    // Azimuth of the observation
+	Airmass    float32   `json:"airmass"`    // Airmass of the observation
+	Refraction float32   `json:"refraction"` // Refraction of the observation
 	Object     string    `json:"object"`     // The name for the object observed
 	Telescope  string    `json:"telescope"`  // The telescope used to acquire the data
 	Instrument string    `json:"instrument"` // The instrument used to acquire the data
@@ -192,12 +196,37 @@ func (f *FITSImage) AddObservationEntry(observation *FITSObservation) *FITSImage
 	}
 
 	// Necessary for Twirl API Plate Solving
+	f.Header.Strings["RADESYS"] = struct {
+		Value   string
+		Comment string
+	}{
+		Value:   "ICRS",
+		Comment: "International Celestial Reference System",
+	}
+
+	// Necessary for Twirl API Plate Solving
 	f.Header.Floats["RA"] = struct {
 		Value   float32
 		Comment string
 	}{
 		Value:   observation.RA,
 		Comment: "Right Ascension (in degrees) of the observation",
+	}
+
+	f.Header.Floats["ALT"] = struct {
+		Value   float32
+		Comment string
+	}{
+		Value:   observation.Altitude,
+		Comment: "Altitude (in degrees) of the observation",
+	}
+
+	f.Header.Floats["AZ"] = struct {
+		Value   float32
+		Comment string
+	}{
+		Value:   observation.Azimuth,
+		Comment: "Azimuth (in degrees) of the observation",
 	}
 
 	// Necessary for Twirl API Plate Solving
@@ -207,6 +236,22 @@ func (f *FITSImage) AddObservationEntry(observation *FITSObservation) *FITSImage
 	}{
 		Value:   observation.Dec,
 		Comment: "Declination (in degrees) of the observation",
+	}
+
+	f.Header.Floats["AIRMASS"] = struct {
+		Value   float32
+		Comment string
+	}{
+		Value:   observation.Airmass,
+		Comment: "Airmass of the observation (sec z)",
+	}
+
+	f.Header.Floats["REFRACT"] = struct {
+		Value   float32
+		Comment string
+	}{
+		Value:   observation.Refraction,
+		Comment: "Refraction correction (in degrees) of the observation",
 	}
 
 	f.Header.Strings["OBJECT"] = struct {
