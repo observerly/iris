@@ -57,7 +57,7 @@ type FITSObservation struct {
 type FITSObserver struct {
 	Latitude  float32 `json:"latitude"`  // Latitude of the observer
 	Longitude float32 `json:"longitude"` // Longitude of the observer
-	Elevetion float32 `json:"elevation"` // Elevation of the observer
+	Elevation float32 `json:"elevation"` // Elevation of the observer
 }
 
 // Creates a new instance of FITS image initialized with empty header
@@ -316,7 +316,7 @@ func (f *FITSImage) AddObserverEntry(observer *FITSObserver) *FITSImage {
 		Value   float32
 		Comment string
 	}{
-		Value:   observer.Elevetion,
+		Value:   observer.Elevation,
 		Comment: "Elevation of the observer (in meters)",
 	}
 
