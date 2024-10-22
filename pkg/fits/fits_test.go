@@ -527,3 +527,60 @@ func TestNewAddObservationEntry(t *testing.T) {
 		t.Errorf("Error writing image: %s", err)
 	}
 }
+
+func TestNewAddObserverEntry(t *testing.T) {
+	data, bounds := GetTestDataFromImage()
+
+	xs := bounds.Dx()
+
+	ys := bounds.Dy()
+
+	var fit = NewFITSImageFrom2DData(data, 2, int32(xs), int32(ys), 65535)
+
+	fit.AddObserverEntry(&FITSObserver{
+		Latitude:  24.7122222,
+		Longitude: 41.2691667,
+		Elevation: 2023.7,
+	})
+
+	if fit.Header.Floats["LATITUDE"].Value != 24.7122222 {
+		t.Errorf("Expected the LATITUDE to be 24.7122222, but got %f", fit.Header.Floats["LATITUDE"].Value)
+	}
+
+	if fit.Header.Floats["LONGITUD"].Value != 41.2691667 {
+		t.Errorf("Expected the LONGITUD to be 41.2691667, but got %f", fit.Header.Floats["LONGITUD"].Value)
+	}
+
+	if fit.Header.Floats["ELEVATIO"].Value != 2023.7 {
+		t.Errorf("Expected the ELEVATIO to be 2023.7, but got %f", fit.Header.Floats["ELEVATIO"].Value)
+	}
+
+	f, err := os.OpenFile("noise16-obs.fits", os.O_WRONLY|os.O_CREATE, 0644)
+
+	if err != nil {
+		t.Errorf("Error opening image: %s", err)
+	}
+
+	defer f.Close()
+
+	defer func() {
+		if err := f.Close(); err != nil {
+			t.Errorf("Expected the image buffer to be saved successfully, but got %q", err)
+		}
+
+		// Clean up the file after we have finished with the test:
+		os.Remove("noise16-obs.fits")
+	}()
+
+	buf, err := fit.WriteToBuffer()
+
+	if err != nil {
+		t.Errorf("Error writing image: %s", err)
+	}
+
+	_, err = f.Write(buf.Bytes())
+
+	if err != nil {
+		t.Errorf("Error writing image: %s", err)
+	}
+}
