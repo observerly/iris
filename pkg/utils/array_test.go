@@ -256,7 +256,7 @@ func TestMeanABC(t *testing.T) {
 		t.Errorf("result should be 6 but got %v", m[5])
 	}
 
-	//... Assume here that the mean calculation is correct for all other elements
+	// Assume here that the mean calculation is correct for all other elements
 }
 
 /*****************************************************************************************************************/
@@ -304,7 +304,7 @@ func TestMeanABCD(t *testing.T) {
 		t.Errorf("result should be 6 but got %v", m[5])
 	}
 
-	//... Assume here that the mean calculation is correct for all other elements
+	// Assume here that the mean calculation is correct for all other elements
 }
 
 /*****************************************************************************************************************/
@@ -407,6 +407,61 @@ func TestFlatten2DUInt32Array1Rows5Columns(t *testing.T) {
 
 	if f[4] != 5 {
 		t.Errorf("result should be 5, but got %v", f[4])
+	}
+}
+
+/*****************************************************************************************************************/
+
+func TestFlatten2DUFloat64Array2Rows5Columns(t *testing.T) {
+	a := [][]float64{
+		{1, 2, 3, 4, 5},
+		{6, 7, 8, 9, 10},
+	}
+
+	f := Flatten2DFloat64Array(a)
+
+	if len(f) != 10 {
+		t.Errorf("result should be of length 10, but got %v", len(f))
+	}
+
+	if f[0] != 1 {
+		t.Errorf("result should be 1, but got %v", f[0])
+	}
+
+	if f[1] != 2 {
+		t.Errorf("result should be 2, but got %v", f[1])
+	}
+
+	if f[2] != 3 {
+		t.Errorf("result should be 3, but got %v", f[2])
+	}
+
+	if f[3] != 4 {
+		t.Errorf("result should be 4, but got %v", f[3])
+	}
+
+	if f[4] != 5 {
+		t.Errorf("result should be 5, but got %v", f[4])
+	}
+
+	if f[5] != 6 {
+		t.Errorf("result should be 6, but got %v", f[5])
+	}
+
+	if f[6] != 7 {
+		t.Errorf("result should be 7, but got %v", f[6])
+	}
+
+	if f[7] != 8 {
+		t.Errorf("result should be 8, but got %v", f[7])
+	}
+
+	if f[8] != 9 {
+		t.Errorf("result should be 9, but got %v", f[8])
+	}
+
+	if f[9] != 10 {
+		t.Errorf("result should be 10, but got %v", f[9])
 	}
 }
 

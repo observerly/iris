@@ -189,6 +189,23 @@ func Flatten2DUInt32Array(a [][]uint32) []float32 {
 /*****************************************************************************************************************/
 
 /*
+Flatten2DFloat64Array
+
+Flattens a 2D array of float64 into a 1D array of float64.
+*/
+func Flatten2DFloat64Array(a [][]float64) []float64 {
+	f := make([]float64, 0)
+
+	for _, j := range a {
+		f = append(f, j...)
+	}
+
+	return f
+}
+
+/*****************************************************************************************************************/
+
+/*
 BoundsFloat32Array
 
 Computes the minimum and maximum values of array a.
