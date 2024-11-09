@@ -1,4 +1,14 @@
+/*****************************************************************************************************************/
+
+//	@author		Michael Roberts <michael@observerly.com>
+//	@package	@observerly/iris/fits
+//	@license	Copyright © 2021-2025 observerly
+
+/*****************************************************************************************************************/
+
 package fits
+
+/*****************************************************************************************************************/
 
 import (
 	"bytes"
@@ -16,9 +26,14 @@ import (
 	"github.com/observerly/iris/pkg/utils"
 )
 
+/*****************************************************************************************************************/
+
 const FITS_STANDARD = "FITS Standard 4.0"
 
-// FITS Image struct:
+/*****************************************************************************************************************/
+
+// Represents a FITS Image
+//
 // @see https://fits.gsfc.nasa.gov/fits_primer.html
 // @see https://fits.gsfc.nasa.gov/standard40/fits_standard40aa-le.pdf
 type FITSImage struct {
@@ -36,7 +51,10 @@ type FITSImage struct {
 	Stats    *stats.Stats // Image statistics (mean, min, max, stdDev etc)
 }
 
-// FITS Observation struct:
+/*****************************************************************************************************************/
+
+// Represents a FITS Observation
+//
 // @see https://fits.gsfc.nasa.gov/standard40/fits_standard40aa-le.pdf
 type FITSObservation struct {
 	DateObs    time.Time `json:"dateObs"`    // Date of observation e.g., 2022-05-15
@@ -54,11 +72,16 @@ type FITSObservation struct {
 	Observer   string    `json:"observer"`   // Who acquired the data
 }
 
+/*****************************************************************************************************************/
+
+// Represents a FITS Observer
 type FITSObserver struct {
 	Latitude  float32 `json:"latitude"`  // Latitude of the observer
 	Longitude float32 `json:"longitude"` // Longitude of the observer
 	Elevation float32 `json:"elevation"` // Elevation of the observer
 }
+
+/*****************************************************************************************************************/
 
 // Creates a new instance of FITS image initialized with empty header
 func NewFITSImage(naxis int32, naxis1 int32, naxis2 int32, adu int32) *FITSImage {
@@ -97,6 +120,8 @@ func NewFITSImage(naxis int32, naxis1 int32, naxis2 int32, adu int32) *FITSImage
 	}
 }
 
+/*****************************************************************************************************************/
+
 // Creates a new instance of FITS image initialized from an io.Reader:
 func NewFITSImageFromReader(r io.Reader) *FITSImage {
 	// Construct a blank FITS Image:
@@ -111,6 +136,8 @@ func NewFITSImageFromReader(r io.Reader) *FITSImage {
 
 	return f
 }
+
+/*****************************************************************************************************************/
 
 // Creates a new instance of FITS image from given 2D exposure array
 // (Data is not copied, allocated if nil. naxisn is deep copied)
@@ -167,6 +194,8 @@ func NewFITSImageFrom2DData(ex [][]uint32, naxis int32, naxis1 int32, naxis2 int
 		Stats:    f.Stats,
 	}
 }
+
+/*****************************************************************************************************************/
 
 func (f *FITSImage) AddObservationEntry(observation *FITSObservation) *FITSImage {
 	f.Header.Dates["DATE-OBS"] = struct {
@@ -295,6 +324,8 @@ func (f *FITSImage) AddObservationEntry(observation *FITSObservation) *FITSImage
 	return f
 }
 
+/*****************************************************************************************************************/
+
 func (f *FITSImage) AddObserverEntry(observer *FITSObserver) *FITSImage {
 	f.Header.Floats["LATITUDE"] = struct {
 		Value   float32
@@ -323,6 +354,8 @@ func (f *FITSImage) AddObserverEntry(observer *FITSObserver) *FITSImage {
 	return f
 }
 
+/*****************************************************************************************************************/
+
 func (f *FITSImage) ExtractHFR(radius float32, sigma float32, starInOut float32) float32 {
 	se := photometry.NewStarsExtractor(f.Data, int(f.Naxisn[0]), int(f.Naxisn[1]), radius, f.ADU)
 
@@ -332,6 +365,8 @@ func (f *FITSImage) ExtractHFR(radius float32, sigma float32, starInOut float32)
 
 	return se.HFR
 }
+
+/*****************************************************************************************************************/
 
 func (f *FITSImage) ReadFromFile(fp string) error {
 	// Check that the filename is not empty:
@@ -354,6 +389,8 @@ func (f *FITSImage) ReadFromFile(fp string) error {
 
 	return f.Read(file)
 }
+
+/*****************************************************************************************************************/
 
 // Read the FITS image from the given file.
 func (f *FITSImage) Read(r io.Reader) error {
@@ -435,6 +472,8 @@ func (f *FITSImage) Read(r io.Reader) error {
 	return nil
 }
 
+/*****************************************************************************************************************/
+
 // Writes an in-memory FITS image to an io.Writer output stream
 func (f *FITSImage) WriteToBuffer() (*bytes.Buffer, error) {
 	buf := new(bytes.Buffer)
@@ -455,6 +494,8 @@ func (f *FITSImage) WriteToBuffer() (*bytes.Buffer, error) {
 
 	return buf, nil
 }
+
+/*****************************************************************************************************************/
 
 // Writes FITS binary body data in network byte order to buffer
 func writeFloat32ArrayToBuffer(buf *bytes.Buffer, data []float32) (*bytes.Buffer, error) {
@@ -486,16 +527,10 @@ func writeFloat32ArrayToBuffer(buf *bytes.Buffer, data []float32) (*bytes.Buffer
 	return buf, nil
 }
 
-/*
-*
+/*****************************************************************************************************************/
 
-	Reads the FITS binary data from the given io.Reader stream and returns a
-	slice of float32 values, or error
-
-	Note: The data is read in network byte order and only supports 32-bitpix data
-
-*
-*/
+// Reads the FITS binary data from the given io.Reader stream and returns a slice of float32 values, or error.
+// Note: The data is read in network byte order and only supports 32-bitpix data
 func readData(r io.Reader, bitpix int32, pixels int32) ([]float32, error) {
 	data := make([]float32, pixels)
 
@@ -543,7 +578,11 @@ func readData(r io.Reader, bitpix int32, pixels int32) ([]float32, error) {
 	return data, err
 }
 
+/*****************************************************************************************************************/
+
 // Reads FITS binary body float32 data in network byte order from buffer
 func readFloat32ArrayFromBuffer(buf *bytes.Buffer, data []float32) error {
 	return binary.Read(buf, binary.BigEndian, data)
 }
+
+/*****************************************************************************************************************/

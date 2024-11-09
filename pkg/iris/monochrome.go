@@ -1,4 +1,14 @@
+/*****************************************************************************************************************/
+
+//	@author		Michael Roberts <michael@observerly.com>
+//	@package	@observerly/iris
+//	@license	Copyright © 2021-2025 observerly
+
+/*****************************************************************************************************************/
+
 package iris
+
+/*****************************************************************************************************************/
 
 import (
 	"bytes"
@@ -10,6 +20,8 @@ import (
 	"github.com/observerly/iris/pkg/histogram"
 	"github.com/observerly/iris/pkg/photometry"
 )
+
+/*****************************************************************************************************************/
 
 type MonochromeExposure struct {
 	Width     int
@@ -25,6 +37,8 @@ type MonochromeExposure struct {
 	Threshold uint8
 	Pixels    int
 }
+
+/*****************************************************************************************************************/
 
 func NewMonochromeExposure(exposure [][]uint32, adu int32, xs int, ys int) MonochromeExposure {
 	pixels := xs * ys
@@ -46,6 +60,8 @@ func NewMonochromeExposure(exposure [][]uint32, adu int32, xs int, ys int) Monoc
 	return mono
 }
 
+/*****************************************************************************************************************/
+
 func (m *MonochromeExposure) GetBuffer(img *image.Gray) (bytes.Buffer, error) {
 	var buff bytes.Buffer
 
@@ -57,6 +73,8 @@ func (m *MonochromeExposure) GetBuffer(img *image.Gray) (bytes.Buffer, error) {
 
 	return buff, nil
 }
+
+/*****************************************************************************************************************/
 
 func (m *MonochromeExposure) GetFITSImage() *fits.FITSImage {
 	f := fits.NewFITSImageFrom2DData(
@@ -77,6 +95,8 @@ func (m *MonochromeExposure) GetFITSImage() *fits.FITSImage {
 
 	return f
 }
+
+/*****************************************************************************************************************/
 
 func (m *MonochromeExposure) GetOtsuThresholdValue(img *image.Gray, size image.Point, histogram [256]uint64) uint8 {
 	var threshold uint8
@@ -119,22 +139,10 @@ func (m *MonochromeExposure) GetOtsuThresholdValue(img *image.Gray, size image.P
 	return threshold
 }
 
-/*
- 	PreprocessImageArray()
+/*****************************************************************************************************************/
 
-	Preprocesses an ASCOM Alpaca Image Array to a m.Raw 2D array of uint32 values.
-	Converts the 2D array of uint16 values to a 2D array of uint32 values.
-
-	@returns  a bytes.Buffer containing the preprocessed image.
-	@see https://ascom-standards.org/api/#/Camera%20Specific%20Methods/get_camera__device_number__imagearray
-
-	"... "column-major" order (column changes most rapidly) from the image's row and column
-	perspective, while, from the array's perspective, serialisation is actually effected in
-	"row-major" order (rightmost index changes most rapidly). This unintuitive outcome arises
-	because the ASCOM Camera Interface specification defines the image column dimension as
-	the rightmost array dimension."
-
-*/
+// Preprocesses an ASCOM Alpaca Image Array to a m.Raw 2D array of uint32 values. Converts the 2D array of
+// uint16 values to a 2D array of uint32 values, returning a bytes.Buffer containing the preprocessed image.
 func (m *MonochromeExposure) PreprocessImageArray(xs int, ys int) (bytes.Buffer, error) {
 	// Switch the columns and rows in the image:
 	ex := make([][]uint32, xs)
@@ -168,6 +176,8 @@ func (m *MonochromeExposure) PreprocessImageArray(xs int, ys int) (bytes.Buffer,
 	return m.Preprocess()
 }
 
+/*****************************************************************************************************************/
+
 func (m *MonochromeExposure) Preprocess() (bytes.Buffer, error) {
 	bounds := m.Image.Bounds()
 
@@ -183,6 +193,8 @@ func (m *MonochromeExposure) Preprocess() (bytes.Buffer, error) {
 
 	return m.GetBuffer(m.Image)
 }
+
+/*****************************************************************************************************************/
 
 func (m *MonochromeExposure) ApplyNoiseReduction() (bytes.Buffer, error) {
 	bounds := m.Image.Bounds()
@@ -213,6 +225,8 @@ func (m *MonochromeExposure) ApplyNoiseReduction() (bytes.Buffer, error) {
 	return m.GetBuffer(m.Image)
 }
 
+/*****************************************************************************************************************/
+
 func (m *MonochromeExposure) ApplyOtsuThreshold() (bytes.Buffer, error) {
 	bounds := m.Image.Bounds()
 
@@ -241,3 +255,5 @@ func (m *MonochromeExposure) ApplyOtsuThreshold() (bytes.Buffer, error) {
 
 	return m.GetBuffer(m.Otsu)
 }
+
+/*****************************************************************************************************************/

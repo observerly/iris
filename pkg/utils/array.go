@@ -18,12 +18,7 @@ import (
 
 /*****************************************************************************************************************/
 
-/*
-Add
-
-Computes the element-wise sum of arrays a and b and stores in array s "sum",
-that is, s[i]=a[i]+b[i].
-*/
+// Computes the element-wise sum of arrays a and b and stores in array s "sum", that is, s[i]=a[i]+b[i].
 func AddFloat32Array(a, b []float32) ([]float32, error) {
 	if len(a) != len(b) {
 		return nil, errors.New("to add arrays they must be of same length")
@@ -40,12 +35,7 @@ func AddFloat32Array(a, b []float32) ([]float32, error) {
 
 /*****************************************************************************************************************/
 
-/*
-Subtract
-
-Computes the element-wise difference of arrays a and b
-and stores in array d "divide", that is, d[i]=a[i]-b[i].
-*/
+// Computes the element-wise difference of arrays a and b and stores in array d "divide", that is, d[i]=a[i]-b[i].
 func SubtractFloat32Array(a, b []float32) ([]float32, error) {
 	if len(a) != len(b) {
 		return nil, errors.New("to subtract arrays they must be of same length")
@@ -62,12 +52,7 @@ func SubtractFloat32Array(a, b []float32) ([]float32, error) {
 
 /*****************************************************************************************************************/
 
-/*
-Multiply
-
-Computes the element-wise product of arrays a and b and stores
-in array p "product", that is, m[i]=a[i]*b[i].
-*/
+// Computes the element-wise product of arrays a and b and stores in array p "product", that is, m[i]=a[i]*b[i].
 func MultiplyFloat32Array(a, b []float32) ([]float32, error) {
 	if len(a) != len(b) {
 		return nil, errors.New("to multiply arrays they must be of same length")
@@ -84,12 +69,8 @@ func MultiplyFloat32Array(a, b []float32) ([]float32, error) {
 
 /*****************************************************************************************************************/
 
-/*
-Divide
-
-Computes the element-wise division of arrays a and b, scaled
-with bMean and stores in array d "divide", that is, d[i]=a[i]*bMax/b[i].
-*/
+// Computes the element-wise division of arrays a and b, scaled with bMean and stores in array d "divide",
+// that is, d[i]=a[i]*bMax/b[i].
 func DivideFloat32Array(a, b []float32, bMax float32) ([]float32, error) {
 	if len(a) != len(b) {
 		return nil, errors.New("to divide arrays they must be of same length")
@@ -112,12 +93,7 @@ func DivideFloat32Array(a, b []float32, bMax float32) ([]float32, error) {
 
 /*****************************************************************************************************************/
 
-/*
-Average
-
-Computes the average of array a and stores in array m "mean",
-that is, m[i]=mean(a). If a is empty, m is nil.
-*/
+// Computes the average of array a and stores in array m "mean", that is, m[i]=mean(a). If a is empty, m is nil.
 func AverageFloat32Array(a []float32) (float32, error) {
 	if len(a) == 0 {
 		return 0, errors.New("cannot compute the average of an empty array")
@@ -134,12 +110,7 @@ func AverageFloat32Array(a []float32) (float32, error) {
 
 /*****************************************************************************************************************/
 
-/*
-Mean
-
-Computes the mean of array a and stores in array m "mean",
-that is, m[i]=mean(a). If a is empty, m is nil.
-*/
+// Computes the mean of array a and stores in array m "mean", that is, m[i]=mean(a). If a is empty, m is nil.
 func MeanFloat32Arrays(a [][]float32) ([]float32, error) {
 	if len(a) == 0 {
 		return nil, errors.New("to divide arrays they must be of same length")
@@ -169,11 +140,7 @@ func MeanFloat32Arrays(a [][]float32) ([]float32, error) {
 
 /*****************************************************************************************************************/
 
-/*
-Flatten2DUInt32Array
-
-Flattens a 2D array of uint32 into a 1D array of float32.
-*/
+// Flattens a 2D array of uint32 into a 1D array of float32.
 func Flatten2DUInt32Array(a [][]uint32) []float32 {
 	f := make([]float32, 0)
 
@@ -188,11 +155,7 @@ func Flatten2DUInt32Array(a [][]uint32) []float32 {
 
 /*****************************************************************************************************************/
 
-/*
-Flatten2DFloat64Array
-
-Flattens a 2D array of float64 into a 1D array of float64.
-*/
+// Flattens a 2D array of float64 into a 1D array of float64.
 func Flatten2DFloat64Array(a [][]float64) []float64 {
 	f := make([]float64, 0)
 
@@ -205,11 +168,7 @@ func Flatten2DFloat64Array(a [][]float64) []float64 {
 
 /*****************************************************************************************************************/
 
-/*
-BoundsFloat32Array
-
-Computes the minimum and maximum values of array a.
-*/
+// Computes the minimum and maximum values of array a.
 func BoundsFloat32Array(a []float32) (float32, float32) {
 	// Set the initial min and max values:
 	min, max := float32(math.MaxFloat32-1), float32(0.0)

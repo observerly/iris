@@ -1,4 +1,14 @@
+/*****************************************************************************************************************/
+
+//	@author		Michael Roberts <michael@observerly.com>
+//	@package	@observerly/iris/stats
+//	@license	Copyright © 2021-2025 observerly
+
+/*****************************************************************************************************************/
+
 package stats
+
+/*****************************************************************************************************************/
 
 import (
 	"encoding/json"
@@ -6,6 +16,8 @@ import (
 	"math"
 	"testing"
 )
+
+/*****************************************************************************************************************/
 
 type CameraExposure struct {
 	BayerXOffset int32      `json:"bayerXOffset"`
@@ -17,6 +29,8 @@ type CameraExposure struct {
 	Rank         uint32     `json:"rank"`
 	SensorType   string     `json:"sensorType"`
 }
+
+/*****************************************************************************************************************/
 
 func GetTestData(xs int, ys int) []float32 {
 	file, err := ioutil.ReadFile("../../data/m42-800x600-monochrome.json")
@@ -55,6 +69,8 @@ func GetTestData(xs int, ys int) []float32 {
 	return data
 }
 
+/*****************************************************************************************************************/
+
 func TestCalculateMinMeanMax(t *testing.T) {
 	data := []float32{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
 
@@ -73,6 +89,8 @@ func TestCalculateMinMeanMax(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func TestCalculateMeanStdDevVar(t *testing.T) {
 	data := []float32{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
 
@@ -90,6 +108,8 @@ func TestCalculateMeanStdDevVar(t *testing.T) {
 		t.Errorf("variance should be 8.25, but got %v", variance)
 	}
 }
+
+/*****************************************************************************************************************/
 
 func TestCalculateMinMeanMaxStdDevVar(t *testing.T) {
 	data := []float32{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
@@ -117,6 +137,8 @@ func TestCalculateMinMeanMaxStdDevVar(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func TestCalculateMedianOdd(t *testing.T) {
 	data := []float32{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
 
@@ -126,6 +148,8 @@ func TestCalculateMedianOdd(t *testing.T) {
 		t.Errorf("median should be 5.5, but got %v", median)
 	}
 }
+
+/*****************************************************************************************************************/
 
 func TestCalculateMedianEven(t *testing.T) {
 	data := []float32{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
@@ -137,6 +161,8 @@ func TestCalculateMedianEven(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func TestCalculateMedianDispersedRandom(t *testing.T) {
 	data := []float32{10, 12, 23, 23, 16, 23, 21, 16}
 
@@ -146,6 +172,8 @@ func TestCalculateMedianDispersedRandom(t *testing.T) {
 		t.Errorf("median should be 18.5, but got %v", median)
 	}
 }
+
+/*****************************************************************************************************************/
 
 func TestNewStats(t *testing.T) {
 	data := []float32{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
@@ -173,6 +201,8 @@ func TestNewStats(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func TestNewStatsMonochromeExposure(t *testing.T) {
 	xs := 800
 
@@ -199,6 +229,8 @@ func TestNewStatsMonochromeExposure(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func TestNewStatsFastMedianFloat32(t *testing.T) {
 	data := []float32{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
 
@@ -210,6 +242,8 @@ func TestNewStatsFastMedianFloat32(t *testing.T) {
 		t.Errorf("median should be 5.5, but got %v", median)
 	}
 }
+
+/*****************************************************************************************************************/
 
 func TestFastApproxMedian(t *testing.T) {
 	xs := 800
@@ -235,6 +269,8 @@ func TestFastApproxMedian(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func TestFastApproxQn(t *testing.T) {
 	xs := 800
 
@@ -254,6 +290,8 @@ func TestFastApproxQn(t *testing.T) {
 		t.Errorf("The fast approximate Qn should be close to the true scale, but got %v", scale)
 	}
 }
+
+/*****************************************************************************************************************/
 
 func TestFastApproxBoundedMedian(t *testing.T) {
 	xs := 800
@@ -285,6 +323,8 @@ func TestFastApproxBoundedMedian(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func TestFastApproxBoundedQn(t *testing.T) {
 	xs := 800
 
@@ -315,6 +355,8 @@ func TestFastApproxBoundedQn(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func TestFastApproxSigmaClippedMedianAndQn(t *testing.T) {
 	xs := 800
 
@@ -343,6 +385,8 @@ func TestFastApproxSigmaClippedMedianAndQn(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func TestNewStatsMonochrome16Exposure(t *testing.T) {
 	xs := 800
 
@@ -368,3 +412,5 @@ func TestNewStatsMonochrome16Exposure(t *testing.T) {
 		t.Errorf("stddev should be 10592.966, but got %v", stats.StdDev)
 	}
 }
+
+/*****************************************************************************************************************/

@@ -1,12 +1,21 @@
+/*****************************************************************************************************************/
+
+//	@author		Michael Roberts <michael@observerly.com>
+//	@package	@observerly/iris
+//	@license	Copyright © 2021-2025 observerly
+
+/*****************************************************************************************************************/
+
 package iris
 
 import (
 	"encoding/json"
 	"image/jpeg"
-	"io/ioutil"
 	"os"
 	"testing"
 )
+
+/*****************************************************************************************************************/
 
 func TestNewRGGBExposureWidth(t *testing.T) {
 	rggb := NewRGGBExposure(ex, 1, 800, 600, "RGGB")
@@ -20,6 +29,8 @@ func TestNewRGGBExposureWidth(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func TestNewRGGBExposureHeight(t *testing.T) {
 	rggb := NewRGGBExposure(ex, 1, 800, 600, "RGGB")
 
@@ -32,6 +43,8 @@ func TestNewRGGBExposureHeight(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func TestNewRGGBExpsourePixels(t *testing.T) {
 	rggb := NewRGGBExposure(ex, 1, 800, 600, "RGGB")
 
@@ -43,6 +56,8 @@ func TestNewRGGBExpsourePixels(t *testing.T) {
 		t.Errorf("got %q, wanted %q", got, want)
 	}
 }
+
+/*****************************************************************************************************************/
 
 func TestNewRGGBGetBayerMatrixOffset(t *testing.T) {
 	rggb := NewRGGBExposure(ex, 1, 800, 600, "RGGB")
@@ -62,6 +77,8 @@ func TestNewRGGBGetBayerMatrixOffset(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func TestNewGRBGGetBayerMatrixOffset(t *testing.T) {
 	rggb := NewRGGBExposure(ex, 1, 800, 600, "GRBG")
 
@@ -79,6 +96,8 @@ func TestNewGRBGGetBayerMatrixOffset(t *testing.T) {
 		t.Errorf("got %q, wanted %q", yOffset, 0)
 	}
 }
+
+/*****************************************************************************************************************/
 
 func TestNewGBRGGetBayerMatrixOffset(t *testing.T) {
 	rggb := NewRGGBExposure(ex, 1, 800, 600, "GBRG")
@@ -98,6 +117,8 @@ func TestNewGBRGGetBayerMatrixOffset(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func TestNewBGGRGetBayerMatrixOffset(t *testing.T) {
 	rggb := NewRGGBExposure(ex, 1, 800, 600, "BGGR")
 
@@ -116,6 +137,8 @@ func TestNewBGGRGetBayerMatrixOffset(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func TestNewRGGBGetBayerMatrixOffsetInvalid(t *testing.T) {
 	rggb := NewRGGBExposure(ex, 1, 800, 600, "INVALID")
 
@@ -125,6 +148,8 @@ func TestNewRGGBGetBayerMatrixOffsetInvalid(t *testing.T) {
 		t.Errorf("Expected the CFA string to be invalid, but got %q", err)
 	}
 }
+
+/*****************************************************************************************************************/
 
 func TestNewRGGBDebayerBilinearInterpolation(t *testing.T) {
 	var ex = [][]uint32{
@@ -166,6 +191,8 @@ func TestNewRGGBDebayerBilinearInterpolation(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func TestNewRGGBPreprocess(t *testing.T) {
 	var ex = [][]uint32{
 		{123, 6, 117, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6},
@@ -195,6 +222,8 @@ func TestNewRGGBPreprocess(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func TestNewRGGBExposureRGBChannelDebayered(t *testing.T) {
 	type CameraExposure struct {
 		BayerXOffset int32      `json:"bayerXOffset"`
@@ -207,7 +236,7 @@ func TestNewRGGBExposureRGBChannelDebayered(t *testing.T) {
 		SensorType   string     `json:"sensorType"`
 	}
 
-	file, err := ioutil.ReadFile("../../data/m42-800x600-rggb.json")
+	file, err := os.ReadFile("../../data/m42-800x600-rggb.json")
 
 	if err != nil {
 		t.Errorf("Error opening from JSON data: %s", err)
@@ -241,6 +270,9 @@ func TestNewRGGBExposureRGBChannelDebayered(t *testing.T) {
 		t.Errorf("Expected the B channel to be %d pixels, but got %d", w*h, len(rggb.R))
 	}
 }
+
+/*****************************************************************************************************************/
+
 func TestNewRGGBExposureDebayerBilinearInterpolation(t *testing.T) {
 	type CameraExposure struct {
 		BayerXOffset int32      `json:"bayerXOffset"`
@@ -253,7 +285,7 @@ func TestNewRGGBExposureDebayerBilinearInterpolation(t *testing.T) {
 		SensorType   string     `json:"sensorType"`
 	}
 
-	file, err := ioutil.ReadFile("../../data/m42-800x600-rggb.json")
+	file, err := os.ReadFile("../../data/m42-800x600-rggb.json")
 
 	if err != nil {
 		t.Errorf("Error opening from JSON data: %s", err)
@@ -296,6 +328,9 @@ func TestNewRGGBExposureDebayerBilinearInterpolation(t *testing.T) {
 		t.Errorf("Expected the image buffer to be saved successfully, but got %q", err)
 	}
 }
+
+/*****************************************************************************************************************/
+
 func TestNewRGGBExposurePreprocessImageArray(t *testing.T) {
 	type CameraExposure struct {
 		BayerXOffset int32      `json:"bayerXOffset"`
@@ -308,7 +343,7 @@ func TestNewRGGBExposurePreprocessImageArray(t *testing.T) {
 		SensorType   string     `json:"sensorType"`
 	}
 
-	file, err := ioutil.ReadFile("../../data/m42-800x600-rggb.json")
+	file, err := os.ReadFile("../../data/m42-800x600-rggb.json")
 
 	if err != nil {
 		t.Errorf("Error opening from JSON data: %s", err)
@@ -358,6 +393,8 @@ func TestNewRGGBExposurePreprocessImageArray(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func TestNewRGGBExposureGetFITSImageForRedChannel(t *testing.T) {
 	type CameraExposure struct {
 		BayerXOffset int32      `json:"bayerXOffset"`
@@ -370,7 +407,7 @@ func TestNewRGGBExposureGetFITSImageForRedChannel(t *testing.T) {
 		SensorType   string     `json:"sensorType"`
 	}
 
-	file, err := ioutil.ReadFile("../../data/m42-800x600-rggb.json")
+	file, err := os.ReadFile("../../data/m42-800x600-rggb.json")
 
 	if err != nil {
 		t.Errorf("Error opening from JSON data: %s", err)
@@ -449,6 +486,8 @@ func TestNewRGGBExposureGetFITSImageForRedChannel(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func TestNewRGGBExposureGetFITSImageForGreenChannel(t *testing.T) {
 	type CameraExposure struct {
 		BayerXOffset int32      `json:"bayerXOffset"`
@@ -461,7 +500,7 @@ func TestNewRGGBExposureGetFITSImageForGreenChannel(t *testing.T) {
 		SensorType   string     `json:"sensorType"`
 	}
 
-	file, err := ioutil.ReadFile("../../data/m42-800x600-rggb.json")
+	file, err := os.ReadFile("../../data/m42-800x600-rggb.json")
 
 	if err != nil {
 		t.Errorf("Error opening from JSON data: %s", err)
@@ -540,6 +579,8 @@ func TestNewRGGBExposureGetFITSImageForGreenChannel(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func TestNewRGGBExposureGetFITSImageForBlueChannel(t *testing.T) {
 	type CameraExposure struct {
 		BayerXOffset int32      `json:"bayerXOffset"`
@@ -552,7 +593,7 @@ func TestNewRGGBExposureGetFITSImageForBlueChannel(t *testing.T) {
 		SensorType   string     `json:"sensorType"`
 	}
 
-	file, err := ioutil.ReadFile("../../data/m42-800x600-rggb.json")
+	file, err := os.ReadFile("../../data/m42-800x600-rggb.json")
 
 	if err != nil {
 		t.Errorf("Error opening from JSON data: %s", err)
@@ -631,6 +672,8 @@ func TestNewRGGBExposureGetFITSImageForBlueChannel(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func TestNewRGGBExposureGetFITSImages(t *testing.T) {
 	type CameraExposure struct {
 		BayerXOffset int32      `json:"bayerXOffset"`
@@ -643,7 +686,7 @@ func TestNewRGGBExposureGetFITSImages(t *testing.T) {
 		SensorType   string     `json:"sensorType"`
 	}
 
-	file, err := ioutil.ReadFile("../../data/m42-800x600-rggb.json")
+	file, err := os.ReadFile("../../data/m42-800x600-rggb.json")
 
 	if err != nil {
 		t.Errorf("Error opening from JSON data: %s", err)
@@ -724,6 +767,8 @@ func TestNewRGGBExposureGetFITSImages(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func TestNewRGGBExposureGetMonochromeFromColorChannel(t *testing.T) {
 	type CameraExposure struct {
 		BayerXOffset int32      `json:"bayerXOffset"`
@@ -736,7 +781,7 @@ func TestNewRGGBExposureGetMonochromeFromColorChannel(t *testing.T) {
 		SensorType   string     `json:"sensorType"`
 	}
 
-	file, err := ioutil.ReadFile("../../data/m42-800x600-rggb.json")
+	file, err := os.ReadFile("../../data/m42-800x600-rggb.json")
 
 	if err != nil {
 		t.Errorf("Error opening from JSON data: %s", err)
@@ -801,3 +846,5 @@ func TestNewRGGBExposureGetMonochromeFromColorChannel(t *testing.T) {
 		t.Errorf("Error writing image: %s", err)
 	}
 }
+
+/*****************************************************************************************************************/

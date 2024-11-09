@@ -1,6 +1,18 @@
+/*****************************************************************************************************************/
+
+//	@author		Michael Roberts <michael@observerly.com>
+//	@package	@observerly/iris/palette
+//	@license	Copyright © 2021-2025 observerly
+
+/*****************************************************************************************************************/
+
 package palette
 
+/*****************************************************************************************************************/
+
 import "testing"
+
+/*****************************************************************************************************************/
 
 func TestCombineRedChannelSimple(t *testing.T) {
 	red := []PaletteChannel{
@@ -37,6 +49,8 @@ func TestCombineRedChannelSimple(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func TestCombineGreenChannelSimple(t *testing.T) {
 	green := []PaletteChannel{
 		{
@@ -72,6 +86,8 @@ func TestCombineGreenChannelSimple(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func TestCombineBlueChannelSimple(t *testing.T) {
 	blue := []PaletteChannel{
 		{
@@ -106,6 +122,8 @@ func TestCombineBlueChannelSimple(t *testing.T) {
 		t.Errorf("expected 70 in red channel, got %v", b[2])
 	}
 }
+
+/*****************************************************************************************************************/
 
 func TestFromPaletteSimple(t *testing.T) {
 	red := []PaletteChannel{
@@ -168,3 +186,5 @@ func TestFromPaletteSimple(t *testing.T) {
 		t.Errorf("expected 80 in red channel, got %v", r[2])
 	}
 }
+
+/*****************************************************************************************************************/

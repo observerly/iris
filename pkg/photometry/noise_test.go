@@ -1,8 +1,20 @@
+/*****************************************************************************************************************/
+
+//	@author		Michael Roberts <michael@observerly.com>
+//	@package	@observerly/iris/photometry
+//	@license	Copyright © 2021-2025 observerly
+
+/*****************************************************************************************************************/
+
 package photometry
+
+/*****************************************************************************************************************/
 
 import (
 	"testing"
 )
+
+/*****************************************************************************************************************/
 
 func TestNewNoiseExtractor(t *testing.T) {
 	var ex = [][]uint32{
@@ -47,6 +59,8 @@ func TestNewNoiseExtractor(t *testing.T) {
 		t.Errorf("Width is %d, expected 16", s.Width)
 	}
 }
+
+/*****************************************************************************************************************/
 
 func TestNewNoiseExtractorGaussianNoise(t *testing.T) {
 	var ex = [][]uint32{
@@ -101,3 +115,5 @@ func TestNewNoiseExtractorGaussianNoise(t *testing.T) {
 		t.Errorf("Noise is %f, expected <= 255", noise)
 	}
 }
+
+/*****************************************************************************************************************/

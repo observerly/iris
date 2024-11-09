@@ -1,10 +1,22 @@
+/*****************************************************************************************************************/
+
+//	@author		Michael Roberts <michael@observerly.com>
+//	@package	@observerly/iris/frames
+//	@license	Copyright © 2021-2025 observerly
+
+/*****************************************************************************************************************/
+
 package frames
+
+/*****************************************************************************************************************/
 
 import (
 	"testing"
 
 	"github.com/observerly/iris/pkg/fits"
 )
+
+/*****************************************************************************************************************/
 
 func TestNewMasterBiasFrame(t *testing.T) {
 	var bias = [][]uint32{
@@ -58,6 +70,8 @@ func TestNewMasterBiasFrame(t *testing.T) {
 		t.Errorf("NewMasterBiasFrame() failed: expected data[0] of 6, got %f", masterBias.Combined.Data[0])
 	}
 }
+
+/*****************************************************************************************************************/
 
 func TestApplyFrameToMasterBiasFrame(t *testing.T) {
 	var bias = [][]uint32{
@@ -154,3 +168,5 @@ func TestApplyFrameToMasterBiasFrame(t *testing.T) {
 		t.Errorf("NewMasterBiasFrame() failed: expected data[0] of 6, got %f", masterBias.Combined.Data[0])
 	}
 }
+
+/*****************************************************************************************************************/

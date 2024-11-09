@@ -1,4 +1,14 @@
+/*****************************************************************************************************************/
+
+//	@author		Michael Roberts <michael@observerly.com>
+//	@package	@observerly/iris/vcurve
+//	@license	Copyright © 2021-2025 observerly
+
+/*****************************************************************************************************************/
+
 package vcurve
+
+/*****************************************************************************************************************/
 
 import (
 	"math"
@@ -8,16 +18,22 @@ import (
 	"gonum.org/v1/gonum/stat"
 )
 
+/*****************************************************************************************************************/
+
 // Point is a data point with x and y coordinates.
 type Point struct {
 	X float64
 	Y float64
 }
 
+/*****************************************************************************************************************/
+
 // VCurve is a struct that holds the data points for the V-curve.
 type VCurve struct {
 	Points []Point
 }
+
+/*****************************************************************************************************************/
 
 // VCurveParams is a struct that holds the parameters for the V-curve model optisation and the data points.
 type VCurveParams struct {
@@ -29,13 +45,13 @@ type VCurveParams struct {
 	Y []float64
 }
 
-/*
-NewHyperbolicVCurve
+/*****************************************************************************************************************/
 
-Creates a new VCurve object ready for applying the Levenberg-Marquardt iterative optimization technique.
-
-The VCurve object is initialized with the data points, and initial guesses for the parameters are calculated from the input data.
-*/
+// NewHyperbolicVCurve
+//
+// Creates a new VCurve object ready for applying the Levenberg-Marquardt iterative optimization technique.
+// The VCurve object is initialized with the data points, and initial guesses for the parameters are calculated
+// from the input data.
 func NewHyperbolicVCurve(data VCurve) *VCurveParams {
 	// Preallocate slices with the exact required capacity
 	dataX := make([]float64, 0, len(data.Points))
@@ -66,11 +82,15 @@ func NewHyperbolicVCurve(data VCurve) *VCurveParams {
 	}
 }
 
+/*****************************************************************************************************************/
+
 // This is the hyperbolic function that we want to fit to the data.
 func hyperbolicFunction(x float64, params VCurveParams) float64 {
 	a, b, c, d := params.A, params.B, params.C, params.D
 	return b*math.Sqrt(1+math.Pow((x-c)/a, 2)) + d
 }
+
+/*****************************************************************************************************************/
 
 // objectiveFunc is the least squares objective function that accepts dataX and dataY.
 func objectiveFunc(dataX, dataY []float64) func(params []float64) float64 {
@@ -100,11 +120,10 @@ func objectiveFunc(dataX, dataY []float64) func(params []float64) float64 {
 	}
 }
 
-/*
-LevenbergMarquardtOptimisation
+/*****************************************************************************************************************/
 
-LevenbergMarquardtOptimisation optimizes the hyperbolic function using the Levenberg-Marquardt algorithm.
-*/
+// LevenbergMarquardtOptimisation
+// Optimizes the hyperbolic function using the Levenberg-Marquardt algorithm.
 func (p *VCurveParams) LevenbergMarquardtOptimisation() (VCurveParams, error) {
 	// Setting up the optimizer:
 	problem := optimize.Problem{
@@ -135,3 +154,5 @@ func (p *VCurveParams) LevenbergMarquardtOptimisation() (VCurveParams, error) {
 		D: result.X[3],
 	}, nil
 }
+
+/*****************************************************************************************************************/

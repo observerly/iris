@@ -1,4 +1,14 @@
+/*****************************************************************************************************************/
+
+//	@author		Michael Roberts <michael@observerly.com>
+//	@package	@observerly/iris/histogram
+//	@license	Copyright © 2021-2025 observerly
+
+/*****************************************************************************************************************/
+
 package histogram
+
+/*****************************************************************************************************************/
 
 import (
 	"image"
@@ -8,6 +18,8 @@ import (
 	"os"
 	"testing"
 )
+
+/*****************************************************************************************************************/
 
 func TestNewHistogramGray(t *testing.T) {
 	f, err := os.Open("../../images/noise.jpeg")
@@ -54,6 +66,8 @@ func TestNewHistogramGray(t *testing.T) {
 		t.Errorf("Histogram maximum is not 256")
 	}
 }
+
+/*****************************************************************************************************************/
 
 func TestNewHistogramGray16(t *testing.T) {
 	f, err := os.Open("../../images/noise16.jpeg")
@@ -102,3 +116,5 @@ func TestNewHistogramGray16(t *testing.T) {
 		t.Errorf("Histogram maximum is not 256")
 	}
 }
+
+/*****************************************************************************************************************/

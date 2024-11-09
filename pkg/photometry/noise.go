@@ -1,6 +1,18 @@
+/*****************************************************************************************************************/
+
+//	@author		Michael Roberts <michael@observerly.com>
+//	@package	@observerly/iris/photometry
+//	@license	Copyright © 2021-2025 observerly
+
+/*****************************************************************************************************************/
+
 package photometry
 
+/*****************************************************************************************************************/
+
 import "math"
+
+/*****************************************************************************************************************/
 
 type NoiseExtractor struct {
 	Width  int       // Width of a line in the underlying data array (for noise)
@@ -8,6 +20,8 @@ type NoiseExtractor struct {
 	Noise  float64   // The noise value
 	Data   []float32 // The underlying data array
 }
+
+/*****************************************************************************************************************/
 
 func NewNoiseExtractor(data []float32, xs int, ys int) *NoiseExtractor {
 	pixels := xs * ys
@@ -24,11 +38,11 @@ func NewNoiseExtractor(data []float32, xs int, ys int) *NoiseExtractor {
 	}
 }
 
-/*
-  GetGaussianNoise()
+/*****************************************************************************************************************/
 
-  From J. Immerkær, “Fast Noise Variance Estimation”, Computer Vision and Image Understanding, Vol. 64, No. 2, pp. 300-302, Sep. 1996.
-*/
+// Calculates the Gaussian noise in the image using a 3x3 kernel.
+//
+// From J. Immerkær, “Fast Noise Variance Estimation”, Computer Vision and Image Understanding, Vol. 64, No. 2, pp. 300-302, Sep. 1996.
 func (n *NoiseExtractor) GetGaussianNoise() float64 {
 	// Weights for the 3x3 noise estimate kernel:
 	weight := []int32{
@@ -80,3 +94,5 @@ func (n *NoiseExtractor) GetGaussianNoise() float64 {
 
 	return fr * noise
 }
+
+/*****************************************************************************************************************/
