@@ -1,7 +1,21 @@
 {
   "[go]": {
-    "editor.insertSpaces": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit"
+    },
+    "editor.defaultFormatter": "golang.go",
+    "editor.showFoldingControls": "always",
+    "editor.folding": true,
+    "editor.foldingStrategy": "auto", 
     "editor.formatOnSave": true,
-    "editor.defaultFormatter": "golang.go"
+    "editor.insertSpaces": true,
+    "editor.tabSize": 2,
+    "editor.rulers": [
+      115
+    ]
+  },
+  "[json]": {
+    "editor.defaultFormatter": "ZainChen.json",
+    "editor.formatOnSave": true
   }
 }
