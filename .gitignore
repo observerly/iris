@@ -17,3 +17,15 @@ playground
 
 # Editor directories and files
 .DS_Store
+
+# Dependency directories (remove the comment below to include it)
+vendor/
+
+# Go workspace file
+go.work
+go.work.sum
+
+# env file
+.env
+.env.config
+!.env.*.example
