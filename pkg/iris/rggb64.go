@@ -1,4 +1,14 @@
+/*****************************************************************************************************************/
+
+//	@author		Michael Roberts <michael@observerly.com>
+//	@package	@observerly/iris
+//	@license	Copyright © 2021-2025 observerly
+
+/*****************************************************************************************************************/
+
 package iris
+
+/*****************************************************************************************************************/
 
 import (
 	"bytes"
@@ -12,6 +22,8 @@ import (
 	"github.com/observerly/iris/pkg/fits"
 	"github.com/observerly/iris/pkg/photometry"
 )
+
+/*****************************************************************************************************************/
 
 type RGGB64Exposure struct {
 	Width             int
@@ -27,10 +39,14 @@ type RGGB64Exposure struct {
 	Pixels            int
 }
 
+/*****************************************************************************************************************/
+
 type RGGB64Color struct {
 	Name    string
 	Channel []float32
 }
+
+/*****************************************************************************************************************/
 
 func NewRGGB64Exposure(exposure [][]uint32, adu int32, xs int, ys int, cfa string) *RGGB64Exposure {
 	img := image.NewRGBA64(image.Rect(0, 0, xs, ys))
@@ -47,9 +63,9 @@ func NewRGGB64Exposure(exposure [][]uint32, adu int32, xs int, ys int, cfa strin
 	}
 }
 
-/**
-	Accepts a CFA (Color Filter Array) string, e.g., "RGGB" and returns the Bayering Matrix offset
-**/
+/*****************************************************************************************************************/
+
+// Accepts a CFA (Color Filter Array) string, e.g., "RGGB" and returns the Bayering Matrix offset
 func (b *RGGB64Exposure) GetBayerMatrixOffset() (xOffset int, yOffset int, err error) {
 	switch strings.ToLower(b.ColourFilterArray) {
 	case "rggb":
@@ -65,6 +81,8 @@ func (b *RGGB64Exposure) GetBayerMatrixOffset() (xOffset int, yOffset int, err e
 	}
 }
 
+/*****************************************************************************************************************/
+
 func (b *RGGB64Exposure) GetBuffer(img *image.RGBA64) (bytes.Buffer, error) {
 	var buff bytes.Buffer
 
@@ -77,9 +95,9 @@ func (b *RGGB64Exposure) GetBuffer(img *image.RGBA64) (bytes.Buffer, error) {
 	return buff, nil
 }
 
-/**
-	Convert an R or G or B channel to a Monochrome 16 bit exposure
-**/
+/*****************************************************************************************************************/
+
+// Converts an R, G, or B channel to a Monochrome 16 bit exposure
 func (b *RGGB64Exposure) GetMonochrome() Monochrome16Exposure {
 	// Create a 2D array of the specific RGB channel from flattened 1D color channel array:
 	raw := make([][]uint32, b.Height)
@@ -110,9 +128,9 @@ func (b *RGGB64Exposure) GetMonochrome() Monochrome16Exposure {
 	return m
 }
 
-/**
-	Convert an R or G or B channel to a FITS standard image
-**/
+/*****************************************************************************************************************/
+
+// Converts a R, G, or B channel to a FITS standard image
 func (b *RGGB64Exposure) GetFITSImageForChannel(color RGGB64Color) *fits.FITSImage {
 	// Create a 2D array of the specific RGB channel from flattened 1D color channel array:
 	raw := make([][]uint32, b.Height)
@@ -152,9 +170,9 @@ func (b *RGGB64Exposure) GetFITSImageForChannel(color RGGB64Color) *fits.FITSIma
 	return f
 }
 
-/**
-	Return each R, G, B FITS standard images
-**/
+/*****************************************************************************************************************/
+
+// Returns each of the R, G and B channels as FITS images
 func (b *RGGB64Exposure) GetFITSImages() (*fits.FITSImage, *fits.FITSImage, *fits.FITSImage) {
 	var wg sync.WaitGroup
 
@@ -206,9 +224,9 @@ func (b *RGGB64Exposure) GetFITSImages() (*fits.FITSImage, *fits.FITSImage, *fit
 	return <-R, <-G, <-B
 }
 
-/**
-	Perform Debayering w/ Bilinear Interpolation Technique
-**/
+/*****************************************************************************************************************/
+
+// Performs a Debayering with a bilinear interpolation technique.
 func (b *RGGB64Exposure) DebayerBilinearInterpolation() error {
 	var wg sync.WaitGroup
 
@@ -302,22 +320,10 @@ func (b *RGGB64Exposure) DebayerBilinearInterpolation() error {
 	return nil
 }
 
-/*
- 	PreprocessImageArray()
+/*****************************************************************************************************************/
 
-	Preprocesses an ASCOM Alpaca Image Array to a m.Raw 2D array of uint32 values.
-	Converts the 2D array of uint16 values to a 2D array of uint32 values.
-
-	@returns  a bytes.Buffer containing the preprocessed image.
-	@see https://ascom-standards.org/api/#/Camera%20Specific%20Methods/get_camera__device_number__imagearray
-
-	"... "column-major" order (column changes most rapidly) from the image's row and column
-	perspective, while, from the array's perspective, serialisation is actually effected in
-	"row-major" order (rightmost index changes most rapidly). This unintuitive outcome arises
-	because the ASCOM Camera Interface specification defines the image column dimension as
-	the rightmost array dimension."
-
-*/
+// Preprocesses an ASCOM Alpaca Image Array to a m.Raw 2D array of uint32 values. Converts the 2D array of uint16
+// values to a 2D array of uint32 values, returning a bytes.Buffer containing the preprocessed image.
 func (b *RGGB64Exposure) PreprocessImageArray(xs int, ys int) (bytes.Buffer, error) {
 	// Switch the columns and rows in the image:
 	ex := make([][]uint32, xs)
@@ -348,3 +354,5 @@ func (b *RGGB64Exposure) Preprocess() (bytes.Buffer, error) {
 
 	return b.GetBuffer(b.Image)
 }
+
+/*****************************************************************************************************************/

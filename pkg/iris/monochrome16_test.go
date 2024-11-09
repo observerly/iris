@@ -1,14 +1,27 @@
+/*****************************************************************************************************************/
+
+//	@author		Michael Roberts <michael@observerly.com>
+//	@package	@observerly/iris
+//	@license	Copyright © 2021-2025 observerly
+
+/*****************************************************************************************************************/
+
 package iris
+
+/*****************************************************************************************************************/
 
 import (
 	"encoding/json"
 	"image/jpeg"
-	"io/ioutil"
 	"os"
 	"testing"
 )
 
+/*****************************************************************************************************************/
+
 var ex16 = [][]uint32{}
+
+/*****************************************************************************************************************/
 
 func TestNewMonochrome16ExposureWidth(t *testing.T) {
 	mono := NewMonochrome16Exposure(ex16, 1, 800, 600)
@@ -22,6 +35,8 @@ func TestNewMonochrome16ExposureWidth(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func TestNewMonochrome16ExposureHeight(t *testing.T) {
 	mono := NewMonochrome16Exposure(ex16, 1, 800, 600)
 
@@ -33,6 +48,8 @@ func TestNewMonochrome16ExposureHeight(t *testing.T) {
 		t.Errorf("got %q, wanted %q", got, want)
 	}
 }
+
+/*****************************************************************************************************************/
 
 func TestNewMonochrome16ExposurePixels(t *testing.T) {
 	mono := NewMonochrome16Exposure(ex16, 1, 800, 600)
@@ -46,6 +63,8 @@ func TestNewMonochrome16ExposurePixels(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func TestNewMonochrome16ExposureGetBuffer(t *testing.T) {
 	mono := NewMonochrome16Exposure(ex16, 1, 800, 600)
 
@@ -55,6 +74,8 @@ func TestNewMonochrome16ExposureGetBuffer(t *testing.T) {
 		t.Errorf("Expected no error when creating the output buffer, got %q", err)
 	}
 }
+
+/*****************************************************************************************************************/
 
 func TestNewMonochrome16ExposurePreprocess4x4(t *testing.T) {
 	var ex = [][]uint32{
@@ -109,6 +130,8 @@ func TestNewMonochrome16ExposurePreprocess4x4(t *testing.T) {
 		t.Errorf("Expected the number of bytes to be approximately less than 1024, but got %v", n)
 	}
 }
+
+/*****************************************************************************************************************/
 
 func TestNewMonochrome16ExposurePreprocess16x16(t *testing.T) {
 	var ex = [][]uint32{
@@ -175,6 +198,8 @@ func TestNewMonochrome16ExposurePreprocess16x16(t *testing.T) {
 		t.Errorf("Expected the number of bytes to be approximately less than 1086, but got %q", n)
 	}
 }
+
+/*****************************************************************************************************************/
 
 func TestNewNoiseExtractorGaussianNoise16PngImage(t *testing.T) {
 	f, err := os.Open("../../images/noise16.jpeg")
@@ -244,6 +269,8 @@ func TestNewNoiseExtractorGaussianNoise16PngImage(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func TestNewMonochrome16ExposureOtsuThreshold(t *testing.T) {
 	var ex = [][]uint32{
 		{6, 6, 6, 6, 6, 6, 6, 6, 9, 6, 6, 6, 6, 6, 6, 6},
@@ -311,6 +338,8 @@ func TestNewMonochrome16ExposureOtsuThreshold(t *testing.T) {
 		t.Errorf("Expected the number of bytes to be approximately less than 1086, but got %q", n)
 	}
 }
+
+/*****************************************************************************************************************/
 
 func TestNewMonochrome16ExposureNoiseReduction16x16(t *testing.T) {
 	var ex = [][]uint32{
@@ -387,6 +416,8 @@ func TestNewMonochrome16ExposureNoiseReduction16x16(t *testing.T) {
 		t.Errorf("Noise is %f, expected <= 255", mono.Noise)
 	}
 }
+
+/*****************************************************************************************************************/
 
 func TestNewMonochrome16ExposureGetFITSImage(t *testing.T) {
 	f, err := os.Open("../../images/noise16.jpeg")
@@ -476,6 +507,8 @@ func TestNewMonochrome16ExposureGetFITSImage(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func TestNewMonochrome16ExposureFromASCOMGetFITSImage(t *testing.T) {
 	type CameraExposure struct {
 		BayerXOffset int32      `json:"bayerXOffset"`
@@ -488,7 +521,7 @@ func TestNewMonochrome16ExposureFromASCOMGetFITSImage(t *testing.T) {
 		SensorType   string     `json:"sensorType"`
 	}
 
-	file, err := ioutil.ReadFile("../../data/m42-800x600-monochrome.json")
+	file, err := os.ReadFile("../../data/m42-800x600-monochrome.json")
 
 	if err != nil {
 		t.Errorf("Error opening from JSON data: %s", err)
@@ -557,3 +590,5 @@ func TestNewMonochrome16ExposureFromASCOMGetFITSImage(t *testing.T) {
 		t.Errorf("Error writing image: %s", err)
 	}
 }
+
+/*****************************************************************************************************************/

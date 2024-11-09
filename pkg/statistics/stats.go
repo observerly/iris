@@ -1,4 +1,14 @@
+/*****************************************************************************************************************/
+
+//	@author		Michael Roberts <michael@observerly.com>
+//	@package	@observerly/iris/stats
+//	@license	Copyright © 2021-2025 observerly
+
+/*****************************************************************************************************************/
+
 package stats
+
+/*****************************************************************************************************************/
 
 import (
 	"math"
@@ -8,7 +18,9 @@ import (
 	"github.com/observerly/iris/pkg/utils"
 )
 
-// Statistics on data arrays, calculated on demand
+/*****************************************************************************************************************/
+
+// Statistics on data arrays, calculated on demand.
 type Stats struct {
 	Width    int       // Width of a line in the underlying data array (for noise)
 	Data     []float32 // The underlying data array
@@ -22,6 +34,8 @@ type Stats struct {
 	Scale    float32   // Selected scale indicator (standard: randomized Qn)
 	Noise    float32   // Noise Estimation
 }
+
+/*****************************************************************************************************************/
 
 func NewStats(data []float32, adu int32, xs int) *Stats {
 	NaN32 := float32(math.NaN())
@@ -51,6 +65,8 @@ func NewStats(data []float32, adu int32, xs int) *Stats {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func calcMinMeanMax(data []float32) (min float32, mean float32, max float32) {
 	mmin, mmean, mmax := float32(data[0]), float32(0), float32(data[0])
 
@@ -66,6 +82,8 @@ func calcMinMeanMax(data []float32) (min float32, mean float32, max float32) {
 
 	return mmin, float32(mmean / float32(len(data))), mmax
 }
+
+/*****************************************************************************************************************/
 
 func calcMeanStdDevVar(data []float32) (mean float32, stddev float32, variance float32) {
 	xvar, mmean := float32(0), float32(0)
@@ -87,6 +105,8 @@ func calcMeanStdDevVar(data []float32) (mean float32, stddev float32, variance f
 
 	return mmean, stddev, xvar
 }
+
+/*****************************************************************************************************************/
 
 func calcMinMeanMaxStdDevVar(data []float32) (min float32, mean float32, max float32, stddev float32, variance float32) {
 	mmin, mmean, mmax, xvar := float32(data[0]), float32(0), float32(data[0]), float32(0)
@@ -117,6 +137,8 @@ func calcMinMeanMaxStdDevVar(data []float32) (min float32, mean float32, max flo
 	return mmin, mmean, mmax, stddev, xvar
 }
 
+/*****************************************************************************************************************/
+
 func calcMedian(data []float32) float32 {
 	p := make([]float64, len(data))
 
@@ -133,27 +155,22 @@ func calcMedian(data []float32) float32 {
 	return float32(p[len(p)/2])
 }
 
-/*
-	FastMedian
+/*****************************************************************************************************************/
 
-	Calculates fast median of the data sample
-*/
+// FastMedian calculates the median of the data sample
 func (s *Stats) FastMedian() float32 {
 	median := qsort.QSelectMedianFloat32(s.Data)
 	return median
 }
 
-/*
-	FastApproxMedian
+/*****************************************************************************************************************/
 
-	Calculates fast approximate median of the (presumably large) data by
-	sub-sampling the given number of values and taking the median of that.
-
-	Note: this is not a statistically correct median, but it is fast and
-	should be good enough for most purposes.	The sub-sampling is done
-	by randomly selecting sub-values from the data array using a random
-	number generator pinned to the maximum of the data array.
-*/
+// Calculates fast approximate median of the (presumably large) data by sub-sampling the given number of values
+// and taking the median of that.
+//
+// N.B. This is not a statistically correct median, but it is fast and should be good enough for most purposes.
+// The sub-sampling is done by randomly selecting sub-values from the data array using a random number generator
+// pinned to the maximum of the data array.
 func (s *Stats) FastApproxMedian(sample []float32) float32 {
 	rng := utils.RNG{}
 
@@ -171,19 +188,16 @@ func (s *Stats) FastApproxMedian(sample []float32) float32 {
 	return median
 }
 
-/*
-	FastApproxQn
+/*****************************************************************************************************************/
 
-	Calculates fast approximate Qn scale estimate of the (presumably large) data by
-	sub-sampling the given number of pairs and taking the first quartile of that.
-
-	Note: this is not a statistically correct median, but it is fast and
-	should be good enough for most purposes. The sub-sampling is done
-	by randomly selecting sub-values from the data array using a random
-	number generator pinned to the maximum of the data array.
-
-	@see http://web.ipac.caltech.edu/staff/fmasci/home/astro_refs/BetterThanMAD.pdf
-*/
+// Calculates fast approximate Qn scale estimate of the (presumably large) data by sub-sampling the given number
+// of pairs.
+//
+// N.B. This is not a statistically correct median, but it is fast and should be good enough for most purposes.
+// The sub-sampling is done by randomly selecting sub-values from the data array using a random number generator
+// pinned to the maximum of the data array.
+//
+// @see http://web.ipac.caltech.edu/staff/fmasci/home/astro_refs/BetterThanMAD.pdf
 func (s *Stats) FastApproxQn(sample []float32) float32 {
 	rng := utils.RNG{}
 
@@ -204,16 +218,18 @@ func (s *Stats) FastApproxQn(sample []float32) float32 {
 	return qn
 }
 
+/*****************************************************************************************************************/
+
 /*
-	FastApproxBoundedMedian
+FastApproxBoundedMedian
 
-	Calculates fast approximate median of the (presumably large) data by
-	sub-sampling the given number of values and taking the median of that.
+Calculates fast approximate median of the (presumably large) data by
+sub-sampling the given number of values and taking the median of that.
 
-	Note: this is not a statistically correct median, but it is fast and
-	should be good enough for most purposes. The sub-sampling is done
-	by randomly selecting sub-values from the data array using a random
-	number generator pinned to the maximum of the data array.
+Note: this is not a statistically correct median, but it is fast and
+should be good enough for most purposes. The sub-sampling is done
+by randomly selecting sub-values from the data array using a random
+number generator pinned to the maximum of the data array.
 */
 func (s *Stats) FastApproxBoundedMedian(sample []float32, lowerBound, higherBound float32) float32 {
 	rng := utils.RNG{}
@@ -239,17 +255,14 @@ func (s *Stats) FastApproxBoundedMedian(sample []float32, lowerBound, higherBoun
 	return median
 }
 
-/*
-	FastApproxBoundedQn
+/*****************************************************************************************************************/
 
-	Calculates fast approximate Qn scale estimate of the (presumably large) data by
-	sub-sampling the given number of pairs and taking the first quartile of that.
-
-	Note: this is not a statistically correct median, but it is fast and
-	should be good enough for most purposes. The sub-sampling is done
-	by randomly selecting sub-values from the data array using a random
-	number generator pinned to the maximum of the data array.
-*/
+// Calculates fast approximate Qn scale estimate of the (presumably large) data by sub-sampling the given number
+// of pairs and taking the first quartile of that.
+//
+// N.B This is not a statistically correct median, but it is fast and should be good enough for most purposes.
+// The sub-sampling is done by randomly selecting sub-values from the data array using a random number generator
+// pinned to the maximum of the data array.
 func (s *Stats) FastApproxBoundedQn(sample []float32, lowerBound, higherBound float32) float32 {
 	rng := utils.RNG{}
 
@@ -283,14 +296,12 @@ func (s *Stats) FastApproxBoundedQn(sample []float32, lowerBound, higherBound fl
 	return qn
 }
 
-/*
-	FastApproxSigmaClippedMedianAndQn
+/*****************************************************************************************************************/
 
-	@returns a rapid robust estimation of location and scale. Uses a fast approximate
-	median based on randomized sub-sampling, iteratively sigma clipped with a fast
-	approximate Qn based on random sampling. Exits once the absolute change in
-	location and scale is below epsilon.
-*/
+// Calculates the fast approximate sigma-clipped median and Qn scale estimate of the data, returning a rapid
+// estimation of location and scale. Uses a fast approximate median based on randomized sub-sampling, iteratively
+// sigma clipped with a fast approximate Qn based on random sampling. Exits once the absolute change in location
+// and scale is below epsilon.
 func (s *Stats) FastApproxSigmaClippedMedianAndQn() (float32, float32) {
 	sample := make([]float32, int(float32(len(s.Data))*0.8))
 
@@ -327,3 +338,5 @@ func (s *Stats) FastApproxSigmaClippedMedianAndQn() (float32, float32) {
 		location, scale = nlocation, nscale
 	}
 }
+
+/*****************************************************************************************************************/

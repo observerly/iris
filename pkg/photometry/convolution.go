@@ -1,6 +1,18 @@
+/*****************************************************************************************************************/
+
+//	@author		Michael Roberts <michael@observerly.com>
+//	@package	@observerly/iris/photometry
+//	@license	Copyright © 2021-2025 observerly
+
+/*****************************************************************************************************************/
+
 package photometry
 
+/*****************************************************************************************************************/
+
 import "math"
+
+/*****************************************************************************************************************/
 
 func BiLinearConvolveRedChannel(raw []uint32, w, h, xOffset, yOffset, x, y uint32) []float32 {
 	R := make([]float32, int(x)*int(y))
@@ -39,6 +51,8 @@ func BiLinearConvolveRedChannel(raw []uint32, w, h, xOffset, yOffset, x, y uint3
 
 	return R
 }
+
+/*****************************************************************************************************************/
 
 func BiLinearConvolveGreenChannel(raw []uint32, w, h, xOffset, yOffset, x, y uint32) []float32 {
 	G := make([]float32, int(x)*int(y))
@@ -91,6 +105,8 @@ func BiLinearConvolveGreenChannel(raw []uint32, w, h, xOffset, yOffset, x, y uin
 	return G
 }
 
+/*****************************************************************************************************************/
+
 func BiLinearConvolveBlueChannel(raw []uint32, w, h, xOffset, yOffset, x, y uint32) []float32 {
 	B := make([]float32, int(x)*int(y))
 
@@ -128,3 +144,5 @@ func BiLinearConvolveBlueChannel(raw []uint32, w, h, xOffset, yOffset, x, y uint
 
 	return B
 }
+
+/*****************************************************************************************************************/

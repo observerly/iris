@@ -1,4 +1,14 @@
+/*****************************************************************************************************************/
+
+//	@author		Michael Roberts <michael@observerly.com>
+//	@package	@observerly/iris/photometry
+//	@license	Copyright © 2021-2025 observerly
+
+/*****************************************************************************************************************/
+
 package photometry
+
+/*****************************************************************************************************************/
 
 import (
 	"image"
@@ -10,6 +20,8 @@ import (
 	stats "github.com/observerly/iris/pkg/statistics"
 	"github.com/observerly/iris/pkg/utils"
 )
+
+/*****************************************************************************************************************/
 
 func GetTestDataFromImage() ([][]uint32, image.Rectangle) {
 	f, err := os.Open("../../images/noise16.jpeg")
@@ -45,6 +57,8 @@ func GetTestDataFromImage() ([][]uint32, image.Rectangle) {
 
 	return data, bounds
 }
+
+/*****************************************************************************************************************/
 
 func TestNewStarsExtractor(t *testing.T) {
 	var ex = [][]uint32{
@@ -106,6 +120,8 @@ func TestNewStarsExtractor(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func TestNewGetBrightPixels(t *testing.T) {
 	var ex = [][]uint32{
 		{123, 6, 117, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6},
@@ -150,6 +166,8 @@ func TestNewGetBrightPixels(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func TestNewGetBrightPixelsFrom2DData(t *testing.T) {
 	data, bounds := GetTestDataFromImage()
 
@@ -177,6 +195,8 @@ func TestNewGetBrightPixelsFrom2DData(t *testing.T) {
 		t.Error("Expected 2084 bright pixels, got ", len(stars))
 	}
 }
+
+/*****************************************************************************************************************/
 
 func TestNewRejectBadPixelsFrom2DData(t *testing.T) {
 	data, bounds := GetTestDataFromImage()
@@ -213,6 +233,8 @@ func TestNewRejectBadPixelsFrom2DData(t *testing.T) {
 		t.Error("Expected to reject about 50 bad pixels, got ", len(stars))
 	}
 }
+
+/*****************************************************************************************************************/
 
 func TestNewFilterOverlappingStarsFrom2DData(t *testing.T) {
 	data, bounds := GetTestDataFromImage()
@@ -255,6 +277,8 @@ func TestNewFilterOverlappingStarsFrom2DData(t *testing.T) {
 		t.Error("Expected to filter out ~1860 number of overlapping stars, but filtered out ", 2084-len(stars))
 	}
 }
+
+/*****************************************************************************************************************/
 
 func TestNewShiftToBrightestPixelStarsFrom2DData(t *testing.T) {
 	data, bounds := GetTestDataFromImage()
@@ -303,6 +327,8 @@ func TestNewShiftToBrightestPixelStarsFrom2DData(t *testing.T) {
 		t.Error("Expected to shift all stars, but shifted ", len(stars))
 	}
 }
+
+/*****************************************************************************************************************/
 
 func TestNewExtractAndFilterHalfFluxRadiusStarsFrom2DData(t *testing.T) {
 	data, bounds := GetTestDataFromImage()
@@ -360,6 +386,8 @@ func TestNewExtractAndFilterHalfFluxRadiusStarsFrom2DData(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func TestNewFindStarsFrom2DData(t *testing.T) {
 	data, bounds := GetTestDataFromImage()
 
@@ -403,3 +431,5 @@ func TestNewFindStarsFrom2DData(t *testing.T) {
 		t.Error("Expected to calculate HFR to an accuracy of 0.1, but got ", s.HFR)
 	}
 }
+
+/*****************************************************************************************************************/

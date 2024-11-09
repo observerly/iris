@@ -1,12 +1,18 @@
+/*****************************************************************************************************************/
+
+//	@author		Michael Roberts <michael@observerly.com>
+//	@package	@observerly/iris/qsort
+//	@license	Copyright © 2021-2025 observerly
+
+/*****************************************************************************************************************/
+
 package qsort
 
-/*
-  Partitions an array of float32 with the middle pivot element, and returns the pivot index.
+/*****************************************************************************************************************/
 
-  Values less than the pivot are moved left of the pivot, those greater are moved right.
-
-  Array must not contain IEEE NaN
-*/
+// Partition an array of float32 with the middle pivot element, and return the pivot index.
+//
+// Values less than the pivot are moved left of the pivot, those greater are moved right.
 func QPartitionFloat32(a []float32) int {
 	left, right := 0, len(a)-1
 
@@ -37,11 +43,9 @@ func QPartitionFloat32(a []float32) int {
 	}
 }
 
-/*
-	Sort an array of float32 in ascending order.
+/*****************************************************************************************************************/
 
-	Array must not contain IEEE NaN
-*/
+// Quick sort an array of float32 in ascending order.
 func QSortFloat32(a []float32) {
 	if len(a) > 1 {
 		index := QPartitionFloat32(a)
@@ -50,11 +54,9 @@ func QSortFloat32(a []float32) {
 	}
 }
 
-/*
-	Select kth lowest element from an array of float32. Partially reorders the array.
+/*****************************************************************************************************************/
 
-	Array must not contain IEEE NaN
-*/
+// Select kth lowest element from an array of float32. Partially reorders the array.
 func QSelectFloat32(a []float32, k int) float32 {
 	left, right := 0, len(a)-1
 
@@ -92,27 +94,23 @@ func QSelectFloat32(a []float32, k int) float32 {
 			right = index
 		} else {
 			left = index + 1
-			k = k - offset
+			k -= offset
 		}
 	}
 
 	return a[left]
 }
 
-/*
-	Select first quartile of an array of float32. Partially reorders the array.
+/*****************************************************************************************************************/
 
-	Array must not contain IEEE NaN
-*/
+// Selects the first quartile of an array of float32 and partially reorders the array.
 func QSelectFirstQuartileFloat32(a []float32) float32 {
 	return QSelectFloat32(a, (len(a)>>2)+1)
 }
 
-/*
-	Select median of an array of float32. Partially reorders the array.
+/*****************************************************************************************************************/
 
-	Array must not contain IEEE NaN
-*/
+// Selects the median of an array of float32 and partially reorders the array.
 func QSelectMedianFloat32(a []float32) float32 {
 	// Quickly  select the midpoint element:
 	k := (len(a) >> 1) + 1
@@ -137,3 +135,5 @@ func QSelectMedianFloat32(a []float32) float32 {
 	// Return average of the upper and lower elements:
 	return 0.5 * (lower + upper)
 }
+
+/*****************************************************************************************************************/

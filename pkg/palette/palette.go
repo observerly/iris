@@ -1,4 +1,14 @@
+/*****************************************************************************************************************/
+
+//	@author		Michael Roberts <michael@observerly.com>
+//	@package	@observerly/iris/palette
+//	@license	Copyright © 2021-2025 observerly
+
+/*****************************************************************************************************************/
+
 package palette
+
+/*****************************************************************************************************************/
 
 import (
 	"fmt"
@@ -7,10 +17,14 @@ import (
 	"github.com/observerly/iris/pkg/utils"
 )
 
+/*****************************************************************************************************************/
+
 type PaletteChannel struct {
 	Data     []float32
 	Fraction float32
 }
+
+/*****************************************************************************************************************/
 
 type Palette struct {
 	Name string
@@ -19,18 +33,10 @@ type Palette struct {
 	B    []PaletteChannel
 }
 
-/*
-*
+/*****************************************************************************************************************/
 
-	FromPalette takes a colour palette and returns the red, green and blue
-	channels as a slice of float32, which can be constructed into an image
-	or into FITS data.
-
-	@param p *Palette - the colour palette to construct the channels from
-	@returns []float32, []float32, []float32, error - the red, green and blue channels, and any error
-
-*
-*/
+// FromPalette takes a colour palette and returns the red, green and blue channels as a slice of float32,
+// which can be constructed into an image or into FITS data.
 func FromPalette(p *Palette) (r, g, b []float32, err error) {
 	var wg sync.WaitGroup
 
@@ -102,17 +108,9 @@ func FromPalette(p *Palette) (r, g, b []float32, err error) {
 	return <-R, <-G, <-B, <-errors
 }
 
-/*
-*
+/*****************************************************************************************************************/
 
-	combinePaletteChannel takes a slice of PaletteChannel and combines them
-	into a single slice of float32.
-
-	@param c []PaletteChannel - the slice of PaletteChannel to combine
-	@returns []float32, error - the combined slice of float32, and any error
-
-*
-*/
+// combinePaletteChannel takes a slice of PaletteChannel and combines them into a single slice of float32.
 func combinePaletteChannel(channel []PaletteChannel) ([]float32, error) {
 	// Take each channel of the palette, and their respective constituents, and multiply them by the fraction:
 	fraction := float32(0.0)
@@ -148,3 +146,5 @@ func combinePaletteChannel(channel []PaletteChannel) ([]float32, error) {
 
 	return d, nil
 }
+
+/*****************************************************************************************************************/

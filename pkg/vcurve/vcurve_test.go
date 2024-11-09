@@ -1,8 +1,20 @@
+/*****************************************************************************************************************/
+
+//	@author		Michael Roberts <michael@observerly.com>
+//	@package	@observerly/iris/vcurve
+//	@license	Copyright © 2021-2025 observerly
+
+/*****************************************************************************************************************/
+
 package vcurve
+
+/*****************************************************************************************************************/
 
 import (
 	"testing"
 )
+
+/*****************************************************************************************************************/
 
 var (
 	points = []Point{
@@ -29,6 +41,8 @@ var (
 		{X: 31000, Y: 39.7},
 	}
 )
+
+/*****************************************************************************************************************/
 
 func TestNewHyperbolicVCurve(t *testing.T) {
 	v := NewHyperbolicVCurve(VCurve{
@@ -58,6 +72,8 @@ func TestNewHyperbolicVCurve(t *testing.T) {
 		t.Errorf("D should be 0, but got %v", d)
 	}
 }
+
+/*****************************************************************************************************************/
 
 // Test for V-curve fitting with hyperbolic model
 func TestHyperbolicVCurveLevenbergMarquardtOptimisation(t *testing.T) {
@@ -96,3 +112,5 @@ func TestHyperbolicVCurveLevenbergMarquardtOptimisation(t *testing.T) {
 		t.Errorf("D should be close to %v, but got %v", -1.7965, d)
 	}
 }
+
+/*****************************************************************************************************************/

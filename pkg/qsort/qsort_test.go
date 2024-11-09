@@ -1,8 +1,20 @@
+/*****************************************************************************************************************/
+
+//	@author		Michael Roberts <michael@observerly.com>
+//	@package	@observerly/iris/qsort
+//	@license	Copyright © 2021-2025 observerly
+
+/*****************************************************************************************************************/
+
 package qsort
+
+/*****************************************************************************************************************/
 
 import (
 	"testing"
 )
+
+/*****************************************************************************************************************/
 
 func TestQPartitionFloat32(t *testing.T) {
 	a := []float32{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
@@ -18,6 +30,8 @@ func TestQPartitionFloat32(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func TestQPartitionFloat32DispersedRandom(t *testing.T) {
 	a := []float32{10, 12, 23, 23, 16, 23, 21, 16}
 
@@ -32,6 +46,8 @@ func TestQPartitionFloat32DispersedRandom(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func TestQSortFloat32(t *testing.T) {
 	a := []float32{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
 
@@ -43,6 +59,8 @@ func TestQSortFloat32(t *testing.T) {
 		}
 	}
 }
+
+/*****************************************************************************************************************/
 
 func TestQSortFloat32DispersedRandom(t *testing.T) {
 	a := []float32{10, 12, 23, 23, 16, 23, 21, 16}
@@ -82,6 +100,8 @@ func TestQSortFloat32DispersedRandom(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func TestQSelectFloat32(t *testing.T) {
 	a := []float32{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
 
@@ -91,6 +111,8 @@ func TestQSelectFloat32(t *testing.T) {
 		t.Errorf("Expected 5, got %f", v)
 	}
 }
+
+/*****************************************************************************************************************/
 
 func TestQSelectFloat32DispersedRandom(t *testing.T) {
 	a := []float32{10, 12, 23, 23, 16, 23, 21, 16}
@@ -102,6 +124,8 @@ func TestQSelectFloat32DispersedRandom(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func TestQSelectFirstQuartileFloat32(t *testing.T) {
 	a := []float32{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
 
@@ -112,6 +136,8 @@ func TestQSelectFirstQuartileFloat32(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func TestQSelectFirstQuartileFloat32DispersedRandom(t *testing.T) {
 	a := []float32{10, 12, 23, 23, 16, 23, 21, 16}
 
@@ -121,6 +147,8 @@ func TestQSelectFirstQuartileFloat32DispersedRandom(t *testing.T) {
 		t.Errorf("Expected 12, got %f", v)
 	}
 }
+
+/*****************************************************************************************************************/
 
 func TestQSelectMedianFloat32Odd(t *testing.T) {
 	a := []float32{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
@@ -134,6 +162,8 @@ func TestQSelectMedianFloat32Odd(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func TestQSelectMedianFloat32Even(t *testing.T) {
 	a := []float32{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
 
@@ -146,6 +176,8 @@ func TestQSelectMedianFloat32Even(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func TestQSelectMedianFloat32DispersedRandom(t *testing.T) {
 	a := []float32{10, 12, 23, 23, 16, 23, 21, 16}
 
@@ -157,3 +189,5 @@ func TestQSelectMedianFloat32DispersedRandom(t *testing.T) {
 		t.Errorf("median should be 18.5, but got %v", median)
 	}
 }
+
+/*****************************************************************************************************************/

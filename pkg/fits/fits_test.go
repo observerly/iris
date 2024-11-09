@@ -1,4 +1,14 @@
+/*****************************************************************************************************************/
+
+//	@author		Michael Roberts <michael@observerly.com>
+//	@package	@observerly/iris/fits
+//	@license	Copyright © 2021-2025 observerly
+
+/*****************************************************************************************************************/
+
 package fits
+
+/*****************************************************************************************************************/
 
 import (
 	"bytes"
@@ -10,6 +20,8 @@ import (
 	"testing"
 	"time"
 )
+
+/*****************************************************************************************************************/
 
 func GetTestDataFromImage() ([][]uint32, image.Rectangle) {
 	f, err := os.Open("../../images/noise16.jpeg")
@@ -46,6 +58,8 @@ func GetTestDataFromImage() ([][]uint32, image.Rectangle) {
 	return data, bounds
 }
 
+/*****************************************************************************************************************/
+
 func TestNewDefaultFITSImageHeaderEnd(t *testing.T) {
 	var img = NewFITSImage(2, 600, 800, 65535)
 
@@ -58,6 +72,8 @@ func TestNewDefaultFITSImageHeaderEnd(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func TestNewDefaultFITSImageBScale(t *testing.T) {
 	var img = NewFITSImage(2, 600, 800, 65535)
 
@@ -69,6 +85,8 @@ func TestNewDefaultFITSImageBScale(t *testing.T) {
 		t.Errorf("NewFITSImage() Bscale: got %v, want %v", got, want)
 	}
 }
+
+/*****************************************************************************************************************/
 
 func TestNewFITSImageFromReader(t *testing.T) {
 	// Attempt to open the file from the given filepath:
@@ -114,6 +132,8 @@ func TestNewFITSImageFromReader(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func TestNewFITSImageFrom2DDataID(t *testing.T) {
 	var ex = [][]uint32{
 		{1, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6},
@@ -144,6 +164,8 @@ func TestNewFITSImageFrom2DDataID(t *testing.T) {
 		t.Errorf("NewFITSImageFrom2DData() ID: got %v, want %v", got, want)
 	}
 }
+
+/*****************************************************************************************************************/
 
 func TestNewFITSImageFrom2DDataPixels(t *testing.T) {
 	var ex = [][]uint32{
@@ -176,6 +198,8 @@ func TestNewFITSImageFrom2DDataPixels(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func TestNewFITSImageFrom2DDataData(t *testing.T) {
 	var ex = [][]uint32{
 		{1, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6},
@@ -207,6 +231,8 @@ func TestNewFITSImageFrom2DDataData(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func TestNewFITSImageFrom2DDataWriteFloatData(t *testing.T) {
 	data, bounds := GetTestDataFromImage()
 
@@ -232,6 +258,8 @@ func TestNewFITSImageFrom2DDataWriteFloatData(t *testing.T) {
 		t.Errorf("Error writing float32 array to standard output: %s", err)
 	}
 }
+
+/*****************************************************************************************************************/
 
 func TestNewFITSImageFrom2DDataWrite(t *testing.T) {
 	data, bounds := GetTestDataFromImage()
@@ -267,6 +295,9 @@ func TestNewFITSImageFrom2DDataWrite(t *testing.T) {
 		t.Errorf("Error writing image: %s", err)
 	}
 }
+
+/*****************************************************************************************************************/
+
 func TestNewFITSImageFrom2DStats(t *testing.T) {
 	data, bounds := GetTestDataFromImage()
 
@@ -302,6 +333,8 @@ func TestNewFITSImageFrom2DStats(t *testing.T) {
 		t.Errorf("Expected the mean pixel value to be 18514.215, but got %f", stats.Mean)
 	}
 }
+
+/*****************************************************************************************************************/
 
 func TestNewFITSRead(t *testing.T) {
 	var fit = NewFITSImage(2, 1, 1, 65535)
@@ -370,6 +403,8 @@ func TestNewFITSRead(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func TestNewFITSFromFile(t *testing.T) {
 	var fit = NewFITSImage(2, 1, 1, 65535)
 
@@ -413,6 +448,8 @@ func TestNewFITSFromFile(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func TestNewFindStarsFrom2DData(t *testing.T) {
 	data, bounds := GetTestDataFromImage()
 
@@ -440,6 +477,8 @@ func TestNewFindStarsFrom2DData(t *testing.T) {
 		t.Error("Expected to calculate HFR to an accuracy of 0.1, but got ", hfr)
 	}
 }
+
+/*****************************************************************************************************************/
 
 func TestNewAddObservationEntry(t *testing.T) {
 	data, bounds := GetTestDataFromImage()
@@ -528,6 +567,8 @@ func TestNewAddObservationEntry(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func TestNewAddObserverEntry(t *testing.T) {
 	data, bounds := GetTestDataFromImage()
 
@@ -584,3 +625,5 @@ func TestNewAddObserverEntry(t *testing.T) {
 		t.Errorf("Error writing image: %s", err)
 	}
 }
+
+/*****************************************************************************************************************/

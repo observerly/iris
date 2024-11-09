@@ -1,4 +1,14 @@
+/*****************************************************************************************************************/
+
+//	@author		Michael Roberts <michael@observerly.com>
+//	@package	@observerly/iris/frames
+//	@license	Copyright © 2021-2025 observerly
+
+/*****************************************************************************************************************/
+
 package frames
+
+/*****************************************************************************************************************/
 
 import (
 	"time"
@@ -7,20 +17,16 @@ import (
 	"github.com/observerly/iris/pkg/utils"
 )
 
-/*
-NewMasterBiasFrame()
+/*****************************************************************************************************************/
 
-Creates a new master bias frame from a slice of bias frames.
-
-The idea of a bias frame is to take a series of exposures with the shutter closed,
-for the shortest exposure resolution supported by the camera with no light falling
-on the sensor. The resulting images are then averaged to produce a master bias frame.
-
-The master bias frame is then created by taking the mean of all the bias frames.
-
-@retuns a new FITSImage containing the master bias frame.
-@see Image Calibration & Stack Woodhouse, C. (2017). The Astrophotography Manual. Taylor & Francis. p.203
-*/
+// Creates a new master bias frame from a slice of bias frames.
+// The idea of a bias frame is to take a series of exposures with the shutter closed, for the shortest exposure
+// resolution supported by the camera with no light falling on the sensor. The resulting images are then averaged
+// to produce a master bias frame, which is then subtracted from all subsequent images to remove the bias noise.
+//
+// The master bias frame is then created by taking the mean of all the bias frames.
+//
+// @see Image Calibration & Stack Woodhouse, C. (2017). The Astrophotography Manual. Taylor & Francis. p.203
 func NewMasterBiasFrame(frames []fits.FITSImage, naxis int32, naxis1 int32, naxis2 int32, adu int32, resolution float32) (*MasterFrame, error) {
 	pixels := naxis1 * naxis2
 
@@ -92,3 +98,5 @@ func NewMasterBiasFrame(frames []fits.FITSImage, naxis int32, naxis1 int32, naxi
 		CreatedTimestamp: time.Now().Unix(),
 	}, nil
 }
+
+/*****************************************************************************************************************/

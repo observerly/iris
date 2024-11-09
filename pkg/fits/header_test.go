@@ -1,4 +1,14 @@
+/*****************************************************************************************************************/
+
+//	@author		Michael Roberts <michael@observerly.com>
+//	@package	@observerly/iris/fits
+//	@license	Copyright © 2021-2025 observerly
+
+/*****************************************************************************************************************/
+
 package fits
+
+/*****************************************************************************************************************/
 
 import (
 	"bytes"
@@ -7,6 +17,8 @@ import (
 	"strings"
 	"testing"
 )
+
+/*****************************************************************************************************************/
 
 func TestNewDefaultFITSHeaderEnd(t *testing.T) {
 	var header = NewFITSHeader(2, 600, 800)
@@ -19,6 +31,8 @@ func TestNewDefaultFITSHeaderEnd(t *testing.T) {
 		t.Errorf("NewFITSHeader() Header.End: got %v, want %v", got, want)
 	}
 }
+
+/*****************************************************************************************************************/
 
 func TestNewDefaultFITSHeaderWriteBoolean(t *testing.T) {
 	var header = NewFITSHeader(2, 600, 800)
@@ -41,6 +55,8 @@ func TestNewDefaultFITSHeaderWriteBoolean(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func TestNewDefaultFITSHeaderWriteString(t *testing.T) {
 	var header = NewFITSHeader(2, 600, 800)
 
@@ -61,6 +77,8 @@ func TestNewDefaultFITSHeaderWriteString(t *testing.T) {
 		t.Errorf("NewFITSHeader() Header.Write() expected length of 2880 characters: got %v, want %v", len(got), want)
 	}
 }
+
+/*****************************************************************************************************************/
 
 func TestNewDefaultFITSHeaderWriteStringContinue(t *testing.T) {
 	var header = NewFITSHeader(2, 600, 800)
@@ -83,6 +101,8 @@ func TestNewDefaultFITSHeaderWriteStringContinue(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func TestNewDefaultFITSHeaderWriteDate(t *testing.T) {
 	var header = NewFITSHeader(2, 600, 800)
 
@@ -103,6 +123,8 @@ func TestNewDefaultFITSHeaderWriteDate(t *testing.T) {
 		t.Errorf("NewFITSHeader() Header.Write() expected length of 2880 characters: got %v, want %v", len(got), want)
 	}
 }
+
+/*****************************************************************************************************************/
 
 func TestNewDefaultFITSHeaderWriteInt(t *testing.T) {
 	var header = NewFITSHeader(2, 600, 800)
@@ -128,6 +150,8 @@ func TestNewDefaultFITSHeaderWriteInt(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func TestNewDefaultFITSHeaderWriteFloat(t *testing.T) {
 	var header = NewFITSHeader(2, 600, 800)
 
@@ -151,6 +175,8 @@ func TestNewDefaultFITSHeaderWriteFloat(t *testing.T) {
 		t.Errorf("NewFITSHeader() Header.Write() expected length of 2880 characters: got %v, want %v", len(got), want)
 	}
 }
+
+/*****************************************************************************************************************/
 
 func TestNewDefaultFITSHeaderWriteEnd(t *testing.T) {
 	var header = NewFITSHeader(2, 600, 800)
@@ -181,9 +207,13 @@ func TestNewDefaultFITSHeaderWriteEnd(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func GetRegexSubValuesAndSubNames(str []byte) ([][]byte, []string) {
 	return re.FindSubmatch(str), re.SubexpNames()
 }
+
+/*****************************************************************************************************************/
 
 func TestCompileFITSHeaderRegExpSIMPLEKey(t *testing.T) {
 	values, names := GetRegexSubValuesAndSubNames([]byte("SIMPLE  =                    T / FITS Standard 4.0"))
@@ -208,6 +238,8 @@ func TestCompileFITSHeaderRegExpSIMPLEKey(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func TestCompileFITSHeaderRegExpSIMPLEValue(t *testing.T) {
 	values, names := GetRegexSubValuesAndSubNames([]byte("SIMPLE  =                    T / FITS Standard 4.0"))
 
@@ -230,6 +262,8 @@ func TestCompileFITSHeaderRegExpSIMPLEValue(t *testing.T) {
 		t.Errorf("CompileFITSHeaderRegExp() expected value to be true: got %v, want %v", got, want)
 	}
 }
+
+/*****************************************************************************************************************/
 
 func TestCompileFITSHeaderRegExpSIMPLEComment(t *testing.T) {
 	values, names := GetRegexSubValuesAndSubNames([]byte("SIMPLE  =                    T / FITS Standard 4.0"))
@@ -254,6 +288,8 @@ func TestCompileFITSHeaderRegExpSIMPLEComment(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func TestCompileFITSHeaderRegExpNAXIS1Key(t *testing.T) {
 	values, names := GetRegexSubValuesAndSubNames([]byte("NAXIS1  =                 6000 / Number of pixels in axis 1"))
 
@@ -276,6 +312,8 @@ func TestCompileFITSHeaderRegExpNAXIS1Key(t *testing.T) {
 		t.Errorf("CompileFITSHeaderRegExp() expected key to be NAXIS1: got %v, want %v", got, want)
 	}
 }
+
+/*****************************************************************************************************************/
 
 func TestCompileFITSHeaderRegExpNAXIS1Value(t *testing.T) {
 	values, names := GetRegexSubValuesAndSubNames([]byte("NAXIS1  =                 6000 / Number of pixels in axis 1"))
@@ -306,6 +344,8 @@ func TestCompileFITSHeaderRegExpNAXIS1Value(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func TestCompileFITSHeaderRegExpNAXIS1Comment(t *testing.T) {
 	values, names := GetRegexSubValuesAndSubNames([]byte("NAXIS1  =                 6000 / [1] Length of data axis 1"))
 
@@ -328,6 +368,8 @@ func TestCompileFITSHeaderRegExpNAXIS1Comment(t *testing.T) {
 		t.Errorf("CompileFITSHeaderRegExp() expected value to be [1] Length of data axis 1: got %v, want %v", got, want)
 	}
 }
+
+/*****************************************************************************************************************/
 
 func TestCompileFITSHeaderRegExpSENSORKey(t *testing.T) {
 	values, names := GetRegexSubValuesAndSubNames([]byte("SENSOR  = 'Monochrome'         / ASCOM Alpaca Sensor Type"))
@@ -352,6 +394,8 @@ func TestCompileFITSHeaderRegExpSENSORKey(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func TestCompileFITSHeaderRegExpSENSORValue(t *testing.T) {
 	values, names := GetRegexSubValuesAndSubNames([]byte("SENSOR  = 'Monochrome'         / ASCOM Alpaca Sensor Type"))
 
@@ -374,6 +418,8 @@ func TestCompileFITSHeaderRegExpSENSORValue(t *testing.T) {
 		t.Errorf("CompileFITSHeaderRegExp() expected value to be Monochrome: got %v, want %v", got, want)
 	}
 }
+
+/*****************************************************************************************************************/
 
 func TestCompileFITSHeaderRegExpSENSORComment(t *testing.T) {
 	values, names := GetRegexSubValuesAndSubNames([]byte("SENSOR  = 'Monochrome'         / ASCOM Alpaca Sensor Type"))
@@ -398,6 +444,8 @@ func TestCompileFITSHeaderRegExpSENSORComment(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func TestCompileFITSHeaderRegExpEND(t *testing.T) {
 	values, names := GetRegexSubValuesAndSubNames([]byte("END"))
 
@@ -421,6 +469,8 @@ func TestCompileFITSHeaderRegExpEND(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func TestCompileFITSHeaderParseLineBool(t *testing.T) {
 	var header = NewFITSHeader(2, 600, 800)
 
@@ -442,6 +492,8 @@ func TestCompileFITSHeaderParseLineBool(t *testing.T) {
 		t.Errorf("CompileFITSHeaderParseLine() expected SIMPLE comment to be Standard FITS format: but got %v", simple.Comment)
 	}
 }
+
+/*****************************************************************************************************************/
 
 func TestCompileFITSHeaderParseLineInt32(t *testing.T) {
 	var header = NewFITSHeader(2, 600, 800)
@@ -465,6 +517,8 @@ func TestCompileFITSHeaderParseLineInt32(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func TestCompileFITSHeaderParseLineFloat32(t *testing.T) {
 	var header = NewFITSHeader(2, 600, 800)
 
@@ -486,6 +540,8 @@ func TestCompileFITSHeaderParseLineFloat32(t *testing.T) {
 		t.Errorf("CompileFITSHeaderParseLine() expected EXPOSURE comment to be [s] Exposure time: but got %v", exposure.Comment)
 	}
 }
+
+/*****************************************************************************************************************/
 
 func TestCompileFITSHeaderParseLineString(t *testing.T) {
 	var header = NewFITSHeader(2, 600, 800)
@@ -509,6 +565,8 @@ func TestCompileFITSHeaderParseLineString(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func TestCompileFITSHeaderParseDate(t *testing.T) {
 	var header = NewFITSHeader(2, 600, 800)
 
@@ -530,6 +588,8 @@ func TestCompileFITSHeaderParseDate(t *testing.T) {
 		t.Errorf("CompileFITSHeaderParseLine() expected DATE-OBS comment to be Observation Start Time UTC: but got %v", date.Comment)
 	}
 }
+
+/*****************************************************************************************************************/
 
 func TestReadHeaderFromFile(t *testing.T) {
 	// Attempt to open the file from the given filename:
@@ -602,3 +662,5 @@ func TestReadHeaderFromFile(t *testing.T) {
 		t.Errorf("ReadHeaderFromFile() expected Length to be divisible by 2880: but got %v", h.Length)
 	}
 }
+
+/*****************************************************************************************************************/

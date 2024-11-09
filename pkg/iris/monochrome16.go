@@ -1,3 +1,11 @@
+/*****************************************************************************************************************/
+
+//	@author		Michael Roberts <michael@observerly.com>
+//	@package	@observerly/iris
+//	@license	Copyright © 2021-2025 observerly
+
+/*****************************************************************************************************************/
+
 package iris
 
 import (
@@ -119,20 +127,19 @@ func (m *Monochrome16Exposure) GetOtsuThresholdValue(img *image.Gray16, size ima
 }
 
 /*
- 	PreprocessImageArray()
+	 	PreprocessImageArray()
 
-	Preprocesses an ASCOM Alpaca Image Array to a m.Raw 2D array of uint32 values.
-	Converts the 2D array of uint16 values to a 2D array of uint32 values.
+		Preprocesses an ASCOM Alpaca Image Array to a m.Raw 2D array of uint32 values.
+		Converts the 2D array of uint16 values to a 2D array of uint32 values.
 
-	@returns  a bytes.Buffer containing the preprocessed image.
-	@see https://ascom-standards.org/api/#/Camera%20Specific%20Methods/get_camera__device_number__imagearray
+		@returns  a bytes.Buffer containing the preprocessed image.
+		@see https://ascom-standards.org/api/#/Camera%20Specific%20Methods/get_camera__device_number__imagearray
 
-	"... "column-major" order (column changes most rapidly) from the image's row and column
-	perspective, while, from the array's perspective, serialisation is actually effected in
-	"row-major" order (rightmost index changes most rapidly). This unintuitive outcome arises
-	because the ASCOM Camera Interface specification defines the image column dimension as
-	the rightmost array dimension."
-
+		"... "column-major" order (column changes most rapidly) from the image's row and column
+		perspective, while, from the array's perspective, serialisation is actually effected in
+		"row-major" order (rightmost index changes most rapidly). This unintuitive outcome arises
+		because the ASCOM Camera Interface specification defines the image column dimension as
+		the rightmost array dimension."
 */
 func (m *Monochrome16Exposure) PreprocessImageArray(xs int, ys int) (bytes.Buffer, error) {
 	// Switch the columns and rows in the image:

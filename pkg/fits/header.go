@@ -1,4 +1,14 @@
+/*****************************************************************************************************************/
+
+//	@author		Michael Roberts <michael@observerly.com>
+//	@package	@observerly/iris/fits
+//	@license	Copyright © 2021-2025 observerly
+
+/*****************************************************************************************************************/
+
 package fits
+
+/*****************************************************************************************************************/
 
 import (
 	"bytes"
@@ -10,28 +20,40 @@ import (
 	"time"
 )
 
+/*****************************************************************************************************************/
+
 // Regular expression parser for FITS header lines:
 var re *regexp.Regexp = compileFITSHeaderRegEx()
+
+/*****************************************************************************************************************/
 
 type FITSHeaderBool struct {
 	Value   bool
 	Comment string
 }
 
+/*****************************************************************************************************************/
+
 type FITSHeaderInt struct {
 	Value   int32
 	Comment string
 }
+
+/*****************************************************************************************************************/
 
 type FITSHeaderFloat struct {
 	Value   float32
 	Comment string
 }
 
+/*****************************************************************************************************************/
+
 type FITSHeaderString struct {
 	Value   string
 	Comment string
 }
+
+/*****************************************************************************************************************/
 
 // FITS Header struct:
 type FITSHeader struct {
@@ -49,6 +71,8 @@ type FITSHeader struct {
 	End      bool
 	Length   int32
 }
+
+/*****************************************************************************************************************/
 
 // Create a new instance of FITS header:
 func NewFITSHeader(naxis int32, naxis1 int32, naxis2 int32) FITSHeader {
@@ -106,6 +130,8 @@ func NewFITSHeader(naxis int32, naxis1 int32, naxis2 int32) FITSHeader {
 	return h
 }
 
+/*****************************************************************************************************************/
+
 func (h *FITSHeader) Read(r io.Reader) error {
 	block := make([]byte, 2880)
 
@@ -139,10 +165,11 @@ func (h *FITSHeader) Read(r io.Reader) error {
 	return nil
 }
 
-/*
-Writes a FITS header according to the FITS standard to output bytes buffer
-@see https://fits.gsfc.nasa.gov/standard40/fits_standard40aa-le.pdf
-*/
+/*****************************************************************************************************************/
+
+// Writes a FITS header according to the FITS standard to output bytes buffer
+//
+// @see https://fits.gsfc.nasa.gov/standard40/fits_standard40aa-le.pdf
 func (h *FITSHeader) WriteToBuffer(buf *bytes.Buffer) (*bytes.Buffer, error) {
 	// SIMPLE needs to be the leading HDR value:
 	writeBool(buf, "SIMPLE", true, FITS_STANDARD)
@@ -193,6 +220,8 @@ func (h *FITSHeader) WriteToBuffer(buf *bytes.Buffer) (*bytes.Buffer, error) {
 
 	return buf, nil
 }
+
+/*****************************************************************************************************************/
 
 // Reads a FITS header line by line and returns a FITSHeader struct
 func (h *FITSHeader) ParseLine(subNames []string, subValues [][]byte) error {
@@ -329,6 +358,8 @@ func (h *FITSHeader) ParseLine(subNames []string, subValues [][]byte) error {
 	return nil
 }
 
+/*****************************************************************************************************************/
+
 // Writes a FITS header boolean T/F value
 func writeBool(w io.Writer, key string, value bool, comment string) {
 	if len(key) > 8 {
@@ -349,6 +380,8 @@ func writeBool(w io.Writer, key string, value bool, comment string) {
 
 	fmt.Fprintf(w, "%-8s= %20s / %-47s", key, v, comment)
 }
+
+/*****************************************************************************************************************/
 
 // Writes a FITS header string value, with escaping and continuations if necessary.
 func writeString(w io.Writer, key, value, comment string) {
@@ -378,6 +411,8 @@ func writeString(w io.Writer, key, value, comment string) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 // Writes a FITS header integer value
 func writeInt(w io.Writer, key string, value int32, comment string) {
 	if len(key) > 8 {
@@ -390,6 +425,8 @@ func writeInt(w io.Writer, key string, value int32, comment string) {
 
 	fmt.Fprintf(w, "%-8s= %20d / %-47s", key, value, comment)
 }
+
+/*****************************************************************************************************************/
 
 // Writes a FITS header float value
 func writeFloat(w io.Writer, key string, value float32, comment string) {
@@ -450,6 +487,8 @@ func compileFITSHeaderRegEx() *regexp.Regexp {
 	return regexp.MustCompile(lineRe)
 }
 
+/*****************************************************************************************************************/
+
 // This function adds a line feed character to the end of each 80-byte chunk in the data array.
 func (h *FITSHeader) AddLineFeedCharacteToHeaderRow(data []byte, lineEnding string) []byte {
 	// Create a new buffer:
@@ -474,3 +513,5 @@ func (h *FITSHeader) AddLineFeedCharacteToHeaderRow(data []byte, lineEnding stri
 
 	return b.Bytes()
 }
+
+/*****************************************************************************************************************/

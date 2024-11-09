@@ -1,4 +1,14 @@
+/*****************************************************************************************************************/
+
+//	@author		Michael Roberts <michael@observerly.com>
+//	@package	@observerly/iris/photometry
+//	@license	Copyright © 2021-2025 observerly
+
+/*****************************************************************************************************************/
+
 package photometry
+
+/*****************************************************************************************************************/
 
 import (
 	"encoding/json"
@@ -7,6 +17,8 @@ import (
 	"io/ioutil"
 	"testing"
 )
+
+/*****************************************************************************************************************/
 
 func TestBiLinearConvolveRedChannel(t *testing.T) {
 	type CameraExposure struct {
@@ -66,6 +78,8 @@ func TestBiLinearConvolveRedChannel(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func TestBiLinearConvolveGreenChannel(t *testing.T) {
 	type CameraExposure struct {
 		BayerXOffset int32      `json:"bayerXOffset"`
@@ -124,6 +138,8 @@ func TestBiLinearConvolveGreenChannel(t *testing.T) {
 	}
 }
 
+/*****************************************************************************************************************/
+
 func TestBiLinearConvolveBlueChannel(t *testing.T) {
 	type CameraExposure struct {
 		BayerXOffset int32      `json:"bayerXOffset"`
@@ -181,3 +197,5 @@ func TestBiLinearConvolveBlueChannel(t *testing.T) {
 		}
 	}
 }
+
+/*****************************************************************************************************************/
