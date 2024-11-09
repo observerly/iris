@@ -1,5 +1,9 @@
 {
   "recommendations": [
-    "golang.go"
+    "golang.go",
+    "github.vscode-github-actions",
+    "neverik.go-critic",
+    "tamasfe.even-better-toml",
+    "ZainChen.json"
   ]
 }
