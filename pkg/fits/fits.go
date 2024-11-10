@@ -219,29 +219,14 @@ func (f *FITSImage) AddObservationEntry(observation *FITSObservation) *FITSImage
 /*****************************************************************************************************************/
 
 func (f *FITSImage) AddObserverEntry(observer *FITSObserver) *FITSImage {
-	f.Header.Floats["LATITUDE"] = struct {
-		Value   float32
-		Comment string
-	}{
-		Value:   observer.Latitude,
-		Comment: "Latitude of the observer (in degrees)",
-	}
+	// Set the Latitude of the Observer (in degrees):
+	f.Header.Set("LATITUDE", observer.Latitude, "Latitude of the observer (in degrees)")
 
-	f.Header.Floats["LONGITUD"] = struct {
-		Value   float32
-		Comment string
-	}{
-		Value:   observer.Longitude,
-		Comment: "Longitude of the observer (in degrees)",
-	}
+	// Set the Latitude of the Observer (in degrees):
+	f.Header.Set("LONGITUD", observer.Longitude, "Longitude of the observer (in degrees)")
 
-	f.Header.Floats["ELEVATIO"] = struct {
-		Value   float32
-		Comment string
-	}{
-		Value:   observer.Elevation,
-		Comment: "Elevation of the observer (in meters)",
-	}
+	// Set the elevation of the Observer (in meters):
+	f.Header.Set("ELEVATIO", observer.Elevation, "Elevation of the observer (in meters)")
 
 	return f
 }
