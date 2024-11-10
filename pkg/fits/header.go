@@ -132,6 +132,37 @@ func NewFITSHeader(naxis int32, naxis1 int32, naxis2 int32) FITSHeader {
 
 /*****************************************************************************************************************/
 
+// Set a new key-value pair to the FITS header, with an optional comment:
+func (h *FITSHeader) Set(key string, value interface{}, comment string) error {
+	switch v := value.(type) {
+	case bool:
+		h.Bools[key] = FITSHeaderBool{
+			Value:   v,
+			Comment: comment,
+		}
+	case float32:
+		h.Floats[key] = FITSHeaderFloat{
+			Value:   v,
+			Comment: comment,
+		}
+	case int32:
+		h.Ints[key] = FITSHeaderInt{
+			Value:   v,
+			Comment: comment,
+		}
+	case string:
+		h.Strings[key] = FITSHeaderString{
+			Value:   v,
+			Comment: comment,
+		}
+	default:
+		return fmt.Errorf("unsupported type: %T", v)
+	}
+	return nil
+}
+
+/*****************************************************************************************************************/
+
 func (h *FITSHeader) Read(r io.Reader) error {
 	block := make([]byte, 2880)
 
