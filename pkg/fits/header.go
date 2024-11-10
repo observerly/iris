@@ -97,37 +97,17 @@ func NewFITSHeader(naxis int32, naxis1 int32, naxis2 int32) FITSHeader {
 
 	h.Naxis2 = naxis2
 
-	h.Strings["TIMESYS"] = struct {
-		Value   string
-		Comment string
-	}{
-		Value:   "UTC",
-		Comment: "The temporal reference frame",
-	}
+	// Set the Time Refernce System header to default to UTC:
+	h.Set("TIMESYS", "UTC", "The temporal reference frame")
 
-	h.Dates["DATE"] = struct {
-		Value   string
-		Comment string
-	}{
-		Value:   time.Now().Format("2006-01-02"),
-		Comment: "Created Timestamp FITS file was generated",
-	}
+	// Set the date of the FITS file creation:
+	h.Set("DATE", time.Now().Format(time.RFC3339), "Created Timestamp FITS file was generated")
 
-	h.Strings["ORIGIN"] = struct {
-		Value   string
-		Comment string
-	}{
-		Value:   "observerly",
-		Comment: "The organization or institution responsible for creating the FITS file",
-	}
+	// Set the data origin to the observerly organization (for reference):
+	h.Set("ORIGIN", "observerly", "The organization or institution responsible for creating the FITS file")
 
-	h.Strings["PROGRAM"] = struct {
-		Value   string
-		Comment string
-	}{
-		Value:   "@observerly/iris",
-		Comment: "@observerly/iris FITS Exposure Generator",
-	}
+	// Set the FITS file creation software to the observerly/iris FITS Exposure Generator:
+	h.Set("PROGRAM", "@observerly/iris", "The software used to generate the FITS file")
 
 	return h
 }
