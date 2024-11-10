@@ -142,6 +142,16 @@ func (h *FITSHeader) Set(key string, value interface{}, comment string) error {
 			Comment: comment,
 		}
 	case string:
+		// If the string could be a date, parse it as a date:
+		if d, err := isDate(v); err == nil {
+			h.Dates[key] = FITSHeaderString{
+				Value:   d.Format(time.RFC3339),
+				Comment: comment,
+			}
+			return nil
+		}
+
+		// Otherwise, simply set the string value:
 		h.Strings[key] = FITSHeaderString{
 			Value:   v,
 			Comment: comment,
@@ -154,19 +164,16 @@ func (h *FITSHeader) Set(key string, value interface{}, comment string) error {
 			Value:   int32(v),
 			Comment: comment,
 		}
-
 	case int8:
 		h.Ints[key] = FITSHeaderInt{
 			Value:   int32(v),
 			Comment: comment,
 		}
-
 	case int16:
 		h.Ints[key] = FITSHeaderInt{
 			Value:   int32(v),
 			Comment: comment,
 		}
-
 	case int32:
 		h.Ints[key] = FITSHeaderInt{
 			Value:   v,
