@@ -168,128 +168,50 @@ func NewFITSImageFrom2DData(ex [][]uint32, naxis int32, naxis1 int32, naxis2 int
 /*****************************************************************************************************************/
 
 func (f *FITSImage) AddObservationEntry(observation *FITSObservation) *FITSImage {
-	f.Header.Dates["DATE-OBS"] = struct {
-		Value   string
-		Comment string
-	}{
-		Value:   observation.DateObs.Format("2006-01-02"),
-		Comment: "Date of observation",
-	}
+	// Set the Object Name:
+	f.Header.Set("OBJECT", observation.Object, "The name for the object observed")
 
-	f.Header.Floats["JD-OBS"] = struct {
-		Value   float32
-		Comment string
-	}{
-		Value:   observation.MJDObs + 2400000.5,
-		Comment: "Julian Date of the observation",
-	}
+	// Set the Date of Observation:
+	f.Header.Set("DATE-OBS", observation.DateObs.Format("2006-01-02"), "Date of observation")
 
-	f.Header.Floats["MJD-OBS"] = struct {
-		Value   float32
-		Comment string
-	}{
-		Value:   observation.MJDObs,
-		Comment: "Modified Julian Date of the observation",
-	}
+	// Set the Julian Date of the Observation:
+	f.Header.Set("JD-OBS", observation.MJDObs, "Julian Date of the observation")
 
-	f.Header.Floats["EQUINOX"] = struct {
-		Value   float32
-		Comment string
-	}{
-		Value:   observation.Equinox,
-		Comment: "Equinox of observation e.g., Julian 2000.0",
-	}
+	// Set the Modified Julian Date of the Observation:
+	f.Header.Set("MJD-OBS", observation.MJDObs, "Modified Julian Date of the observation")
 
-	// Necessary for Twirl API Plate Solving
-	f.Header.Strings["RADESYS"] = struct {
-		Value   string
-		Comment string
-	}{
-		Value:   "ICRS",
-		Comment: "International Celestial Reference System",
-	}
+	// Set the Equinox of the Observation:
+	f.Header.Set("EQUINOX", observation.Equinox, "Equinox of observation e.g., Julian 2000.0")
 
-	// Necessary for Twirl API Plate Solving
-	f.Header.Floats["RA"] = struct {
-		Value   float32
-		Comment string
-	}{
-		Value:   observation.RA,
-		Comment: "Right Ascension (in degrees) of the observation",
-	}
+	// Set the astrometric reference frame or celestial coordinate system used for the celestial coordinates:
+	f.Header.Set("RADESYS", "ICRS", "International Celestial Reference System")
 
-	f.Header.Floats["ALT"] = struct {
-		Value   float32
-		Comment string
-	}{
-		Value:   observation.Altitude,
-		Comment: "Altitude (in degrees) of the observation",
-	}
+	// Set the Right Ascension of the Observation:
+	f.Header.Set("RA", observation.RA, "Right Ascension (in degrees) of the observation")
 
-	f.Header.Floats["AZ"] = struct {
-		Value   float32
-		Comment string
-	}{
-		Value:   observation.Azimuth,
-		Comment: "Azimuth (in degrees) of the observation",
-	}
+	// Set the Declination of the Observation:
+	f.Header.Set("DEC", observation.Dec, "Declination (in degrees) of the observation")
 
-	// Necessary for Twirl API Plate Solving
-	f.Header.Floats["DEC"] = struct {
-		Value   float32
-		Comment string
-	}{
-		Value:   observation.Dec,
-		Comment: "Declination (in degrees) of the observation",
-	}
+	// Set the local Altitude of the Observation:
+	f.Header.Set("ALT", observation.Altitude, "Altitude (in degrees) of the observation")
 
-	f.Header.Floats["AIRMASS"] = struct {
-		Value   float32
-		Comment string
-	}{
-		Value:   observation.Airmass,
-		Comment: "Airmass of the observation (sec z)",
-	}
+	// Set the local Azimuth of the Observation:]
+	f.Header.Set("AZ", observation.Azimuth, "Azimuth (in degrees) of the observation")
 
-	f.Header.Floats["REFRACT"] = struct {
-		Value   float32
-		Comment string
-	}{
-		Value:   observation.Refraction,
-		Comment: "Refraction correction (in degrees) of the observation",
-	}
+	// Set the Airmass of the Observation:
+	f.Header.Set("AIRMASS", observation.Airmass, "Airmass of the observation (sec z)")
 
-	f.Header.Strings["OBJECT"] = struct {
-		Value   string
-		Comment string
-	}{
-		Value:   observation.Object,
-		Comment: "The name for the object observed",
-	}
+	// Set the Refractive Correction of the Observation:
+	f.Header.Set("REFRACT", observation.Refraction, "Refraction correction (in degrees) of the observation")
 
-	f.Header.Strings["TELESCOP"] = struct {
-		Value   string
-		Comment string
-	}{
-		Value:   observation.Telescope,
-		Comment: "The name of the telescope",
-	}
+	// Set the Telescope Name:
+	f.Header.Set("TELESCOP", observation.Telescope, "The name of the telescope")
 
-	f.Header.Strings["INSTRUME"] = struct {
-		Value   string
-		Comment string
-	}{
-		Value:   observation.Instrument,
-		Comment: "The name of the instrument",
-	}
+	// Set the Instrument Name:
+	f.Header.Set("INSTRUME", observation.Instrument, "The name of the instrument")
 
-	f.Header.Strings["OBSERVER"] = struct {
-		Value   string
-		Comment string
-	}{
-		Value:   observation.Observer,
-		Comment: "Who owns the observation data",
-	}
+	// Set the Observer Name:
+	f.Header.Set("OBSERVER", observation.Observer, "Who owns the observation data")
 
 	return f
 }
