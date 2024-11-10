@@ -87,29 +87,14 @@ type FITSObserver struct {
 func NewFITSImage(naxis int32, naxis1 int32, naxis2 int32, adu int32) *FITSImage {
 	h := NewFITSHeader(naxis, naxis1, naxis2)
 
-	h.Ints["ADU"] = struct {
-		Value   int32
-		Comment string
-	}{
-		Value:   adu,
-		Comment: "Analog to Digital Units (ADU)",
-	}
+	// Set the ADU (Analog to Digital Units) value:
+	h.Set("ADU", adu, "Analog to Digital Units (ADU)")
 
-	h.Ints["DATAMIN"] = struct {
-		Value   int32
-		Comment string
-	}{
-		Value:   0,
-		Comment: "The minimum valid physical value represented by the array",
-	}
+	// Set the minimum valid physical value represented by the array:
+	h.Set("DATAMIN", int32(0), "The minimum valid physical value represented by the array")
 
-	h.Ints["DATAMAX"] = struct {
-		Value   int32
-		Comment string
-	}{
-		Value:   adu,
-		Comment: "The maximum valid physical value represented by the array",
-	}
+	// Set the maximum valid physical value represented by the array:
+	h.Set("DATAMAX", adu, "The maximum valid physical value represented by the array")
 
 	return &FITSImage{
 		Header: h,
