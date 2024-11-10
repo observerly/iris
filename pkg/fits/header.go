@@ -12,6 +12,7 @@ package fits
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"math"
@@ -129,6 +130,41 @@ func NewFITSHeader(naxis int32, naxis1 int32, naxis2 int32) FITSHeader {
 	}
 
 	return h
+}
+
+/*****************************************************************************************************************/
+
+// List of date formats to check against
+var dateFormats = []string{
+	time.DateOnly,               // "2006-01-02"
+	time.RFC1123,                // "Mon, 02 Jan 2006 15:04:05 MST"
+	time.RFC1123Z,               // "Mon, 02 Jan 2006 15:04:05 -0700"
+	time.RFC3339,                // "2006-01-02T15:04:05Z07:00"
+	time.RFC3339Nano,            // "2006-01-02T15:04:05.999999999Z07:00"
+	time.RFC822,                 // "02 Jan 06 15:04 MST"
+	time.RFC822Z,                // "02 Jan 06 15:04 -0700"
+	time.ANSIC,                  // "Mon Jan _2 15:04:05 2006"
+	time.UnixDate,               // "Mon Jan _2 15:04:05 MST 2006"
+	"2006-01-02",                // YYYY-MM-DD
+	"02-01-2006",                // DD-MM-YYYY
+	"01/02/2006",                // MM/DD/YYYY
+	"2006/01/02",                // YYYY/MM/DD
+	"2006-01-02 15:04:05",       // YYYY-MM-DD HH:MM:SS
+	"2006-01-02T15:04:05Z07:00", // YYYY-MM-DDTHH:MM:SSZ
+	"January 2, 2006",           // Month Day, Year
+	"2 January 2006",            // Day Month Year
+}
+
+/*****************************************************************************************************************/
+
+// isDate attempts to parse a string into a time.Time using predefined formats
+func isDate(s string) (time.Time, error) {
+	for _, format := range dateFormats {
+		if t, err := time.Parse(format, s); err == nil {
+			return t, nil
+		}
+	}
+	return time.Time{}, errors.New("could not parse date")
 }
 
 /*****************************************************************************************************************/
