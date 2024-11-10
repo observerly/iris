@@ -14,6 +14,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"math"
 	"regexp"
 	"strconv"
 	"strings"
@@ -140,24 +141,81 @@ func (h *FITSHeader) Set(key string, value interface{}, comment string) error {
 			Value:   v,
 			Comment: comment,
 		}
-	case float32:
-		h.Floats[key] = FITSHeaderFloat{
-			Value:   v,
-			Comment: comment,
-		}
-	case int32:
-		h.Ints[key] = FITSHeaderInt{
-			Value:   v,
-			Comment: comment,
-		}
 	case string:
 		h.Strings[key] = FITSHeaderString{
 			Value:   v,
 			Comment: comment,
 		}
+	case int:
+		if v < math.MinInt32 || v > math.MaxInt32 {
+			return fmt.Errorf("int value %d out of int32 range", v)
+		}
+		h.Ints[key] = FITSHeaderInt{
+			Value:   int32(v),
+			Comment: comment,
+		}
+
+	case int8:
+		h.Ints[key] = FITSHeaderInt{
+			Value:   int32(v),
+			Comment: comment,
+		}
+
+	case int16:
+		h.Ints[key] = FITSHeaderInt{
+			Value:   int32(v),
+			Comment: comment,
+		}
+
+	case int32:
+		h.Ints[key] = FITSHeaderInt{
+			Value:   v,
+			Comment: comment,
+		}
+	case uint:
+		if v > uint(math.MaxInt32) {
+			return fmt.Errorf("uint value %d out of int32 range", v)
+		}
+		h.Ints[key] = FITSHeaderInt{
+			Value:   int32(v),
+			Comment: comment,
+		}
+	case uint8:
+		h.Ints[key] = FITSHeaderInt{
+			Value:   int32(v),
+			Comment: comment,
+		}
+	case uint16:
+		h.Ints[key] = FITSHeaderInt{
+			Value:   int32(v),
+			Comment: comment,
+		}
+	case uint32:
+		if v > uint32(math.MaxInt32) {
+			return fmt.Errorf("uint32 value %d out of int32 range", v)
+		}
+		h.Ints[key] = FITSHeaderInt{
+			Value:   int32(v),
+			Comment: comment,
+		}
+	case float32:
+		h.Floats[key] = FITSHeaderFloat{
+			Value:   v,
+			Comment: comment,
+		}
+	case float64:
+		if v > math.MaxFloat32 || v < -math.MaxFloat32 {
+			return fmt.Errorf("float64 value %f out of float32 range", v)
+		}
+		h.Floats[key] = FITSHeaderFloat{
+			Value:   float32(v),
+			Comment: comment,
+		}
+
 	default:
-		return fmt.Errorf("unsupported type: %T", v)
+		return fmt.Errorf("unsupported value type %T", value)
 	}
+
 	return nil
 }
 
