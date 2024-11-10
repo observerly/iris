@@ -140,29 +140,14 @@ func NewFITSImageFrom2DData(ex [][]uint32, naxis int32, naxis1 int32, naxis2 int
 
 	f.Stats = stats.NewStats(data, adu, int(naxis1))
 
-	f.Header.Ints["ADU"] = struct {
-		Value   int32
-		Comment string
-	}{
-		Value:   f.ADU,
-		Comment: "Analog to Digital Units (ADU)",
-	}
+	// Set the ADU (Analog to Digital Units) value:
+	f.Header.Set("ADU", adu, "Analog to Digital Units (ADU)")
 
-	f.Header.Ints["DATAMIN"] = struct {
-		Value   int32
-		Comment string
-	}{
-		Value:   0,
-		Comment: "The minimum valid physical value represented by the array",
-	}
+	// Set the minimum valid physical value represented by the array:
+	f.Header.Set("DATAMIN", int32(0), "The minimum valid physical value represented by the array")
 
-	f.Header.Ints["DATAMAX"] = struct {
-		Value   int32
-		Comment string
-	}{
-		Value:   f.ADU,
-		Comment: "The maximum valid physical value represented by the array",
-	}
+	// Set the maximum valid physical value represented by the array:
+	f.Header.Set("DATAMAX", adu, "The maximum valid physical value represented by the array")
 
 	return &FITSImage{
 		ID:       f.ID,
