@@ -1,4 +1,14 @@
+/*****************************************************************************************************************/
+
+//	@author		Michael Roberts <michael@observerly.com>
+//	@package	@observerly/iris/photometry
+//	@license	Copyright © 2021-2025 observerly
+
+/*****************************************************************************************************************/
+
 package photometry
+
+/*****************************************************************************************************************/
 
 import (
 	"math"
@@ -6,6 +16,8 @@ import (
 	stats "github.com/observerly/iris/pkg/statistics"
 	"github.com/observerly/iris/pkg/utils"
 )
+
+/*****************************************************************************************************************/
 
 type Star struct {
 	Index     int32   // Index of the star in the data array. int32(x)+width*int32(y)
@@ -16,10 +28,14 @@ type Star struct {
 	HFR       float32 // Half-Flux Radius of the star, in pixels
 }
 
+/*****************************************************************************************************************/
+
 type StarLink struct {
 	Star *Star
 	Next *StarLink
 }
+
+/*****************************************************************************************************************/
 
 type StarsExtractor struct {
 	Width     int
@@ -32,6 +48,8 @@ type StarsExtractor struct {
 	Stars     []Star
 	HFR       float32
 }
+
+/*****************************************************************************************************************/
 
 func NewStarsExtractor(data []float32, xs int, ys int, radius float32, adu int32) *StarsExtractor {
 	stars := make([]Star, 0)
@@ -48,21 +66,31 @@ func NewStarsExtractor(data []float32, xs int, ys int, radius float32, adu int32
 	}
 }
 
+/*****************************************************************************************************************/
+
 func (s *StarsExtractor) GetBrightPixels() []Star {
 	return findBrightPixels(s.Data, int32(s.Width), s.Threshold, int32(s.Radius))
 }
+
+/*****************************************************************************************************************/
 
 func (s *StarsExtractor) RejectBadPixels() []Star {
 	return rejectBadPixels(s.Stars, s.Data, int32(s.Width), s.Sigma, s.ADU)
 }
 
+/*****************************************************************************************************************/
+
 func (s *StarsExtractor) FilterOverlappingPixels() []Star {
 	return filterOverlappingPixels(s.Stars, int32(s.Width), int32(s.Height), int32(s.Radius))
 }
 
+/*****************************************************************************************************************/
+
 func (s *StarsExtractor) ShiftToCenterOfMass() []Star {
 	return shiftToCenterOfMass(s.Stars, s.Data, int32(s.Width), s.Threshold, int32(s.Radius))
 }
+
+/*****************************************************************************************************************/
 
 func (s *StarsExtractor) ExtractAndFilterHalfFluxRadius(location float32, starInOut float32) []Star {
 	stars, HFR := extractAndFilterHalfFluxRadius(s.Stars, s.Data, int32(s.Width), s.Radius, location, starInOut)
@@ -72,11 +100,9 @@ func (s *StarsExtractor) ExtractAndFilterHalfFluxRadius(location float32, starIn
 	return stars
 }
 
-/**
-	FindStars
+/*****************************************************************************************************************/
 
-	Find stars in the data array, using the given threshold. sigma and radius.
-**/
+// FindStars finds stars in the data array, using the given threshold, sigma and radius.
 func (s *StarsExtractor) FindStars(stats *stats.Stats, sigma float32, starInOut float32) []Star {
 	// Set the global sigma:
 	s.Sigma = sigma
@@ -110,14 +136,10 @@ func (s *StarsExtractor) FindStars(stats *stats.Stats, sigma float32, starInOut 
 	return result
 }
 
-/**
-	gatherNeighbourhoodAndCalcMedian()
+/*****************************************************************************************************************/
 
-	Applies an element-wise Median filter to the sparse data points provided by the indices,
-	with the local neighborhood defined by the mask.
-
-	@returns the median of the masked neighborhood:
-**/
+// Applies an element-wise Median filter to the sparse data points provided by the indices, with the local
+// neighborhood defined by the mask.
 func gatherNeighbourhoodAndCalcMedian(data []float32, index int32, mask []int32, buffer []float32, adu int32) float32 {
 	// Gather the neighborhood of each indexed data point into an array:
 	num := 0
@@ -137,14 +159,10 @@ func gatherNeighbourhoodAndCalcMedian(data []float32, index int32, mask []int32,
 	return s.FastMedian()
 }
 
-/**
-	findBrightPixels()
+/*****************************************************************************************************************/
 
-	Find pixels above the threshold and return them as stars. Applies early
-	overlap rejection based on radius to reduce allocations.
-
-	Uses central pixel value as initial mass, 1 as initial HFR.
-**/
+// Finds bright pixels in the data array, using the given threshold and radius, applying an
+// early overlap rejection to reduce allocations. Use a central pixel value as initial mass, and 1 as initial HFR.
 func findBrightPixels(data []float32, xs int32, threshold float32, radius int32) []Star {
 	// Roughly, we'll locate 100 bright stars []Star{}
 	stars := make([]Star, 0)
@@ -178,14 +196,10 @@ func findBrightPixels(data []float32, xs int32, threshold float32, radius int32)
 	return stars
 }
 
-/**
-	rejectBadPixels()
+/*****************************************************************************************************************/
 
-	Reject bad pixels which differ from the local median by more than sigma times the
-	estimated standard deviation.
-
-	Modifies the given stars array values, and returns shortened slice.
-**/
+// Rejects bad pixels which differ from the local median by more than sigma times the estimated standard deviation.
+// The stars array is modified in place, and the shortened slice is returned.
 func rejectBadPixels(stars []Star, data []float32, xs int32, sigma float32, adu int32) []Star {
 	// Create a radial mask for local 9-pixel neighborhood:
 	mask := utils.CreateRadialPixelMask(int32(xs), 1.5)
@@ -228,6 +242,8 @@ func rejectBadPixels(stars []Star, data []float32, xs int32, sigma float32, adu 
 
 	return stars[:remainingStars]
 }
+
+/*****************************************************************************************************************/
 
 func filterOverlappingPixels(stars []Star, xs int32, ys int32, radius int32) []Star {
 	// To avoid quadratic search effort, we bin the stars into a 2D grid.
@@ -309,13 +325,9 @@ forAllStars:
 	return stars[:remainingStars]
 }
 
-/**
-	shiftToCenterOfMass
+/*****************************************************************************************************************/
 
-	Shift the star positions to the center of mass of the star.
-
-	Modifies the given stars array values in place.
-**/
+// Shifts the star positions to the center of mass of the star.
 func shiftToCenterOfMass(stars []Star, data []float32, xs int32, threshold float32, radius int32) []Star {
 	// For all stars, shift to center of mass:
 	for i, s := range stars {
@@ -388,13 +400,10 @@ func shiftToCenterOfMass(stars []Star, data []float32, xs int32, threshold float
 	return stars
 }
 
-/**
-	extractAndFilterHalfFluxRadius
+/*****************************************************************************************************************/
 
-	Extract the half-flux radius (HFR) of each star, and filter out implausible candidates.
-
-	Returns a new list of stars, each enriched with the HFR field and updated mass.
-**/
+// Extracts the half-flux radius (HFR) of each star, and filters out implausible candidates. Returns a new list
+// of stars, each enriched with the HFR field and updated mass.
 func extractAndFilterHalfFluxRadius(stars []Star, data []float32, xs int32, radius, location, starInOut float32) (res []Star, avgHFR float32) {
 	remainingStars := 0
 
@@ -500,3 +509,5 @@ func extractAndFilterHalfFluxRadius(stars []Star, data []float32, xs int32, radi
 	// Return the remaining stars and the average HFR:
 	return stars[:remainingStars], avgHFR
 }
+
+/*****************************************************************************************************************/
