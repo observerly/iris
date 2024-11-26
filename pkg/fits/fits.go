@@ -59,7 +59,8 @@ type FITSImage struct {
 type FITSObservation struct {
 	DateObs    time.Time `json:"dateObs"`    // Date of observation e.g., 2022-05-15
 	MJDObs     float32   `json:"mjdObs"`     // Modified Julian Date (JD − 2,400,000.5) of the observation
-	Equinox    float32   `json:"equinox"`    // Equinox of observation e.g., J2000
+	Equinox    float32   `json:"equinox"`    // Equinox of observation e.g., J2000.0
+	Epoch      float32   `json:"epoch"`      // Epoch of observation e.g., J2022.0
 	RA         float32   `json:"ra"`         // Right Ascension of observation
 	Dec        float32   `json:"dec"`        // Declination of observation
 	Altitude   float32   `json:"altitude"`   // Altitude of the observation
@@ -175,22 +176,25 @@ func (f *FITSImage) AddObservationEntry(observation *FITSObservation) *FITSImage
 	f.Header.Set("DATE-OBS", observation.DateObs.Format("2006-01-02"), "Date of observation")
 
 	// Set the Julian Date of the Observation:
-	f.Header.Set("JD-OBS", observation.MJDObs, "Julian Date of the observation")
+	f.Header.Set("JD-OBS", observation.MJDObs+2400000.5, "Julian Date of the observation")
 
 	// Set the Modified Julian Date of the Observation:
 	f.Header.Set("MJD-OBS", observation.MJDObs, "Modified Julian Date of the observation")
 
 	// Set the Equinox of the Observation:
-	f.Header.Set("EQUINOX", observation.Equinox, "Equinox of observation e.g., Julian 2000.0")
+	f.Header.Set("EQUINOX", fmt.Sprintf("J%.1f", observation.Equinox), "Equinox of observation e.g., J2000.0")
+
+	// Set the Epoch of the Observation:
+	f.Header.Set("EPOCH", fmt.Sprintf("J%.1f", observation.Epoch), "Epoch of observation")
 
 	// Set the astrometric reference frame or celestial coordinate system used for the celestial coordinates:
 	f.Header.Set("RADESYS", "ICRS", "International Celestial Reference System")
 
 	// Set the Right Ascension of the Observation:
-	f.Header.Set("RA", observation.RA, "Right Ascension (in degrees) of the observation")
+	f.Header.Set("RA", observation.RA, "Right Ascension (in degrees) at J2000.0")
 
 	// Set the Declination of the Observation:
-	f.Header.Set("DEC", observation.Dec, "Declination (in degrees) of the observation")
+	f.Header.Set("DEC", observation.Dec, "Declination (in degrees) at J2000.0")
 
 	// Set the local Altitude of the Observation:
 	f.Header.Set("ALT", observation.Altitude, "Altitude (in degrees) of the observation")
