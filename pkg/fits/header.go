@@ -540,24 +540,50 @@ func writeInt(w io.Writer, key string, value int32, comment string) {
 
 /*****************************************************************************************************************/
 
-// Writes a FITS header float value
+// Writes a FITS header float value to the FITS header with upper-case exponent
 func writeFloat(w io.Writer, key string, value float32, comment string) {
+	// Ensure the key is exactly 8 characters long:
 	if len(key) > 8 {
-		key = key[0:8]
+		key = key[:8]
+	} else if len(key) < 8 {
+		key = fmt.Sprintf("%-8s", key)
 	}
 
+	// Ensure the comment is exactly 47 characters long:
 	if len(comment) > 47 {
-		comment = comment[0:47]
+		comment = comment[:47]
+	} else if len(comment) < 47 {
+		comment = fmt.Sprintf("%-47s", comment)
 	}
 
-	fmt.Fprintf(w, "%-8s= %20g / %-47s", key, value, comment)
+	absValue := math.Abs(float64(value))
+	var formattedValue string
+
+	// Format the float with upper-case 'E' and 6 decimal places
+	// The total width for the value field is 20 characters
+	// Example: " 2.460641E+06"
+	// Determine if the value requires scientific notation
+	if absValue >= 1e+04 || (absValue > 0 && absValue < 1e-04) {
+		// Use scientific notation with upper-case 'E' and 6 decimal places
+		formattedValue = fmt.Sprintf("%20.6E", value)
+	} else {
+		// Use standard decimal notation with 6 decimal places
+		formattedValue = fmt.Sprintf("%20.6f", value)
+	}
+
+	// Write the formatted header line
+	fmt.Fprintf(w, "%-8s= %s / %-47s", key, formattedValue, comment)
 }
+
+/*****************************************************************************************************************/
 
 // Writes a FITS header end record
 func writeEnd(w io.Writer) bool {
 	n, _ := fmt.Fprintf(w, "END%s", strings.Repeat(" ", 80-3))
 	return n > 0
 }
+
+/*****************************************************************************************************************/
 
 // Build regexp parser for FITS header lines
 func compileFITSHeaderRegEx() *regexp.Regexp {
