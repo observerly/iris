@@ -178,6 +178,78 @@ func TestNewDefaultFITSHeaderWriteFloat(t *testing.T) {
 
 /*****************************************************************************************************************/
 
+func TestWriteFloatPositiveScientific(t *testing.T) {
+	var buf bytes.Buffer
+	key := "JD-OBS"
+	value := float32(2.460641e+06) // Requires scientific notation
+	comment := "Julian Date of the observation"
+
+	writeFloat(&buf, key, value, comment)
+
+	expected := "JD-OBS  =         2.460641E+06 / Julian Date of the observation                 "
+	got := buf.String()
+
+	if got != expected {
+		t.Errorf("writeFloat() = %q, want %q", got, expected)
+	}
+}
+
+/*****************************************************************************************************************/
+
+func TestWriteFloatNegativeScientific(t *testing.T) {
+	var buf bytes.Buffer
+	key := "TEMP"
+	value := float32(-3.14159e-05) // Requires scientific notation
+	comment := "Temperature in Celsius"
+
+	writeFloat(&buf, key, value, comment)
+
+	expected := "TEMP    =        -3.141590E-05 / Temperature in Celsius                         "
+	got := buf.String()
+
+	if got != expected {
+		t.Errorf("writeFloat() = %q, want %q", got, expected)
+	}
+}
+
+/*****************************************************************************************************************/
+
+func TestWriteFloatPositiveDecimal(t *testing.T) {
+	var buf bytes.Buffer
+	key := "RA"
+	value := float32(150.025) // Does not require scientific notation
+	comment := "Right Ascension in decimal degrees"
+
+	writeFloat(&buf, key, value, comment)
+
+	expected := "RA      =           150.024994 / Right Ascension in decimal degrees             "
+	got := buf.String()
+
+	if got != expected {
+		t.Errorf("writeFloat() = %q, want %q", got, expected)
+	}
+}
+
+/*****************************************************************************************************************/
+
+func TestWriteFloatNegativeDecimal(t *testing.T) {
+	var buf bytes.Buffer
+	key := "DEC"
+	value := float32(-25.75) // Does not require scientific notation
+	comment := "Declination in decimal degrees"
+
+	writeFloat(&buf, key, value, comment)
+
+	expected := "DEC     =           -25.750000 / Declination in decimal degrees                 "
+	got := buf.String()
+
+	if got != expected {
+		t.Errorf("writeFloat() = %q, want %q", got, expected)
+	}
+}
+
+/*****************************************************************************************************************/
+
 func TestNewDefaultFITSHeaderWriteEnd(t *testing.T) {
 	var header = NewFITSHeader(2, 600, 800)
 
