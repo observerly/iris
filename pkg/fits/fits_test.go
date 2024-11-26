@@ -502,7 +502,7 @@ func TestNewAddObservationEntry(t *testing.T) {
 		Observer:   "Michael Roberts",
 	})
 
-	if fit.Header.Dates["DATE-OBS"].Value != "2022-05-14T00:00:00Z" {
+	if fit.Header.Strings["DATE-OBS"].Value != "2022-05-14" {
 		t.Errorf("Expected the DATE-OBS to be 2022-05-14, but got %s", fit.Header.Strings["DATE-OBS"].Value)
 	}
 
