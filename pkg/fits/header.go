@@ -138,7 +138,7 @@ var dateFormats = []string{
 /*****************************************************************************************************************/
 
 // isDate attempts to parse a string into a time.Time using predefined formats
-func isDate(s string) (time.Time, error) {
+func IsDate(s string) (time.Time, error) {
 	for _, format := range dateFormats {
 		if t, err := time.Parse(format, s); err == nil {
 			return t, nil
@@ -158,16 +158,6 @@ func (h *FITSHeader) Set(key string, value interface{}, comment string) error {
 			Comment: comment,
 		}
 	case string:
-		// If the string could be a date, parse it as a date:
-		if d, err := isDate(v); err == nil {
-			h.Dates[key] = FITSHeaderString{
-				Value:   d.Format(time.RFC3339),
-				Comment: comment,
-			}
-			return nil
-		}
-
-		// Otherwise, simply set the string value:
 		h.Strings[key] = FITSHeaderString{
 			Value:   v,
 			Comment: comment,

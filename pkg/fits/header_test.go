@@ -710,7 +710,7 @@ func TestReadHeaderFromFile(t *testing.T) {
 	}
 
 	// Check that the conforming DATE header value exists as per FITS standard:
-	if len(h.Dates["DATE"].Value) == 0 {
+	if len(h.Strings["DATE"].Value) == 0 {
 		t.Errorf("ReadHeaderFromFile() expected DATE to be non-zero length: got %v, want %v", len(h.Strings["DATE"].Value), 0)
 	}
 
