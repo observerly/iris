@@ -182,10 +182,10 @@ func (f *FITSImage) AddObservationEntry(observation *FITSObservation) *FITSImage
 	f.Header.Set("MJD-OBS", observation.MJDObs, "Modified Julian Date of the observation")
 
 	// Set the Equinox of the Observation:
-	f.Header.Set("EQUINOX", fmt.Sprintf("J%.1f", observation.Equinox), "Equinox of observation e.g., J2000.0")
+	f.Header.Set("EQUINOX", fmt.Sprintf("%.1f", observation.Equinox), "Equinox of observation e.g., J2000.0")
 
 	// Set the Epoch of the Observation:
-	f.Header.Set("EPOCH", fmt.Sprintf("J%.1f", observation.Epoch), "Epoch of observation")
+	f.Header.Set("EPOCH", fmt.Sprintf("%.1f", observation.Epoch), "Epoch of observation")
 
 	// Set the astrometric reference frame or celestial coordinate system used for the celestial coordinates:
 	f.Header.Set("RADESYS", "ICRS", "International Celestial Reference System")
