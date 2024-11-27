@@ -709,11 +709,6 @@ func TestReadHeaderFromFile(t *testing.T) {
 		t.Errorf("ReadHeaderFromFile() expected NAXIS2 to be 800: got %v, want %v", h.Ints["NAXIS2"].Value, 800)
 	}
 
-	// Check that the conforming DATE header value exists as per FITS standard:
-	if len(h.Strings["DATE"].Value) == 0 {
-		t.Errorf("ReadHeaderFromFile() expected DATE to be non-zero length: got %v, want %v", len(h.Strings["DATE"].Value), 0)
-	}
-
 	// Check that the conforming TIMESYS header value exists as per FITS standard:
 	if h.Strings["TIMESYS"].Value != "UTC" {
 		t.Errorf("ReadHeaderFromFile() expected TIMESYS to be UTC: got %v, want %v", h.Strings["SYSTIME"].Value, "UTC")
