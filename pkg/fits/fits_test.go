@@ -506,6 +506,10 @@ func TestNewAddObservationEntry(t *testing.T) {
 		t.Errorf("Expected the DATE-OBS to be 2022-05-14, but got %s", fit.Header.Strings["DATE-OBS"].Value)
 	}
 
+	if fit.Header.Strings["TIME-OBS"].Value != "00:00:00Z" {
+		t.Errorf("Expected the TIME-OBS to be 00:00:00Z, but got %s", fit.Header.Strings["TIME-OBS"].Value)
+	}
+
 	if fit.Header.Floats["MJD-OBS"].Value != 59713 {
 		t.Errorf("Expected the MJD-OBS to be 59713, but got %f", fit.Header.Floats["MJD-OBS"].Value)
 	}

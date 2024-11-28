@@ -100,9 +100,6 @@ func NewFITSHeader(naxis int32, naxis1 int32, naxis2 int32) FITSHeader {
 	// Set the Time Refernce System header to default to UTC:
 	h.Set("TIMESYS", "UTC", "The temporal reference frame")
 
-	// Set the date of the FITS file creation:
-	h.Set("DATE", time.Now().Format(time.RFC3339), "Created Timestamp FITS file was generated")
-
 	// Set the data origin to the observerly organization (for reference):
 	h.Set("ORIGIN", "observerly", "The organization or institution responsible for creating the FITS file")
 

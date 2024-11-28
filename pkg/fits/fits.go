@@ -57,7 +57,7 @@ type FITSImage struct {
 //
 // @see https://fits.gsfc.nasa.gov/standard40/fits_standard40aa-le.pdf
 type FITSObservation struct {
-	DateObs    time.Time `json:"dateObs"`    // Date of observation e.g., 2022-05-15
+	DateObs    time.Time `json:"dateObs"`    // Date and time of observation e.g., 2022-05-15T23:59:59Z
 	MJDObs     float32   `json:"mjdObs"`     // Modified Julian Date (JD − 2,400,000.5) of the observation
 	Equinox    float32   `json:"equinox"`    // Equinox of observation e.g., J2000.0
 	Epoch      float32   `json:"epoch"`      // Epoch of observation e.g., J2022.0
@@ -174,6 +174,9 @@ func (f *FITSImage) AddObservationEntry(observation *FITSObservation) *FITSImage
 
 	// Set the Date of Observation:
 	f.Header.Set("DATE-OBS", observation.DateObs.Format("2006-01-02"), "Date of observation")
+
+	// Set the Time of Observation:
+	f.Header.Set("TIME-OBS", observation.DateObs.Format("15:04:05Z"), "Time of observation")
 
 	// Set the Julian Date of the Observation:
 	f.Header.Set("JD-OBS", observation.MJDObs+2400000.5, "Julian Date of the observation")
