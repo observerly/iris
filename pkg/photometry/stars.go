@@ -80,6 +80,12 @@ func (s *StarsExtractor) RejectBadPixels() []Star {
 
 /*****************************************************************************************************************/
 
+func (s *StarsExtractor) RejectMisalignedPixels() []Star {
+	return rejectMisalignedPixels(s.Stars, s.Data, int32(s.Width), int32(s.Height), s.Radius, s.Radius/2.0)
+}
+
+/*****************************************************************************************************************/
+
 func (s *StarsExtractor) FilterOverlappingPixels() []Star {
 	return filterOverlappingPixels(s.Stars, int32(s.Width), int32(s.Height), int32(s.Radius))
 }
@@ -122,6 +128,10 @@ func (s *StarsExtractor) FindStars(stats *stats.Stats, sigma float32, starInOut 
 	s.Stars = s.ShiftToCenterOfMass()
 
 	s.Stars = s.FilterOverlappingPixels()
+
+	// Reject extracted based on proximity to other stars, e.g., if we have two stars in close proximity
+	// we discard both as the extraction pixel position is likely to be incorrect:
+	s.Stars = s.RejectMisalignedPixels()
 
 	// Remove implausible stars based on HFR, and return stars (updates s.HFR):
 	stars := s.ExtractAndFilterHalfFluxRadius(location, starInOut)
@@ -238,6 +248,70 @@ func rejectBadPixels(stars []Star, data []float32, xs int32, sigma float32, adu 
 			stars[remainingStars] = star
 			remainingStars++
 		}
+	}
+
+	return stars[:remainingStars]
+}
+
+/*****************************************************************************************************************/
+
+// rejectMisalignedPixels filters out stars that are not aligned with the brightest pixel in their vicinity.
+// This is likely due to two stars in close proximity in pixel space, causing the centroid to be misaligned.
+func rejectMisalignedPixels(stars []Star, data []float32, xs int32, ys int32, radius float32, maxAllowedDistance float32) []Star {
+	remainingStars := 0
+
+	for _, s := range stars {
+		// Define the search window around the star's centroid position:
+		xStart := int32(s.X - radius)
+		xEnd := int32(s.X + radius)
+		yStart := int32(s.Y - radius)
+		yEnd := int32(s.Y + radius)
+
+		if xStart < 0 {
+			xStart = 0
+		}
+
+		if xEnd >= xs {
+			xEnd = xs - 1
+		}
+
+		if yStart < 0 {
+			yStart = 0
+		}
+
+		if yEnd >= ys {
+			yEnd = ys - 1
+		}
+
+		// Find the brightest pixel within the radius of the current star:
+		maxIntensity := float32(0)
+		brightestX := s.X
+		brightestY := s.Y
+
+		for y := yStart; y <= yEnd; y++ {
+			for x := xStart; x <= xEnd; x++ {
+				index := y*xs + x
+				intensity := data[index]
+				if intensity > maxIntensity {
+					maxIntensity = intensity
+					brightestX = float32(x)
+					brightestY = float32(y)
+				}
+			}
+		}
+
+		// Calculate the distance between centroid and brightest pixel in the vicinity:
+		dx := s.X - brightestX
+		dy := s.Y - brightestY
+		distanceSquared := dx*dx + dy*dy
+
+		// If the distance is within the allowed threshold, keep the star (increment remainingStars), otherwise,
+		// discard the star (do not increment remainingStars) and continue to the next star:
+		if distanceSquared <= maxAllowedDistance*maxAllowedDistance {
+			stars[remainingStars] = s
+			remainingStars++
+		}
+
 	}
 
 	return stars[:remainingStars]
